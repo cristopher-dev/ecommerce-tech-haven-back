@@ -51,7 +51,6 @@ export class ProcessPaymentUseCase {
     await this.transactionRepository.updateStatus(transactionId, status);
 
     if (status === TransactionStatus.APPROVED) {
-      // Update stock and assign delivery
       await this.updateStock(transaction.productId);
       await this.assignDelivery(transaction);
     }

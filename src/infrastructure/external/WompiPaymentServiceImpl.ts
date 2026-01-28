@@ -24,7 +24,6 @@ export class WompiPaymentServiceImpl implements WompiPaymentService {
       const publicKey = this.configService.get<string>('WOMPI_PUBLIC_KEY')!;
       const privateKey = this.configService.get<string>('WOMPI_PRIVATE_KEY')!;
 
-      // Step 1: Tokenize the card
       const tokenResponse = await axios.post(
         `${wompiUrl}/tokens/cards`,
         {
@@ -41,10 +40,8 @@ export class WompiPaymentServiceImpl implements WompiPaymentService {
         },
       );
 
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
       const token = tokenResponse.data.data.id;
 
-      // Step 2: Create transaction
       const transactionResponse = await axios.post(
         `${wompiUrl}/transactions`,
         {
@@ -59,7 +56,6 @@ export class WompiPaymentServiceImpl implements WompiPaymentService {
           customer_email: customerEmail,
           payment_method: {
             type: 'CARD',
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
             token: token,
             installments: 1, // Assuming single payment
           },
@@ -72,7 +68,6 @@ export class WompiPaymentServiceImpl implements WompiPaymentService {
         },
       );
 
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
       const status = transactionResponse.data.data.status;
 
       if (status === 'APPROVED') {
@@ -83,7 +78,6 @@ export class WompiPaymentServiceImpl implements WompiPaymentService {
         return right(TransactionStatus.PENDING); // Or handle other statuses
       }
     } catch (error) {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       console.error('Wompi API error:', error.response?.data || error.message);
       return left(new Error('Error processing payment with Wompi'));
     }

@@ -10,15 +10,12 @@ export async function bootstrap() {
 
   const app = await NestFactory.create(AppModule);
 
-  // Security headers (only in production)
   if (process.env.NODE_ENV !== 'test') {
     app.use(helmet());
   }
 
-  // Validation
   app.useGlobalPipes(new ValidationPipe());
 
-  // Swagger setup
   const config = new DocumentBuilder()
     .setTitle('Wompi Payment API')
     .setDescription('API for Wompi payment onboarding')
@@ -36,7 +33,6 @@ export async function bootstrap() {
   logger.log(`📚 Swagger disponible en: ${cleanUrl}/api`);
 }
 
-// Only bootstrap in non-test environments
 if (process.env.NODE_ENV !== 'test' && typeof jest === 'undefined') {
   bootstrap().catch(console.error);
 }

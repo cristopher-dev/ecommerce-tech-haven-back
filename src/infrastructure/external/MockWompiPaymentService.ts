@@ -19,7 +19,6 @@ export class MockWompiPaymentService implements WompiPaymentService {
 
     _customerEmail: string,
   ): Promise<Either<Error, TransactionStatus>> {
-    // Mock logic: decline if amount >= 500, otherwise approve
     if (amount >= 500) {
       return Promise.resolve(right(TransactionStatus.DECLINED));
     }
