@@ -15,14 +15,16 @@ export class MockWompiPaymentService implements WompiPaymentService {
   async processPayment(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _transactionId: string,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    _amount: number,
+    amount: number,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _cardData: CardData,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _customerEmail: string,
   ): Promise<Either<Error, TransactionStatus>> {
-    // Mock logic: always approve for testing
+    // Mock logic: decline if amount >= 500, otherwise approve
+    if (amount >= 500) {
+      return Promise.resolve(right(TransactionStatus.DECLINED));
+    }
     return Promise.resolve(right(TransactionStatus.APPROVED));
   }
 }

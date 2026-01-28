@@ -51,7 +51,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"customerId\": \"customer-uuid\",\n  \"productId\": \"product-uuid\",\n  \"amount\": 10000\n}"
+              "raw": "{\n  \"customerName\": \"John Doe\",\n  \"customerEmail\": \"john.doe@example.com\",\n  \"customerAddress\": \"123 Main St, City, Country\",\n  \"productId\": \"prod-1\",\n  \"quantity\": 1\n}"
             },
             "url": {
               "raw": "{{base_url}}/transactions",

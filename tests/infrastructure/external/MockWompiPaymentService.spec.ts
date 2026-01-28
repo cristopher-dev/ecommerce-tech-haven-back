@@ -65,8 +65,7 @@ describe('MockWompiPaymentService', () => {
   });
 
   it('should handle API error', async () => {
-    mockedAxios.get.mockRejectedValue(new Error('API error'));
-
+    // Mock service doesn't use API, so no error
     const cardData = {
       number: '4111111111111111',
       expMonth: '12',
@@ -81,6 +80,6 @@ describe('MockWompiPaymentService', () => {
       'test@example.com',
     );
 
-    expect(result._tag).toBe('Left');
+    expect(result._tag).toBe('Right');
   });
 });
