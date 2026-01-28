@@ -1,11 +1,15 @@
 import 'reflect-metadata';
 import { NestFactory } from '@nestjs/core';
+import { Logger } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 
 export async function bootstrap() {
+  const logger = new Logger('Bootstrap');
+
   const app = await NestFactory.create(AppModule);
 
+  // Swagger setup
   const config = new DocumentBuilder()
     .setTitle('Wompi Payment API')
     .setDescription('API for Wompi payment onboarding')
@@ -16,7 +20,10 @@ export async function bootstrap() {
 
   await app.listen(process.env.PORT ?? 3000);
   const url = await app.getUrl();
-  console.log(`Application is running on: ${url}`);
+
+  logger.log('✅ Base de datos conectada y productos sembrados');
+  logger.log(`🚀 Servidor corriendo en: ${url}`);
+  logger.log(`📚 Swagger disponible en: ${url}/api`);
 }
 
 // Only bootstrap in non-test environments

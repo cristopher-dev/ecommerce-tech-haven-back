@@ -1,4 +1,4 @@
-import { Injectable, OnModuleInit } from '@nestjs/common';
+import { Injectable, OnModuleInit, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ProductEntity } from './entities/ProductEntity';
@@ -7,6 +7,8 @@ import * as path from 'path';
 
 @Injectable()
 export class DatabaseSeeder implements OnModuleInit {
+  private readonly logger = new Logger(DatabaseSeeder.name);
+
   constructor(
     @InjectRepository(ProductEntity)
     private readonly productRepository: Repository<ProductEntity>,
@@ -19,7 +21,7 @@ export class DatabaseSeeder implements OnModuleInit {
   private async seedProducts() {
     const existingProducts = await this.productRepository.count();
     if (existingProducts > 0) {
-      console.log('Products already seeded, skipping...');
+      this.logger.log('📦 Productos ya sembrados, omitiendo...');
       return;
     }
 
@@ -37,6 +39,6 @@ export class DatabaseSeeder implements OnModuleInit {
     const productsData = JSON.parse(fs.readFileSync(seedFilePath, 'utf-8'));
 
     await this.productRepository.save(productsData);
-    console.log('Products seeded successfully!');
+    this.logger.log('🌱 Productos sembrados exitosamente!');
   }
 }
