@@ -1,13 +1,13 @@
 # Wompi Payment Backend
 
-Backend API para procesamiento de pagos Wompi implementado con NestJS y arquitectura hexagonal.
+Backend API for Wompi payment processing implemented with NestJS and hexagonal architecture.
 
-## Arquitectura
+## Architecture
 
-- **Hexagonal Architecture**: Separación clara entre dominio, aplicación e infraestructura
-- **Railway Oriented Programming**: Manejo funcional de errores con fp-ts
-- **Base de datos**: PostgreSQL con TypeORM
-- **Testing**: Jest con >80% cobertura
+- **Hexagonal Architecture**: Clear separation between domain, application, and infrastructure
+- **Railway Oriented Programming**: Functional error handling with fp-ts
+- **Database**: PostgreSQL with TypeORM
+- **Testing**: Jest with >80% coverage
 
 ## Data Model Design
 
@@ -46,26 +46,26 @@ Backend API para procesamiento de pagos Wompi implementado con NestJS y arquitec
 
 ## API Endpoints
 
-- GET /products - Listar productos con stock
-- GET /transactions - Listar transacciones
-- POST /transactions - Crear transacción pendiente
-- PUT /transactions/:id/process-payment - Procesar pago con Wompi
-- GET /customers - Listar clientes
-- GET /deliveries - Listar entregas
+- GET /products - List products with stock
+- GET /transactions - List transactions
+- POST /transactions - Create pending transaction
+- PUT /transactions/:id/process-payment - Process payment with Wompi
+- GET /customers - List customers
+- GET /deliveries - List deliveries
 
-## Configuración
+## Configuration
 
-### Variables de Entorno (.env)
+### Environment Variables (.env)
 
 ```env
-# Base de datos
+# Database
 DATABASE_HOST=localhost
 DATABASE_PORT=5432
 DATABASE_USER=wompi_user
 DATABASE_PASSWORD=wompi_password
 DATABASE_NAME=wompi_db
 
-# Entorno
+# Environment
 NODE_ENV=development
 
 # Wompi API - Sandbox
@@ -76,39 +76,39 @@ WOMPI_EVENTS_KEY=stagtest_events_2PDUmhMywUkvb1LvxYnayFbmofT7w39N
 WOMPI_INTEGRITY_KEY=nAIBuqayW70XpUqJS4qf4STYiISd89Fp
 ```
 
-## Desarrollo Local
+## Local Development
 
-### Prerrequisitos
+### Prerequisites
 
 - Node.js 18+
-- PostgreSQL 13+ o Docker
+- PostgreSQL 13+ or Docker
 
-### Instalación
+### Installation
 
 ```bash
 npm install
 ```
 
-### Base de Datos
+### Database
 
-Opción 1: Docker Compose (recomendado)
+Option 1: Docker Compose (recommended)
 
 ```bash
 cd docker
 docker-compose up -d
 ```
 
-Opción 2: PostgreSQL local
+Option 2: Local PostgreSQL
 
-Asegurarse de que PostgreSQL esté corriendo y crear la base de datos `wompi_db`.
+Make sure PostgreSQL is running and create the `wompi_db` database.
 
-### Ejecutar
+### Run
 
 ```bash
-# Desarrollo con hot reload
+# Development with hot reload
 npm run start:dev
 
-# Producción
+# Production
 npm run build
 npm run start:prod
 ```
@@ -116,36 +116,36 @@ npm run start:prod
 ## Testing
 
 ```bash
-# Ejecutar tests
+# Run tests
 npm test
 
-# Con cobertura
+# With coverage
 npm run test:cov
 
-# Tests E2E
+# E2E tests
 npm run test:e2e
 ```
 
-**Cobertura actual: 85.89%**
+**Current coverage: 85.89%**
 
 ## Swagger Documentation
 
-Disponible en `/api` cuando la aplicación está corriendo.
+Available at `/api` when the application is running.
 
 ## Docker Setup
 
-Para ejecutar PostgreSQL localmente usando Docker:
+To run PostgreSQL locally using Docker:
 
 ```bash
 cd docker
 docker-compose up -d
 ```
 
-Ver `docker/README.md` para más detalles.
+See `docker/README.md` for more details.
 
 ## Deployment
 
-Desplegado en AWS (link por agregar).
+Deployed on AWS (link to be added).
 
 ## Postman Collection
 
