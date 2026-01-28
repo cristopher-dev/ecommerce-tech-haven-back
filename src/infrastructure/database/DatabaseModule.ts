@@ -33,7 +33,7 @@ import { DatabaseSeeder } from './DatabaseSeeder';
           DeliveryEntity,
         ],
         synchronize: configService.get('NODE_ENV') !== 'production', // Solo en desarrollo
-        logging: configService.get('NODE_ENV') === 'development',
+        logging: configService.get('DATABASE_LOGGING', 'false') === 'true',
         retryAttempts: 5,
         retryDelay: 3000,
       }),
