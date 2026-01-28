@@ -14,9 +14,9 @@ export class MockWompiPaymentService implements WompiPaymentService {
   async processPayment(
     _transactionId: string,
     amount: number,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
     _cardData: CardData,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
     _customerEmail: string,
   ): Promise<Either<Error, TransactionStatus>> {
     // Mock logic: decline if amount >= 500, otherwise approve

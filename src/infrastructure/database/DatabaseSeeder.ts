@@ -2,8 +2,6 @@ import { Injectable, OnModuleInit, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ProductEntity } from './entities/ProductEntity';
-import * as fs from 'fs';
-import * as path from 'path';
 
 @Injectable()
 export class DatabaseSeeder implements OnModuleInit {
