@@ -13,6 +13,7 @@ import { GetCustomersUseCase } from './application/use-cases/GetCustomersUseCase
 import { GetDeliveriesUseCase } from './application/use-cases/GetDeliveriesUseCase';
 import { DatabaseModule } from './infrastructure/database/DatabaseModule';
 import { WompiPaymentServiceImpl } from './infrastructure/external/WompiPaymentServiceImpl';
+import { MockWompiPaymentService } from './infrastructure/external/MockWompiPaymentService';
 
 @Module({
   imports: [ConfigModule.forRoot(), DatabaseModule],
@@ -31,7 +32,7 @@ import { WompiPaymentServiceImpl } from './infrastructure/external/WompiPaymentS
     GetDeliveriesUseCase,
     {
       provide: 'WompiPaymentService',
-      useClass: WompiPaymentServiceImpl,
+      useClass: MockWompiPaymentService,
     },
   ],
 })

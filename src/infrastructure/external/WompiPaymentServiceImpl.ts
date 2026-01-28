@@ -53,8 +53,7 @@ export class WompiPaymentServiceImpl implements WompiPaymentService {
           signature: this.generateSignature(
             amount * 100,
             'COP',
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-            token,
+            transactionId,
             privateKey,
           ),
           customer_email: customerEmail,

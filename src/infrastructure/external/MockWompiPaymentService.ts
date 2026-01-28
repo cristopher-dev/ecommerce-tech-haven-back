@@ -22,25 +22,7 @@ export class MockWompiPaymentService implements WompiPaymentService {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _customerEmail: string,
   ): Promise<Either<Error, TransactionStatus>> {
-    try {
-      const wompiUrl = this.configService.get<string>('WOMPI_SANDBOX_URL');
-      const privateKey = this.configService.get<string>('WOMPI_PRIVATE_KEY');
-
-      // Ejemplo de llamada a Wompi para verificar conectividad
-      await axios.get(`${wompiUrl}/merchants/${privateKey}`, {
-        headers: {
-          Authorization: `Bearer ${privateKey}`,
-        },
-      });
-
-      // Mock logic: approve if amount < 500, decline otherwise
-      if (_amount < 500) {
-        return right(TransactionStatus.APPROVED);
-      } else {
-        return right(TransactionStatus.DECLINED);
-      }
-    } catch {
-      return left(new Error('Error processing payment'));
-    }
+    // Mock logic: always approve for testing
+    return Promise.resolve(right(TransactionStatus.APPROVED));
   }
 }
