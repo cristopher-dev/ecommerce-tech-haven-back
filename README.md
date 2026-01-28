@@ -126,7 +126,7 @@ npm run test:cov
 npm run test:e2e
 ```
 
-**Current coverage: 85.89%**
+**Current coverage: 56.94%**
 
 ## Swagger Documentation
 
