@@ -2,6 +2,8 @@ import { Injectable, OnModuleInit, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ProductEntity } from './entities/ProductEntity';
+import { join } from 'node:path';
+import { readFileSync } from 'node:fs';
 
 @Injectable()
 export class DatabaseSeeder implements OnModuleInit {
@@ -23,7 +25,7 @@ export class DatabaseSeeder implements OnModuleInit {
       return;
     }
 
-    const seedFilePath = path.join(
+    const seedFilePath = join(
       __dirname,
       '..',
       '..',
@@ -34,7 +36,7 @@ export class DatabaseSeeder implements OnModuleInit {
       'products-seed.json',
     );
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-    const productsData = JSON.parse(fs.readFileSync(seedFilePath, 'utf-8'));
+    const productsData = JSON.parse(readFileSync(seedFilePath, 'utf-8'));
 
     await this.productRepository.save(productsData);
     this.logger.log('🌱 Productos sembrados exitosamente!');
