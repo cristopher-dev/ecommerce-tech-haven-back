@@ -5,7 +5,7 @@ import { CustomerRepository } from '../../domain/repositories/CustomerRepository
 
 @Injectable()
 export class InMemoryCustomerRepository implements CustomerRepository {
-  private customers: Customer[] = [];
+  private readonly customers: Customer[] = [];
 
   async create(data: Omit<Customer, 'id'>): Promise<Customer> {
     const customer = new Customer(
@@ -15,14 +15,14 @@ export class InMemoryCustomerRepository implements CustomerRepository {
       data.address,
     );
     this.customers.push(customer);
-    return Promise.resolve(customer);
+    return customer;
   }
 
   async findById(id: string): Promise<Customer | null> {
-    return Promise.resolve(this.customers.find((c) => c.id === id) || null);
+    return this.customers.find((c) => c.id === id) || null;
   }
 
   async findAll(): Promise<Customer[]> {
-    return Promise.resolve(this.customers);
+    return this.customers;
   }
 }

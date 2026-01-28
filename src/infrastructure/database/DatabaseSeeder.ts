@@ -26,7 +26,7 @@ export class DatabaseSeeder implements OnModuleInit {
         id: 'prod-1',
         name: 'Laptop Gaming Pro',
         description: 'High-performance gaming laptop with RTX 4070',
-        price: 2500.0,
+        price: 2500,
         stock: 10,
       },
       {
@@ -40,7 +40,7 @@ export class DatabaseSeeder implements OnModuleInit {
         id: 'prod-3',
         name: 'Smartphone Ultra',
         description: 'Latest smartphone with 512GB storage and triple camera',
-        price: 1199.0,
+        price: 1199,
         stock: 15,
       },
       {
