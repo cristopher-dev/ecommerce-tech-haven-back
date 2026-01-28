@@ -50,4 +50,13 @@ describe('DeliveriesController', () => {
     expect(getDeliveriesUseCase.execute).toHaveBeenCalled();
     expect(result).toEqual(deliveries);
   });
+
+  it('should throw error on get deliveries failure', async () => {
+    getDeliveriesUseCase.execute.mockResolvedValue({
+      _tag: 'Left',
+      left: new Error('Database error'),
+    });
+
+    await expect(controller.getDeliveries()).rejects.toThrow('Database error');
+  });
 });

@@ -118,4 +118,34 @@ describe('CreateTransactionUseCase', () => {
     expect(result._tag).toBe('Left');
     expect((result as any).left.message).toBe('Stock check failed');
   });
+
+  it('should fail if input is invalid', async () => {
+    const input = {
+      customerName: '',
+      customerEmail: 'john@example.com',
+      customerAddress: '123 Main St',
+      productId: '1',
+      quantity: 1,
+    };
+
+    const result = await useCase.execute(input)();
+
+    expect(result._tag).toBe('Left');
+    expect((result as any).left.message).toBe('Invalid input');
+  });
+
+  it('should fail if quantity is invalid', async () => {
+    const input = {
+      customerName: 'John Doe',
+      customerEmail: 'john@example.com',
+      customerAddress: '123 Main St',
+      productId: '1',
+      quantity: 0,
+    };
+
+    const result = await useCase.execute(input)();
+
+    expect(result._tag).toBe('Left');
+    expect((result as any).left.message).toBe('Invalid input');
+  });
 });

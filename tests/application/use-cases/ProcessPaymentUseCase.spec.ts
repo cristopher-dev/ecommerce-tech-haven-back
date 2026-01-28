@@ -145,4 +145,121 @@ describe('ProcessPaymentUseCase', () => {
     expect(result._tag).toBe('Left');
     expect((result as any).left.message).toBe('Transaction not found');
   });
+
+  it('should fail if customer not found', async () => {
+    const transaction = new Transaction(
+      '1',
+      'cust1',
+      'prod1',
+      100,
+      TransactionStatus.PENDING,
+      new Date(),
+      new Date(),
+    );
+
+    mockTransactionRepo.findById.mockResolvedValue(transaction);
+    mockCustomerRepo.findById.mockResolvedValue(null);
+
+    const cardData = {
+      number: '4111111111111111',
+      expMonth: '12',
+      expYear: '25',
+      cvc: '123',
+      cardHolder: 'Test User',
+    };
+
+    const result = await useCase.execute('1', cardData);
+
+    expect(result._tag).toBe('Left');
+    expect((result as any).left.message).toBe('Customer not found');
+  });
+
+  it('should fail if payment processing fails', async () => {
+    const transaction = new Transaction(
+      '1',
+      'cust1',
+      'prod1',
+      100,
+      TransactionStatus.PENDING,
+      new Date(),
+      new Date(),
+    );
+    const customer = new Customer(
+      'cust1',
+      'John Doe',
+      'john@example.com',
+      'Address',
+    );
+
+    mockTransactionRepo.findById.mockResolvedValue(transaction);
+    mockCustomerRepo.findById.mockResolvedValue(customer);
+    mockWompiService.processPayment.mockResolvedValue({
+      _tag: 'Left',
+      left: new Error('Payment declined'),
+    });
+
+    const cardData = {
+      number: '4111111111111111',
+      expMonth: '12',
+      expYear: '25',
+      cvc: '123',
+      cardHolder: 'Test User',
+    };
+
+    const result = await useCase.execute('1', cardData);
+
+    expect(result._tag).toBe('Left');
+    expect((result as any).left.message).toBe('Payment declined');
+  });
+
+  it('should process declined payment without updating stock/delivery', async () => {
+    const transaction = new Transaction(
+      '1',
+      'cust1',
+      'prod1',
+      100,
+      TransactionStatus.PENDING,
+      new Date(),
+      new Date(),
+    );
+    const updatedTransaction = new Transaction(
+      '1',
+      'cust1',
+      'prod1',
+      100,
+      TransactionStatus.DECLINED,
+      new Date(),
+      new Date(),
+    );
+    const customer = new Customer(
+      'cust1',
+      'John Doe',
+      'john@example.com',
+      'Address',
+    );
+
+    mockTransactionRepo.findById
+      .mockResolvedValueOnce(transaction)
+      .mockResolvedValueOnce(updatedTransaction);
+    mockCustomerRepo.findById.mockResolvedValue(customer);
+    mockWompiService.processPayment.mockResolvedValue({
+      _tag: 'Right',
+      right: TransactionStatus.DECLINED,
+    });
+
+    const cardData = {
+      number: '4111111111111111',
+      expMonth: '12',
+      expYear: '25',
+      cvc: '123',
+      cardHolder: 'Test User',
+    };
+
+    const result = await useCase.execute('1', cardData);
+
+    expect(result._tag).toBe('Right');
+    expect((result as any).right.status).toBe(TransactionStatus.DECLINED);
+    expect(mockProductRepo.updateStock).not.toHaveBeenCalled();
+    expect(mockDeliveryRepo.create).not.toHaveBeenCalled();
+  });
 });

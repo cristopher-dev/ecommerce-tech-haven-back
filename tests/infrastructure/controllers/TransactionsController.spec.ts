@@ -98,4 +98,43 @@ describe('TransactionsController', () => {
 
     expect(result).toEqual(transaction);
   });
+
+  it('should throw error on get transactions failure', async () => {
+    mockGetUC.execute.mockResolvedValue({
+      _tag: 'Left',
+      left: new Error('Database error'),
+    });
+
+    await expect(controller.getTransactions()).rejects.toThrow(
+      'Database error',
+    );
+  });
+
+  it('should throw error on create transaction failure', async () => {
+    const input = {
+      customerName: 'John',
+      customerEmail: 'john@example.com',
+      customerAddress: 'Addr',
+      productId: '1',
+      quantity: 1,
+    };
+    mockCreateUC.execute.mockReturnValue(() =>
+      Promise.resolve({ _tag: 'Left', left: new Error('Invalid input') }),
+    );
+
+    await expect(controller.createTransaction(input)).rejects.toThrow(
+      'Invalid input',
+    );
+  });
+
+  it('should throw error on process payment failure', async () => {
+    mockProcessUC.execute.mockResolvedValue({
+      _tag: 'Left',
+      left: new Error('Payment failed'),
+    });
+
+    await expect(controller.processPayment('1')).rejects.toThrow(
+      'Payment failed',
+    );
+  });
 });

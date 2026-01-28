@@ -41,4 +41,13 @@ describe('CustomersController', () => {
     expect(getCustomersUseCase.execute).toHaveBeenCalled();
     expect(result).toEqual(customers);
   });
+
+  it('should throw error on get customers failure', async () => {
+    getCustomersUseCase.execute.mockResolvedValue({
+      _tag: 'Left',
+      left: new Error('Database error'),
+    });
+
+    await expect(controller.getCustomers()).rejects.toThrow('Database error');
+  });
 });
