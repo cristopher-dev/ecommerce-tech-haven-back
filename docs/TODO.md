@@ -167,46 +167,46 @@ Este archivo contiene checklists detallados basados en los requisitos del test p
 
 ### OWASP Alignments
 
-- [ ] Validación de input (mejorar DTOs con class-validator)
-- [ ] Protección contra inyección
-- [ ] Manejo seguro de secrets
-- [ ] Rate limiting
-- [ ] CORS configurado
+- [x] Validación de input (mejorar DTOs con class-validator)
+- [x] Protección contra inyección
+- [x] Manejo seguro de secrets
+- [x] Rate limiting
+- [x] CORS configurado
 
 ### Headers de Seguridad
 
-- [ ] HTTPS obligatorio
-- [ ] Security headers (HSTS, CSP, etc.) - agregar helmet
-- [ ] Content Security Policy
+- [x] HTTPS obligatorio
+- [x] Security headers (HSTS, CSP, etc.) - agregar helmet
+- [x] Content Security Policy
 
 ## Mejoras Adicionales (Basado en Revisión de leer.txt)
 
 ### README.md Completado
 
-- [ ] Enlace público a Swagger en README
-- [ ] Colección Postman actualizada y link en README
-- [ ] Diseño de modelo de datos (ER diagram) en README
-- [ ] Resultados de pruebas con cobertura en README
-- [ ] Instrucciones de despliegue en README
+- [x] Enlace público a Swagger en README
+- [x] Colección Postman actualizada y link en README
+- [x] Diseño de modelo de datos (ER diagram) en README
+- [x] Resultados de pruebas con cobertura en README
+- [x] Instrucciones de despliegue en README
 
 ### Validaciones Mejoradas
 
-- [ ] Validación Luhn para números de tarjeta
-- [ ] Detección Visa/Mastercard en frontend (pero backend validar formato)
-- [ ] Validaciones más estrictas en DTOs (email, longitudes, rangos)
-- [ ] Manejo de errores con códigos HTTP específicos
+- [x] Validación Luhn para números de tarjeta
+- [x] Detección Visa/Mastercard en frontend (pero backend validar formato)
+- [x] Validaciones más estrictas en DTOs (email, longitudes, rangos)
+- [x] Manejo de errores con códigos HTTP específicos
 
 ### Arquitectura y ROP
 
 - [ ] Documentar aplicación de Hexagonal/ROP en README
 - [ ] Mejorar pipelines con fp-ts (más TaskEither)
 
-### Testing
+### Testing Enhancements
 
 - [x] Cobertura actualizada (90.09% logrado)
 - [ ] Badge de cobertura en README
 
-### Deployment
+### Deployments
 
 - [ ] Configurar CI/CD con GitHub Actions
 - [ ] Desplegar en AWS free tier

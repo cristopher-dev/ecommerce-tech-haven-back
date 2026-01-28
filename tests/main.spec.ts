@@ -1,3 +1,6 @@
+import { NestFactory } from '@nestjs/core';
+import { SwaggerModule } from '@nestjs/swagger';
+import { bootstrap } from '../src/main';
 import 'reflect-metadata';
 
 jest.mock('@nestjs/core');
@@ -20,11 +23,6 @@ jest.mock('@nestjs/swagger', () => ({
   },
 }));
 
-import { Test, TestingModule } from '@nestjs/testing';
-import { NestFactory } from '@nestjs/core';
-import { SwaggerModule } from '@nestjs/swagger';
-import { bootstrap } from '../src/main';
-
 describe('main', () => {
   let mockApp: any;
 
@@ -33,6 +31,8 @@ describe('main', () => {
       listen: jest.fn().mockResolvedValue(undefined),
       getUrl: jest.fn().mockResolvedValue('http://localhost:3000'),
       getHttpAdapter: jest.fn(),
+      use: jest.fn(),
+      useGlobalPipes: jest.fn(),
     };
     (NestFactory.create as jest.Mock).mockResolvedValue(mockApp);
     (SwaggerModule.createDocument as jest.Mock).mockReturnValue({});

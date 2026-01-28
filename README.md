@@ -92,6 +92,48 @@ Este proyecto sigue las mejores prácticas de desarrollo con NestJS:
 - status: enum (PENDING, ASSIGNED, SHIPPED, DELIVERED)
 - createdAt: timestamp
 
+### Diagrama ER
+
+```mermaid
+erDiagram
+    CUSTOMER ||--o{ TRANSACTION : has
+    PRODUCT ||--o{ TRANSACTION : purchased
+    TRANSACTION ||--|| DELIVERY : generates
+
+    CUSTOMER {
+        string id PK
+        string name
+        string email
+        string address
+    }
+
+    PRODUCT {
+        string id PK
+        string name
+        string description
+        decimal price
+        int stock
+    }
+
+    TRANSACTION {
+        string id PK
+        string customerId FK
+        string productId FK
+        decimal amount
+        enum status
+        timestamp createdAt
+        timestamp updatedAt
+    }
+
+    DELIVERY {
+        string id PK
+        string transactionId FK
+        string customerId FK
+        enum status
+        timestamp createdAt
+    }
+```
+
 ## Endpoints de la API
 
 - GET /products - Listar productos con stock
@@ -174,7 +216,7 @@ npm run test:cov
 npm run test:e2e
 ```
 
-**Cobertura actual: 56.94%**
+**Cobertura actual: 90.09%**
 
 ## Documentación de Swagger
 
@@ -196,7 +238,36 @@ Consulta `docker/README.md` para más detalles.
 
 ## Despliegue
 
-Desplegado en AWS (enlace por agregar).
+### AWS (Recomendado)
+
+1. **Crear cuenta AWS** y configurar free tier.
+2. **RDS PostgreSQL**: Crear instancia de base de datos.
+3. **ECS/EKS**: Desplegar la aplicación en contenedor.
+4. **CloudFront + S3**: Para CDN y assets estáticos (si aplica).
+5. **Configurar variables de entorno** en AWS Systems Manager o Lambda environment.
+
+**Enlace de producción**: (Por agregar después del despliegue)
+
+### Instrucciones Detalladas
+
+- Usar Docker para contenerización.
+- Configurar CI/CD con GitHub Actions para despliegue automático.
+- Asegurar HTTPS con certificados SSL.
+- Monitoreo básico con CloudWatch.
+
+## Seguridad
+
+### OWASP Alignments
+
+- **Validación de Input**: DTOs con class-validator para prevenir inyección.
+- **Manejo Seguro de Datos**: Datos sensibles (tarjetas) no se almacenan en DB.
+- **Headers de Seguridad**: Implementados con Helmet (HSTS, CSP, etc.).
+- **Rate Limiting**: Recomendado para producción.
+- **CORS**: Configurado para orígenes permitidos.
+
+### HTTPS
+
+Obligatorio en producción. Configurar certificados SSL en el servidor.
 
 ## Colección de Postman
 
