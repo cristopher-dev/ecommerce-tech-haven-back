@@ -20,10 +20,11 @@ export async function bootstrap() {
 
   await app.listen(process.env.PORT ?? 3000);
   const url = await app.getUrl();
+  const cleanUrl = url.replace('[::1]', 'localhost');
 
   logger.log('✅ Base de datos conectada y productos sembrados');
-  logger.log(`🚀 Servidor corriendo en: ${url}`);
-  logger.log(`📚 Swagger disponible en: ${url}/api`);
+  logger.log(`🚀 Servidor corriendo en: ${cleanUrl}`);
+  logger.log(`📚 Swagger disponible en: ${cleanUrl}/api`);
 }
 
 // Only bootstrap in non-test environments
