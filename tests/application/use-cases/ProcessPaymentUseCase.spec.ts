@@ -1,0 +1,117 @@
+import { Test, TestingModule } from '@nestjs/testing';
+import { ProcessPaymentUseCase } from '../../../src/application/use-cases/ProcessPaymentUseCase';
+import { TransactionRepository } from '../../../src/domain/repositories/TransactionRepository';
+import { DeliveryRepository } from '../../../src/domain/repositories/DeliveryRepository';
+import { ProductRepository } from '../../../src/domain/repositories/ProductRepository';
+import { WompiPaymentService } from '../../../src/application/use-cases/WompiPaymentService';
+import {
+  Transaction,
+  TransactionStatus,
+} from '../../../src/domain/entities/Transaction';
+import {
+  Delivery,
+  DeliveryStatus,
+} from '../../../src/domain/entities/Delivery';
+import { Product } from '../../../src/domain/entities/Product';
+
+describe('ProcessPaymentUseCase', () => {
+  let useCase: ProcessPaymentUseCase;
+  let mockTransactionRepo: jest.Mocked<TransactionRepository>;
+  let mockDeliveryRepo: jest.Mocked<DeliveryRepository>;
+  let mockProductRepo: jest.Mocked<ProductRepository>;
+  let mockWompiService: jest.Mocked<WompiPaymentService>;
+
+  beforeEach(async () => {
+    const mockTrans = {
+      create: jest.fn(),
+      findById: jest.fn(),
+      updateStatus: jest.fn(),
+      findAll: jest.fn(),
+    };
+    const mockDel = {
+      create: jest.fn(),
+      findById: jest.fn(),
+      updateStatus: jest.fn(),
+      findAll: jest.fn(),
+    };
+    const mockProd = {
+      findAll: jest.fn(),
+      findById: jest.fn(),
+      updateStock: jest.fn(),
+    };
+    const mockWompi = {
+      processPayment: jest.fn(),
+    };
+
+    const module: TestingModule = await Test.createTestingModule({
+      providers: [
+        ProcessPaymentUseCase,
+        { provide: 'TransactionRepository', useValue: mockTrans },
+        { provide: 'DeliveryRepository', useValue: mockDel },
+        { provide: 'ProductRepository', useValue: mockProd },
+        { provide: 'WompiPaymentService', useValue: mockWompi },
+      ],
+    }).compile();
+
+    useCase = module.get<ProcessPaymentUseCase>(ProcessPaymentUseCase);
+    mockTransactionRepo = module.get('TransactionRepository');
+    mockDeliveryRepo = module.get('DeliveryRepository');
+    mockProductRepo = module.get('ProductRepository');
+    mockWompiService = module.get('WompiPaymentService');
+  });
+
+  it('should process approved payment and update stock/delivery', async () => {
+    const transaction = new Transaction(
+      '1',
+      'cust1',
+      'prod1',
+      100,
+      TransactionStatus.PENDING,
+      new Date(),
+      new Date(),
+    );
+    const updatedTransaction = new Transaction(
+      '1',
+      'cust1',
+      'prod1',
+      100,
+      TransactionStatus.APPROVED,
+      new Date(),
+      new Date(),
+    );
+    const product = new Product('prod1', 'Prod', 'Desc', 100, 5);
+    const delivery = new Delivery(
+      'del1',
+      '1',
+      'cust1',
+      DeliveryStatus.PENDING,
+      new Date(),
+    );
+
+    mockTransactionRepo.findById
+      .mockResolvedValueOnce(transaction)
+      .mockResolvedValueOnce(updatedTransaction);
+    mockWompiService.processPayment.mockResolvedValue({
+      _tag: 'Right',
+      right: TransactionStatus.APPROVED,
+    });
+    mockProductRepo.findById.mockResolvedValue(product);
+    mockDeliveryRepo.create.mockResolvedValue(delivery);
+
+    const result = await useCase.execute('1');
+
+    expect(result._tag).toBe('Right');
+    expect((result as any).right.status).toBe(TransactionStatus.APPROVED);
+    expect(mockProductRepo.updateStock).toHaveBeenCalledWith('prod1', 4);
+    expect(mockDeliveryRepo.create).toHaveBeenCalled();
+  });
+
+  it('should fail if transaction not found', async () => {
+    mockTransactionRepo.findById.mockResolvedValue(null);
+
+    const result = await useCase.execute('1');
+
+    expect(result._tag).toBe('Left');
+    expect((result as any).left.message).toBe('Transaction not found');
+  });
+});
