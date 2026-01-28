@@ -1,0 +1,63 @@
+import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import {
+  ProductEntity,
+  CustomerEntity,
+  TransactionEntity,
+  DeliveryEntity,
+} from './entities';
+import {
+  ProductRepositoryImpl,
+  CustomerRepositoryImpl,
+  TransactionRepositoryImpl,
+  DeliveryRepositoryImpl,
+} from './repositories';
+import { DatabaseSeeder } from './DatabaseSeeder';
+
+@Module({
+  imports: [
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: (configService: ConfigService) => ({
+        type: 'postgres',
+        host: configService.get('DATABASE_HOST', 'localhost'),
+        port: configService.get('DATABASE_PORT', 5432),
+        username: configService.get('DATABASE_USER', 'postgres'),
+        password: configService.get('DATABASE_PASSWORD', 'password'),
+        database: configService.get('DATABASE_NAME', 'wompi_db'),
+        entities: [
+          ProductEntity,
+          CustomerEntity,
+          TransactionEntity,
+          DeliveryEntity,
+        ],
+        synchronize: configService.get('NODE_ENV') !== 'production', // Solo en desarrollo
+        logging: configService.get('NODE_ENV') === 'development',
+        retryAttempts: 5,
+        retryDelay: 3000,
+      }),
+      inject: [ConfigService],
+    }),
+    TypeOrmModule.forFeature([
+      ProductEntity,
+      CustomerEntity,
+      TransactionEntity,
+      DeliveryEntity,
+    ]),
+  ],
+  providers: [
+    DatabaseSeeder,
+    ProductRepositoryImpl,
+    CustomerRepositoryImpl,
+    TransactionRepositoryImpl,
+    DeliveryRepositoryImpl,
+  ],
+  exports: [
+    ProductRepositoryImpl,
+    CustomerRepositoryImpl,
+    TransactionRepositoryImpl,
+    DeliveryRepositoryImpl,
+  ],
+})
+export class DatabaseModule {}

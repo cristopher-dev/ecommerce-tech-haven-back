@@ -18,7 +18,7 @@ export class MockWompiPaymentService implements WompiPaymentService {
       const privateKey = this.configService.get<string>('WOMPI_PRIVATE_KEY');
 
       // Ejemplo de llamada a Wompi para verificar conectividad
-      const response = await axios.get(`${wompiUrl}/merchants/${privateKey}`, {
+      await axios.get(`${wompiUrl}/merchants/${privateKey}`, {
         headers: {
           Authorization: `Bearer ${privateKey}`,
         },
@@ -30,7 +30,7 @@ export class MockWompiPaymentService implements WompiPaymentService {
       } else {
         return right(TransactionStatus.DECLINED);
       }
-    } catch (error) {
+    } catch {
       return left(new Error('Error processing payment'));
     }
   }

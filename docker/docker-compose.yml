@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:alpine
+    container_name: wompi-postgres
+    environment:
+      POSTGRES_DB: wompi_db
+      POSTGRES_USER: wompi_user
+      POSTGRES_PASSWORD: wompi_password
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+volumes:
+  postgres_data:

@@ -1,5 +1,4 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { Either, left, right } from 'fp-ts/Either';
 import { TaskEither, tryCatch, chain } from 'fp-ts/TaskEither';
 import { pipe } from 'fp-ts/function';
 import {

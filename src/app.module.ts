@@ -12,14 +12,15 @@ import { ProcessPaymentUseCase } from './application/use-cases/ProcessPaymentUse
 import { GetTransactionsUseCase } from './application/use-cases/GetTransactionsUseCase';
 import { GetCustomersUseCase } from './application/use-cases/GetCustomersUseCase';
 import { GetDeliveriesUseCase } from './application/use-cases/GetDeliveriesUseCase';
-import { InMemoryProductRepository } from './infrastructure/repositories/InMemoryProductRepository';
-import { InMemoryTransactionRepository } from './infrastructure/repositories/InMemoryTransactionRepository';
-import { InMemoryCustomerRepository } from './infrastructure/repositories/InMemoryCustomerRepository';
-import { InMemoryDeliveryRepository } from './infrastructure/repositories/InMemoryDeliveryRepository';
+import { DatabaseModule } from './infrastructure/database/DatabaseModule';
+import { ProductRepositoryImpl } from './infrastructure/database/repositories/ProductRepositoryImpl';
+import { TransactionRepositoryImpl } from './infrastructure/database/repositories/TransactionRepositoryImpl';
+import { CustomerRepositoryImpl } from './infrastructure/database/repositories/CustomerRepositoryImpl';
+import { DeliveryRepositoryImpl } from './infrastructure/database/repositories/DeliveryRepositoryImpl';
 import { MockWompiPaymentService } from './infrastructure/external/MockWompiPaymentService';
 
 @Module({
-  imports: [ConfigModule.forRoot()],
+  imports: [ConfigModule.forRoot(), DatabaseModule],
   controllers: [
     AppController,
     ProductsController,
@@ -37,19 +38,19 @@ import { MockWompiPaymentService } from './infrastructure/external/MockWompiPaym
     GetDeliveriesUseCase,
     {
       provide: 'ProductRepository',
-      useClass: InMemoryProductRepository,
+      useClass: ProductRepositoryImpl,
     },
     {
       provide: 'TransactionRepository',
-      useClass: InMemoryTransactionRepository,
+      useClass: TransactionRepositoryImpl,
     },
     {
       provide: 'CustomerRepository',
-      useClass: InMemoryCustomerRepository,
+      useClass: CustomerRepositoryImpl,
     },
     {
       provide: 'DeliveryRepository',
-      useClass: InMemoryDeliveryRepository,
+      useClass: DeliveryRepositoryImpl,
     },
     {
       provide: 'WompiPaymentService',
