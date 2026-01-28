@@ -10,27 +10,27 @@ import { TransactionStatus } from '../../../domain/entities/Transaction';
 @Entity('transactions')
 export class TransactionEntity {
   @PrimaryColumn()
-  id: string;
+  id!: string;
 
   @Column()
-  customerId: string;
+  customerId!: string;
 
   @Column()
-  productId: string;
+  productId!: string;
 
   @Column('decimal', { precision: 10, scale: 2 })
-  amount: number;
+  amount!: number;
 
   @Column({
     type: 'enum',
     enum: TransactionStatus,
     default: TransactionStatus.PENDING,
   })
-  status: TransactionStatus;
+  status!: TransactionStatus;
 
   @CreateDateColumn()
-  createdAt: Date;
+  createdAt!: Date;
 
   @UpdateDateColumn()
-  updatedAt: Date;
+  updatedAt!: Date;
 }

@@ -17,7 +17,7 @@ export class CreateTransactionInputDto {
     description: 'Name of the customer',
     example: 'John Doe',
   })
-  customerName: string;
+  customerName!: string;
 
   @IsNotEmpty()
   @IsEmail()
@@ -25,7 +25,7 @@ export class CreateTransactionInputDto {
     description: 'Email of the customer',
     example: 'john.doe@example.com',
   })
-  customerEmail: string;
+  customerEmail!: string;
 
   @IsNotEmpty()
   @IsString()
@@ -33,7 +33,7 @@ export class CreateTransactionInputDto {
     description: 'Address of the customer',
     example: '123 Main St, City, Country',
   })
-  customerAddress: string;
+  customerAddress!: string;
 
   @IsNotEmpty()
   @IsUUID()
@@ -41,7 +41,7 @@ export class CreateTransactionInputDto {
     description: 'ID of the product',
     example: 'product-uuid-456',
   })
-  productId: string;
+  productId!: string;
 
   @IsInt()
   @Min(1)
@@ -50,7 +50,7 @@ export class CreateTransactionInputDto {
     description: 'Quantity of the product',
     example: 1,
   })
-  quantity: number;
+  quantity!: number;
 }
 
 export class CardDataDto {
@@ -60,7 +60,7 @@ export class CardDataDto {
     description: 'Credit card number (fake data)',
     example: '4111111111111111',
   })
-  number: string;
+  number!: string;
 
   @IsNotEmpty()
   @Length(2, 2)
@@ -68,7 +68,7 @@ export class CardDataDto {
     description: 'Expiration month',
     example: '12',
   })
-  expMonth: string;
+  expMonth!: string;
 
   @IsNotEmpty()
   @Length(2, 2)
@@ -76,7 +76,7 @@ export class CardDataDto {
     description: 'Expiration year',
     example: '25',
   })
-  expYear: string;
+  expYear!: string;
 
   @IsNotEmpty()
   @Length(3, 4)
@@ -84,7 +84,7 @@ export class CardDataDto {
     description: 'CVV',
     example: '123',
   })
-  cvc: string;
+  cvc!: string;
 
   @IsNotEmpty()
   @IsString()
@@ -92,5 +92,5 @@ export class CardDataDto {
     description: 'Card holder name',
     example: 'John Doe',
   })
-  cardHolder: string;
+  cardHolder!: string;
 }

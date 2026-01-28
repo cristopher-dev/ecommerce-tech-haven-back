@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { Either, right } from 'fp-ts/Either';
 import { TransactionStatus } from '../../domain/entities/Transaction';
 import {
@@ -10,7 +9,7 @@ import { MOCK_DECLINE_THRESHOLD } from '../../domain/constants';
 
 @Injectable()
 export class MockWompiPaymentService implements WompiPaymentService {
-  constructor(private configService: ConfigService) {}
+  constructor() {}
 
   async processPayment(
     _transactionId: string,

@@ -10,7 +10,7 @@ export async function bootstrap() {
 
   const app = await NestFactory.create(AppModule);
 
-  if (process.env.NODE_ENV !== 'test') {
+  if (process.env['NODE_ENV'] !== 'test') {
     app.use(helmet());
   }
 
@@ -24,7 +24,7 @@ export async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
 
-  await app.listen(process.env.PORT ?? 3000);
+  await app.listen(process.env['PORT'] ?? 3000);
   const url = await app.getUrl();
   const cleanUrl = url.replace('[::1]', 'localhost');
 
@@ -33,6 +33,6 @@ export async function bootstrap() {
   logger.log(`📚 Swagger disponible en: ${cleanUrl}/api`);
 }
 
-if (process.env.NODE_ENV !== 'test' && typeof jest === 'undefined') {
+if (process.env['NODE_ENV'] !== 'test' && typeof jest === 'undefined') {
   bootstrap().catch(console.error);
 }

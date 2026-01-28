@@ -4,21 +4,21 @@ import { DeliveryStatus } from '../../../domain/entities/Delivery';
 @Entity('deliveries')
 export class DeliveryEntity {
   @PrimaryColumn()
-  id: string;
+  id!: string;
 
   @Column()
-  transactionId: string;
+  transactionId!: string;
 
   @Column()
-  customerId: string;
+  customerId!: string;
 
   @Column({
     type: 'enum',
     enum: DeliveryStatus,
     default: DeliveryStatus.PENDING,
   })
-  status: DeliveryStatus;
+  status!: DeliveryStatus;
 
   @CreateDateColumn()
-  createdAt: Date;
+  createdAt!: Date;
 }
