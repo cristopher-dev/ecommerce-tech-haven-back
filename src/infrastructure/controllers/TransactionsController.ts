@@ -22,8 +22,28 @@ export class TransactionsController {
   ) {}
 
   @Get()
-  @ApiOperation({ summary: 'Get all transactions' })
-  @ApiResponse({ status: 200, description: 'List of transactions' })
+  @ApiOperation({
+    summary: 'Get all transactions',
+    description:
+      'Retrieve a list of all transactions in the system, including their status, amount, and associated customer and product information.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'List of transactions',
+    schema: {
+      example: [
+        {
+          id: 'txn-123',
+          customerId: 'cust-456',
+          productId: 'prod-789',
+          amount: 100,
+          status: 'PENDING',
+          createdAt: '2023-01-01T00:00:00.000Z',
+          updatedAt: '2023-01-01T00:00:00.000Z',
+        },
+      ],
+    },
+  })
   async getTransactions() {
     const result = await this.getTransactionsUseCase.execute();
     if (result._tag === 'Left') {
@@ -33,9 +53,27 @@ export class TransactionsController {
   }
 
   @Post()
-  @ApiOperation({ summary: 'Create a new transaction' })
+  @ApiOperation({
+    summary: 'Create a new transaction',
+    description:
+      'Create a new transaction by providing customer details (name, email, address) and the product ID with quantity. The transaction will be created with PENDING status and the amount calculated based on product price and quantity.',
+  })
   @ApiBody({ type: CreateTransactionInputDto })
-  @ApiResponse({ status: 201, description: 'Transaction created' })
+  @ApiResponse({
+    status: 201,
+    description: 'Transaction created',
+    schema: {
+      example: {
+        id: 'txn-123',
+        customerId: 'cust-456',
+        productId: 'prod-789',
+        amount: 100,
+        status: 'PENDING',
+        createdAt: '2023-01-01T00:00:00.000Z',
+        updatedAt: '2023-01-01T00:00:00.000Z',
+      },
+    },
+  })
   @ApiResponse({ status: 400, description: 'Bad request' })
   async createTransaction(@Body() input: CreateTransactionInputDto) {
     const result = await this.createTransactionUseCase.execute(input)();
@@ -46,10 +84,28 @@ export class TransactionsController {
   }
 
   @Put(':id/process-payment')
-  @ApiOperation({ summary: 'Process payment for a transaction' })
+  @ApiOperation({
+    summary: 'Process payment for a transaction',
+    description:
+      'Process the payment for an existing transaction using card data. If the payment is approved by Wompi, the transaction status changes to APPROVED, stock is reduced, and a delivery is assigned. If declined, status remains PENDING.',
+  })
   @ApiParam({ name: 'id', description: 'Transaction ID' })
   @ApiBody({ type: CardDataDto })
-  @ApiResponse({ status: 200, description: 'Payment processed' })
+  @ApiResponse({
+    status: 200,
+    description: 'Payment processed',
+    schema: {
+      example: {
+        id: 'txn-123',
+        customerId: 'cust-456',
+        productId: 'prod-789',
+        amount: 100,
+        status: 'APPROVED',
+        createdAt: '2023-01-01T00:00:00.000Z',
+        updatedAt: '2023-01-01T00:00:00.000Z',
+      },
+    },
+  })
   @ApiResponse({ status: 400, description: 'Payment failed' })
   async processPayment(@Param('id') id: string, @Body() cardData: CardDataDto) {
     const result = await this.processPaymentUseCase.execute(id, cardData);
