@@ -13,10 +13,6 @@ import { GetTransactionsUseCase } from './application/use-cases/GetTransactionsU
 import { GetCustomersUseCase } from './application/use-cases/GetCustomersUseCase';
 import { GetDeliveriesUseCase } from './application/use-cases/GetDeliveriesUseCase';
 import { DatabaseModule } from './infrastructure/database/DatabaseModule';
-import { ProductRepositoryImpl } from './infrastructure/database/repositories/ProductRepositoryImpl';
-import { TransactionRepositoryImpl } from './infrastructure/database/repositories/TransactionRepositoryImpl';
-import { CustomerRepositoryImpl } from './infrastructure/database/repositories/CustomerRepositoryImpl';
-import { DeliveryRepositoryImpl } from './infrastructure/database/repositories/DeliveryRepositoryImpl';
 import { MockWompiPaymentService } from './infrastructure/external/MockWompiPaymentService';
 
 @Module({
@@ -36,22 +32,6 @@ import { MockWompiPaymentService } from './infrastructure/external/MockWompiPaym
     GetTransactionsUseCase,
     GetCustomersUseCase,
     GetDeliveriesUseCase,
-    {
-      provide: 'ProductRepository',
-      useClass: ProductRepositoryImpl,
-    },
-    {
-      provide: 'TransactionRepository',
-      useClass: TransactionRepositoryImpl,
-    },
-    {
-      provide: 'CustomerRepository',
-      useClass: CustomerRepositoryImpl,
-    },
-    {
-      provide: 'DeliveryRepository',
-      useClass: DeliveryRepositoryImpl,
-    },
     {
       provide: 'WompiPaymentService',
       useClass: MockWompiPaymentService,

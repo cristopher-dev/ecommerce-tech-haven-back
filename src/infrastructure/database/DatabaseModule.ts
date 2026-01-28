@@ -48,16 +48,28 @@ import { DatabaseSeeder } from './DatabaseSeeder';
   ],
   providers: [
     DatabaseSeeder,
-    ProductRepositoryImpl,
-    CustomerRepositoryImpl,
-    TransactionRepositoryImpl,
-    DeliveryRepositoryImpl,
+    {
+      provide: 'ProductRepository',
+      useClass: ProductRepositoryImpl,
+    },
+    {
+      provide: 'CustomerRepository',
+      useClass: CustomerRepositoryImpl,
+    },
+    {
+      provide: 'TransactionRepository',
+      useClass: TransactionRepositoryImpl,
+    },
+    {
+      provide: 'DeliveryRepository',
+      useClass: DeliveryRepositoryImpl,
+    },
   ],
   exports: [
-    ProductRepositoryImpl,
-    CustomerRepositoryImpl,
-    TransactionRepositoryImpl,
-    DeliveryRepositoryImpl,
+    'ProductRepository',
+    'CustomerRepository',
+    'TransactionRepository',
+    'DeliveryRepository',
   ],
 })
 export class DatabaseModule {}
