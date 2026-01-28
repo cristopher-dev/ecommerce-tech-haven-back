@@ -1,7 +1,5 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { ProductsController } from './infrastructure/controllers/ProductsController';
 import { TransactionsController } from './infrastructure/controllers/TransactionsController';
 import { CustomersController } from './infrastructure/controllers/CustomersController';
@@ -18,14 +16,12 @@ import { WompiPaymentServiceImpl } from './infrastructure/external/WompiPaymentS
 @Module({
   imports: [ConfigModule.forRoot(), DatabaseModule],
   controllers: [
-    AppController,
     ProductsController,
     TransactionsController,
     CustomersController,
     DeliveriesController,
   ],
   providers: [
-    AppService,
     GetProductsUseCase,
     CreateTransactionUseCase,
     ProcessPaymentUseCase,
