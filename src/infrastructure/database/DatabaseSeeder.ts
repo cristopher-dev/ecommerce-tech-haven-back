@@ -33,6 +33,7 @@ export class DatabaseSeeder implements OnModuleInit {
       'database',
       'products-seed.json',
     );
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const productsData = JSON.parse(fs.readFileSync(seedFilePath, 'utf-8'));
 
     await this.productRepository.save(productsData);

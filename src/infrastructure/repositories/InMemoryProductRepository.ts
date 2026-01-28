@@ -10,11 +10,13 @@ export class InMemoryProductRepository implements ProductRepository {
   ];
 
   async findAll(): Promise<Product[]> {
-    return this.products;
+    return await Promise.resolve(this.products);
   }
 
   async findById(id: string): Promise<Product | null> {
-    return this.products.find((p) => p.id === id) || null;
+    return await Promise.resolve(
+      this.products.find((p) => p.id === id) || null,
+    );
   }
 
   async updateStock(id: string, newStock: number): Promise<void> {
@@ -22,5 +24,6 @@ export class InMemoryProductRepository implements ProductRepository {
     if (product) {
       product.stock = newStock;
     }
+    await Promise.resolve();
   }
 }

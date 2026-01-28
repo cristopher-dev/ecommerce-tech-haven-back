@@ -26,10 +26,15 @@ describe('App (e2e)', () => {
       .expect(200)
       .expect((res) => {
         expect(Array.isArray(res.body)).toBe(true);
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
         expect(res.body.length).toBeGreaterThan(0);
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
         expect(res.body[0]).toHaveProperty('id');
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
         expect(res.body[0]).toHaveProperty('name');
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
         expect(res.body[0]).toHaveProperty('price');
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
         expect(res.body[0]).toHaveProperty('stock');
       });
   });

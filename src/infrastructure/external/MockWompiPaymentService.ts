@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import axios from 'axios';
-import { Either, left, right } from 'fp-ts/Either';
+import { Either, right } from 'fp-ts/Either';
 import { TransactionStatus } from '../../domain/entities/Transaction';
 import {
   WompiPaymentService,
@@ -13,7 +12,6 @@ export class MockWompiPaymentService implements WompiPaymentService {
   constructor(private configService: ConfigService) {}
 
   async processPayment(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _transactionId: string,
     amount: number,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
