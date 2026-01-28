@@ -1,42 +1,48 @@
-# Docker Setup
+# Configuración de Docker
 
-This folder contains the Docker configuration for the Wompi Backend project.
+Esta carpeta contiene la configuración de Docker para el proyecto Wompi Backend.
 
-## Services
+## Tabla de Contenidos
 
-- **PostgreSQL**: Database using Alpine image
+- [Servicios](#servicios)
+- [Cómo usar](#cómo-usar)
+- [Configuración](#configuración)
 
-## How to use
+## Servicios
 
-1. Navigate to the docker folder:
+- **PostgreSQL**: Base de datos usando imagen Alpine
+
+## Cómo usar
+
+1. Navega a la carpeta docker:
 
    ```bash
    cd docker
    ```
 
-2. Start the services:
+2. Inicia los servicios:
 
    ```bash
    docker-compose up -d
    ```
 
-3. Verify that PostgreSQL is running:
+3. Verifica que PostgreSQL esté ejecutándose:
 
    ```bash
    docker-compose ps
    ```
 
-4. To stop:
+4. Para detener:
 
    ```bash
    docker-compose down
    ```
 
-## Configuration
+## Configuración
 
-- Port: 5432
-- Database: wompi_db
-- User: wompi_user
-- Password: wompi_password
+- Puerto: 5432
+- Base de datos: wompi_db
+- Usuario: wompi_user
+- Contraseña: wompi_password
 
-The database is persisted in a Docker volume called `postgres_data`.
+La base de datos se persiste en un volumen de Docker llamado `postgres_data`.
