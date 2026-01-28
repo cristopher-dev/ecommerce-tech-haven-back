@@ -10,6 +10,7 @@ import type { DeliveryRepository } from '../../domain/repositories/DeliveryRepos
 import type { ProductRepository } from '../../domain/repositories/ProductRepository';
 import type { CustomerRepository } from '../../domain/repositories/CustomerRepository';
 import type { WompiPaymentService, CardData } from './WompiPaymentService';
+import { DEFAULT_QUANTITY } from '../../domain/constants';
 
 @Injectable()
 export class ProcessPaymentUseCase {
@@ -65,7 +66,10 @@ export class ProcessPaymentUseCase {
   private async updateStock(productId: string): Promise<void> {
     const product = await this.productRepository.findById(productId);
     if (product) {
-      await this.productRepository.updateStock(productId, product.stock - 1); // Assuming quantity 1 for simplicity
+      await this.productRepository.updateStock(
+        productId,
+        product.stock - DEFAULT_QUANTITY,
+      );
     }
   }
 

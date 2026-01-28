@@ -6,6 +6,7 @@ import {
   WompiPaymentService,
   CardData,
 } from '../../application/use-cases/WompiPaymentService';
+import { MOCK_DECLINE_THRESHOLD } from '../../domain/constants';
 
 @Injectable()
 export class MockWompiPaymentService implements WompiPaymentService {
@@ -19,7 +20,7 @@ export class MockWompiPaymentService implements WompiPaymentService {
 
     _customerEmail: string,
   ): Promise<Either<Error, TransactionStatus>> {
-    if (amount >= 500) {
+    if (amount >= MOCK_DECLINE_THRESHOLD) {
       return Promise.resolve(right(TransactionStatus.DECLINED));
     }
     return Promise.resolve(right(TransactionStatus.APPROVED));

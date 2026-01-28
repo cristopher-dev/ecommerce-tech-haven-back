@@ -1,13 +1,26 @@
 import { Injectable } from '@nestjs/common';
 import { createHash } from 'crypto';
 import { ConfigService } from '@nestjs/config';
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import { Either, left, right } from 'fp-ts/Either';
 import { TransactionStatus } from '../../domain/entities/Transaction';
 import {
   WompiPaymentService,
   CardData,
 } from '../../application/use-cases/WompiPaymentService';
+import { CENTS_PER_UNIT, DEFAULT_INSTALLMENTS } from '../../domain/constants';
+
+interface TokenResponse {
+  data: {
+    id: string;
+  };
+}
+
+interface TransactionResponse {
+  data: {
+    status: string;
+  };
+}
 
 @Injectable()
 export class WompiPaymentServiceImpl implements WompiPaymentService {
@@ -24,7 +37,7 @@ export class WompiPaymentServiceImpl implements WompiPaymentService {
       const publicKey = this.configService.get<string>('WOMPI_PUBLIC_KEY')!;
       const privateKey = this.configService.get<string>('WOMPI_PRIVATE_KEY')!;
 
-      const tokenResponse = await axios.post(
+      const tokenResponse = await axios.post<TokenResponse>(
         `${wompiUrl}/tokens/cards`,
         {
           number: cardData.number.replace(/\s/g, ''), // Remove spaces
@@ -42,13 +55,13 @@ export class WompiPaymentServiceImpl implements WompiPaymentService {
 
       const token = tokenResponse.data.data.id;
 
-      const transactionResponse = await axios.post(
+      const transactionResponse = await axios.post<TransactionResponse>(
         `${wompiUrl}/transactions`,
         {
-          amount_in_cents: amount * 100, // Wompi expects cents
+          amount_in_cents: amount * CENTS_PER_UNIT, // Wompi expects cents
           currency: 'COP',
           signature: this.generateSignature(
-            amount * 100,
+            amount * CENTS_PER_UNIT,
             'COP',
             transactionId,
             privateKey,
@@ -57,7 +70,7 @@ export class WompiPaymentServiceImpl implements WompiPaymentService {
           payment_method: {
             type: 'CARD',
             token: token,
-            installments: 1, // Assuming single payment
+            installments: DEFAULT_INSTALLMENTS, // Assuming single payment
           },
           reference: transactionId,
         },
@@ -78,7 +91,11 @@ export class WompiPaymentServiceImpl implements WompiPaymentService {
         return right(TransactionStatus.PENDING); // Or handle other statuses
       }
     } catch (error) {
-      console.error('Wompi API error:', error.response?.data || error.message);
+      const axiosError = error as AxiosError;
+      console.error(
+        'Wompi API error:',
+        axiosError.response?.data || axiosError.message,
+      );
       return left(new Error('Error processing payment with Wompi'));
     }
   }

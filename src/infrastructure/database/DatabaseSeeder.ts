@@ -35,7 +35,9 @@ export class DatabaseSeeder implements OnModuleInit {
       'database',
       'products-seed.json',
     );
-    const productsData = JSON.parse(readFileSync(seedFilePath, 'utf-8'));
+    const productsData: ProductEntity[] = JSON.parse(
+      readFileSync(seedFilePath, 'utf-8'),
+    ) as ProductEntity[];
 
     await this.productRepository.save(productsData);
     this.logger.log('🌱 Productos sembrados exitosamente!');
