@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { INestApplication } from '@nestjs/common';
+import { INestApplication, HttpStatus } from '@nestjs/common';
 import request from 'supertest';
 import { App } from 'supertest/types';
 import { AppModule } from './../src/app.module';
@@ -23,26 +23,21 @@ describe('App (e2e)', () => {
   it('/products (GET)', () => {
     return request(app.getHttpServer())
       .get('/products')
-      .expect(200)
+      .expect(HttpStatus.OK)
       .expect((res) => {
         expect(Array.isArray(res.body)).toBe(true);
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-        expect(res.body.length).toBeGreaterThan(0);
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-        expect(res.body[0]).toHaveProperty('id');
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-        expect(res.body[0]).toHaveProperty('name');
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-        expect(res.body[0]).toHaveProperty('price');
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-        expect(res.body[0]).toHaveProperty('stock');
+        expect((res.body as any[]).length).toBeGreaterThan(0);
+        expect((res.body as any[])[0]).toHaveProperty('id');
+        expect((res.body as any[])[0]).toHaveProperty('name');
+        expect((res.body as any[])[0]).toHaveProperty('price');
+        expect((res.body as any[])[0]).toHaveProperty('stock');
       });
   });
 
   it('/customers (GET)', () => {
     return request(app.getHttpServer())
       .get('/customers')
-      .expect(200)
+      .expect(HttpStatus.OK)
       .expect((res) => {
         expect(Array.isArray(res.body)).toBe(true);
       });
@@ -51,7 +46,7 @@ describe('App (e2e)', () => {
   it('/transactions (GET)', () => {
     return request(app.getHttpServer())
       .get('/transactions')
-      .expect(200)
+      .expect(HttpStatus.OK)
       .expect((res) => {
         expect(Array.isArray(res.body)).toBe(true);
       });
@@ -60,7 +55,7 @@ describe('App (e2e)', () => {
   it('/deliveries (GET)', () => {
     return request(app.getHttpServer())
       .get('/deliveries')
-      .expect(200)
+      .expect(HttpStatus.OK)
       .expect((res) => {
         expect(Array.isArray(res.body)).toBe(true);
       });
