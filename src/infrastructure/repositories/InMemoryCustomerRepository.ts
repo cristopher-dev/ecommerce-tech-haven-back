@@ -15,14 +15,14 @@ export class InMemoryCustomerRepository implements CustomerRepository {
       data.address,
     );
     this.customers.push(customer);
-    return customer;
+    return Promise.resolve(customer);
   }
 
   async findById(id: string): Promise<Customer | null> {
-    return this.customers.find((c) => c.id === id) || null;
+    return Promise.resolve(this.customers.find((c) => c.id === id) || null);
   }
 
   async findAll(): Promise<Customer[]> {
-    return this.customers;
+    return Promise.resolve(this.customers);
   }
 }

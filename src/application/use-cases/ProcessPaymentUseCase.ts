@@ -8,7 +8,8 @@ import { DeliveryStatus } from '../../domain/entities/Delivery';
 import type { TransactionRepository } from '../../domain/repositories/TransactionRepository';
 import type { DeliveryRepository } from '../../domain/repositories/DeliveryRepository';
 import type { ProductRepository } from '../../domain/repositories/ProductRepository';
-import type { WompiPaymentService } from './WompiPaymentService';
+import type { CustomerRepository } from '../../domain/repositories/CustomerRepository';
+import type { WompiPaymentService, CardData } from './WompiPaymentService';
 
 @Injectable()
 export class ProcessPaymentUseCase {
@@ -19,18 +20,30 @@ export class ProcessPaymentUseCase {
     private readonly deliveryRepository: DeliveryRepository,
     @Inject('ProductRepository')
     private readonly productRepository: ProductRepository,
+    @Inject('CustomerRepository')
+    private readonly customerRepository: CustomerRepository,
     @Inject('WompiPaymentService')
     private readonly wompiService: WompiPaymentService,
   ) {}
 
-  async execute(transactionId: string): Promise<Either<Error, Transaction>> {
+  async execute(
+    transactionId: string,
+    cardData: CardData,
+  ): Promise<Either<Error, Transaction>> {
     const transaction =
       await this.transactionRepository.findById(transactionId);
     if (!transaction) return left(new Error('Transaction not found'));
 
+    const customer = await this.customerRepository.findById(
+      transaction.customerId,
+    );
+    if (!customer) return left(new Error('Customer not found'));
+
     const result = await this.wompiService.processPayment(
       transactionId,
       transaction.amount,
+      cardData,
+      customer.email,
     );
     if (result._tag === 'Left') return left(result.left);
 

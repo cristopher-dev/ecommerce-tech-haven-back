@@ -130,7 +130,10 @@ npm run test:e2e
 
 ## Swagger Documentation
 
-Available at `/api` when the application is running.
+API documentation is available via Swagger UI at `/api` when the application is running.
+
+- **URL**: `http://localhost:3000/api` (local development)
+- **Features**: Interactive API documentation with request/response examples, schema definitions, and testing capabilities
 
 ## Docker Setup
 
@@ -149,4 +152,6 @@ Deployed on AWS (link to be added).
 
 ## Postman Collection
 
-[Link to Postman Collection](https://example.com/collection)
+Import the Postman collection from the file: [`Wompi Payment Backend.postman_collection.json`](./Wompi%20Payment%20Backend.postman_collection.json)
+
+This collection includes all API endpoints with example requests and variables for easy testing.

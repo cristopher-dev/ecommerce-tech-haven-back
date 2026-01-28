@@ -1,0 +1,137 @@
+{
+  "info": {
+    "name": "Wompi Payment Backend API",
+    "description": "API collection for Wompi Payment Onboarding Backend. This collection includes all endpoints for managing products, transactions, customers, and deliveries.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Products",
+      "item": [
+        {
+          "name": "Get All Products",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/products",
+              "host": ["{{base_url}}"],
+              "path": ["products"]
+            },
+            "description": "Retrieve a list of all available products with their stock information."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Transactions",
+      "item": [
+        {
+          "name": "Get All Transactions",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/transactions",
+              "host": ["{{base_url}}"],
+              "path": ["transactions"]
+            },
+            "description": "Retrieve a list of all transactions."
+          }
+        },
+        {
+          "name": "Create Transaction",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerId\": \"customer-uuid\",\n  \"productId\": \"product-uuid\",\n  \"amount\": 10000\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/transactions",
+              "host": ["{{base_url}}"],
+              "path": ["transactions"]
+            },
+            "description": "Create a new pending transaction. Note: Customer and Product must exist."
+          }
+        },
+        {
+          "name": "Process Payment",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"number\": \"4111111111111111\",\n  \"expMonth\": \"12\",\n  \"expYear\": \"25\",\n  \"cvc\": \"123\",\n  \"cardHolder\": \"John Doe\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/transactions/{{transaction_id}}/process-payment",
+              "host": ["{{base_url}}"],
+              "path": ["transactions", "{{transaction_id}}", "process-payment"]
+            },
+            "description": "Process payment for a pending transaction using Wompi API. Requires card data (fake data for testing)."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Customers",
+      "item": [
+        {
+          "name": "Get All Customers",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/customers",
+              "host": ["{{base_url}}"],
+              "path": ["customers"]
+            },
+            "description": "Retrieve a list of all customers."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Deliveries",
+      "item": [
+        {
+          "name": "Get All Deliveries",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/deliveries",
+              "host": ["{{base_url}}"],
+              "path": ["deliveries"]
+            },
+            "description": "Retrieve a list of all deliveries."
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "transaction_id",
+      "value": "sample-transaction-id",
+      "type": "string"
+    }
+  ]
+}

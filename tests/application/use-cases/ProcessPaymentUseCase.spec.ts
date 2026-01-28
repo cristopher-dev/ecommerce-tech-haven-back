@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { ProcessPaymentUseCase } from '../../../src/application/use-cases/ProcessPaymentUseCase';
 import { TransactionRepository } from '../../../src/domain/repositories/TransactionRepository';
 import { DeliveryRepository } from '../../../src/domain/repositories/DeliveryRepository';
-import { ProductRepository } from '../../../src/domain/repositories/ProductRepository';
+import { CustomerRepository } from '../../../src/domain/repositories/CustomerRepository';
 import { WompiPaymentService } from '../../../src/application/use-cases/WompiPaymentService';
 import {
   Transaction,
@@ -12,6 +12,7 @@ import {
   Delivery,
   DeliveryStatus,
 } from '../../../src/domain/entities/Delivery';
+import { Customer } from '../../../src/domain/entities/Customer';
 import { Product } from '../../../src/domain/entities/Product';
 
 describe('ProcessPaymentUseCase', () => {
@@ -19,7 +20,7 @@ describe('ProcessPaymentUseCase', () => {
   let mockTransactionRepo: jest.Mocked<TransactionRepository>;
   let mockDeliveryRepo: jest.Mocked<DeliveryRepository>;
   let mockProductRepo: jest.Mocked<ProductRepository>;
-  let mockWompiService: jest.Mocked<WompiPaymentService>;
+  let mockCustomerRepo: jest.Mocked<CustomerRepository>;
 
   beforeEach(async () => {
     const mockTrans = {
@@ -39,6 +40,11 @@ describe('ProcessPaymentUseCase', () => {
       findById: jest.fn(),
       updateStock: jest.fn(),
     };
+    const mockCust = {
+      create: jest.fn(),
+      findById: jest.fn(),
+      findAll: jest.fn(),
+    };
     const mockWompi = {
       processPayment: jest.fn(),
     };
@@ -49,6 +55,7 @@ describe('ProcessPaymentUseCase', () => {
         { provide: 'TransactionRepository', useValue: mockTrans },
         { provide: 'DeliveryRepository', useValue: mockDel },
         { provide: 'ProductRepository', useValue: mockProd },
+        { provide: 'CustomerRepository', useValue: mockCust },
         { provide: 'WompiPaymentService', useValue: mockWompi },
       ],
     }).compile();
@@ -57,6 +64,7 @@ describe('ProcessPaymentUseCase', () => {
     mockTransactionRepo = module.get('TransactionRepository');
     mockDeliveryRepo = module.get('DeliveryRepository');
     mockProductRepo = module.get('ProductRepository');
+    mockCustomerRepo = module.get('CustomerRepository');
     mockWompiService = module.get('WompiPaymentService');
   });
 
@@ -80,6 +88,12 @@ describe('ProcessPaymentUseCase', () => {
       new Date(),
     );
     const product = new Product('prod1', 'Prod', 'Desc', 100, 5);
+    const customer = new Customer(
+      'cust1',
+      'John Doe',
+      'john@example.com',
+      'Address',
+    );
     const delivery = new Delivery(
       'del1',
       '1',
@@ -91,6 +105,7 @@ describe('ProcessPaymentUseCase', () => {
     mockTransactionRepo.findById
       .mockResolvedValueOnce(transaction)
       .mockResolvedValueOnce(updatedTransaction);
+    mockCustomerRepo.findById.mockResolvedValue(customer);
     mockWompiService.processPayment.mockResolvedValue({
       _tag: 'Right',
       right: TransactionStatus.APPROVED,
@@ -98,7 +113,15 @@ describe('ProcessPaymentUseCase', () => {
     mockProductRepo.findById.mockResolvedValue(product);
     mockDeliveryRepo.create.mockResolvedValue(delivery);
 
-    const result = await useCase.execute('1');
+    const cardData = {
+      number: '4111111111111111',
+      expMonth: '12',
+      expYear: '25',
+      cvc: '123',
+      cardHolder: 'Test User',
+    };
+
+    const result = await useCase.execute('1', cardData);
 
     expect(result._tag).toBe('Right');
     expect((result as any).right.status).toBe(TransactionStatus.APPROVED);
@@ -109,7 +132,15 @@ describe('ProcessPaymentUseCase', () => {
   it('should fail if transaction not found', async () => {
     mockTransactionRepo.findById.mockResolvedValue(null);
 
-    const result = await useCase.execute('1');
+    const cardData = {
+      number: '4111111111111111',
+      expMonth: '12',
+      expYear: '25',
+      cvc: '123',
+      cardHolder: 'Test User',
+    };
+
+    const result = await useCase.execute('1', cardData);
 
     expect(result._tag).toBe('Left');
     expect((result as any).left.message).toBe('Transaction not found');

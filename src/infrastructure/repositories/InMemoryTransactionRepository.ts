@@ -23,11 +23,11 @@ export class InMemoryTransactionRepository implements TransactionRepository {
       new Date(),
     );
     this.transactions.push(transaction);
-    return transaction;
+    return Promise.resolve(transaction);
   }
 
   async findById(id: string): Promise<Transaction | null> {
-    return this.transactions.find((t) => t.id === id) || null;
+    return Promise.resolve(this.transactions.find((t) => t.id === id) || null);
   }
 
   async updateStatus(id: string, status: TransactionStatus): Promise<void> {
@@ -36,9 +36,10 @@ export class InMemoryTransactionRepository implements TransactionRepository {
       transaction.status = status;
       transaction.updatedAt = new Date();
     }
+    return Promise.resolve();
   }
 
   async findAll(): Promise<Transaction[]> {
-    return this.transactions;
+    return Promise.resolve(this.transactions);
   }
 }

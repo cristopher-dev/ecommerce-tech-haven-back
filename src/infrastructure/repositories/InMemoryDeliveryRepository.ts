@@ -16,11 +16,11 @@ export class InMemoryDeliveryRepository implements DeliveryRepository {
       new Date(),
     );
     this.deliveries.push(delivery);
-    return delivery;
+    return Promise.resolve(delivery);
   }
 
   async findById(id: string): Promise<Delivery | null> {
-    return this.deliveries.find((d) => d.id === id) || null;
+    return Promise.resolve(this.deliveries.find((d) => d.id === id) || null);
   }
 
   async updateStatus(id: string, status: DeliveryStatus): Promise<void> {
@@ -28,9 +28,10 @@ export class InMemoryDeliveryRepository implements DeliveryRepository {
     if (delivery) {
       delivery.status = status;
     }
+    return Promise.resolve();
   }
 
   async findAll(): Promise<Delivery[]> {
-    return this.deliveries;
+    return Promise.resolve(this.deliveries);
   }
 }

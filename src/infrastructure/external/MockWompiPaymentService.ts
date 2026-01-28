@@ -3,15 +3,24 @@ import { ConfigService } from '@nestjs/config';
 import axios from 'axios';
 import { Either, left, right } from 'fp-ts/Either';
 import { TransactionStatus } from '../../domain/entities/Transaction';
-import { WompiPaymentService } from '../../application/use-cases/WompiPaymentService';
+import {
+  WompiPaymentService,
+  CardData,
+} from '../../application/use-cases/WompiPaymentService';
 
 @Injectable()
 export class MockWompiPaymentService implements WompiPaymentService {
   constructor(private configService: ConfigService) {}
 
   async processPayment(
-    transactionId: string,
-    amount: number,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    _transactionId: string,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    _amount: number,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    _cardData: CardData,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    _customerEmail: string,
   ): Promise<Either<Error, TransactionStatus>> {
     try {
       const wompiUrl = this.configService.get<string>('WOMPI_SANDBOX_URL');
@@ -25,7 +34,7 @@ export class MockWompiPaymentService implements WompiPaymentService {
       });
 
       // Mock logic: approve if amount < 500, decline otherwise
-      if (amount < 500) {
+      if (_amount < 500) {
         return right(TransactionStatus.APPROVED);
       } else {
         return right(TransactionStatus.DECLINED);
