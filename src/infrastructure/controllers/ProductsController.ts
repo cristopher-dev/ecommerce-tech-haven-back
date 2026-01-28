@@ -1,3 +1,4 @@
+import 'reflect-metadata';
 import { Controller, Get } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { GetProductsUseCase } from '../../application/use-cases/GetProductsUseCase';

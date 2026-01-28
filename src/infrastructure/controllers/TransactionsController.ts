@@ -1,3 +1,4 @@
+import 'reflect-metadata';
 import { Controller, Post, Body, Param, Put, Get } from '@nestjs/common';
 import {
   ApiTags,
