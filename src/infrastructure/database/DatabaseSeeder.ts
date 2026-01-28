@@ -2,6 +2,8 @@ import { Injectable, OnModuleInit } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ProductEntity } from './entities/ProductEntity';
+import * as fs from 'fs';
+import * as path from 'path';
 
 @Injectable()
 export class DatabaseSeeder implements OnModuleInit {
@@ -21,45 +23,19 @@ export class DatabaseSeeder implements OnModuleInit {
       return;
     }
 
-    const products = [
-      {
-        id: 'prod-1',
-        name: 'Laptop Gaming Pro',
-        description: 'High-performance gaming laptop with RTX 4070',
-        price: 2500,
-        stock: 10,
-      },
-      {
-        id: 'prod-2',
-        name: 'Wireless Headphones',
-        description: 'Noise-cancelling wireless headphones with 30h battery',
-        price: 299.99,
-        stock: 25,
-      },
-      {
-        id: 'prod-3',
-        name: 'Smartphone Ultra',
-        description: 'Latest smartphone with 512GB storage and triple camera',
-        price: 1199,
-        stock: 15,
-      },
-      {
-        id: 'prod-4',
-        name: 'Mechanical Keyboard',
-        description: 'RGB mechanical keyboard with blue switches',
-        price: 149.99,
-        stock: 30,
-      },
-      {
-        id: 'prod-5',
-        name: '4K Monitor 32"',
-        description: '32-inch 4K UHD monitor with HDR support',
-        price: 699.99,
-        stock: 8,
-      },
-    ];
+    const seedFilePath = path.join(
+      __dirname,
+      '..',
+      '..',
+      '..',
+      'src',
+      'infrastructure',
+      'database',
+      'products-seed.json',
+    );
+    const productsData = JSON.parse(fs.readFileSync(seedFilePath, 'utf-8'));
 
-    await this.productRepository.save(products);
+    await this.productRepository.save(productsData);
     console.log('Products seeded successfully!');
   }
 }
