@@ -7,8 +7,10 @@ import { ProductEntity } from '../../../src/infrastructure/database/entities/Pro
 describe('DatabaseSeeder', () => {
   let seeder: DatabaseSeeder;
   let productRepository: Repository<ProductEntity>;
+  let consoleLogSpy: jest.SpyInstance;
 
   beforeEach(async () => {
+    consoleLogSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
     const mockRepository = {
       count: jest.fn(),
       save: jest.fn(),
@@ -26,6 +28,10 @@ describe('DatabaseSeeder', () => {
 
     seeder = module.get<DatabaseSeeder>(DatabaseSeeder);
     productRepository = module.get(getRepositoryToken(ProductEntity));
+  });
+
+  afterEach(() => {
+    consoleLogSpy.mockRestore();
   });
 
   it('should seed products if none exist', async () => {

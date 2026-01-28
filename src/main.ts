@@ -18,4 +18,8 @@ export async function bootstrap() {
   const url = await app.getUrl();
   console.log(`Application is running on: ${url}`);
 }
-bootstrap().catch(console.error);
+
+// Only bootstrap in non-test environments
+if (process.env.NODE_ENV !== 'test' && typeof jest === 'undefined') {
+  bootstrap().catch(console.error);
+}

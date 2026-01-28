@@ -9,14 +9,20 @@ const mockedAxios = axios as jest.Mocked<typeof axios>;
 
 describe('WompiPaymentServiceImpl', () => {
   let service: WompiPaymentServiceImpl;
+  let consoleErrorSpy: jest.SpyInstance;
 
   beforeEach(async () => {
+    consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
     const module: TestingModule = await Test.createTestingModule({
       imports: [ConfigModule.forRoot()],
       providers: [WompiPaymentServiceImpl],
     }).compile();
 
     service = module.get<WompiPaymentServiceImpl>(WompiPaymentServiceImpl);
+  });
+
+  afterEach(() => {
+    consoleErrorSpy.mockRestore();
   });
 
   it('should process payment successfully', async () => {
