@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ProductsController } from './infrastructure/controllers/ProductsController';
@@ -18,7 +19,7 @@ import { InMemoryDeliveryRepository } from './infrastructure/repositories/InMemo
 import { MockWompiPaymentService } from './infrastructure/external/MockWompiPaymentService';
 
 @Module({
-  imports: [],
+  imports: [ConfigModule.forRoot()],
   controllers: [
     AppController,
     ProductsController,

@@ -1,11 +1,20 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { ConfigModule } from '@nestjs/config';
 import { MockWompiPaymentService } from '../../../src/infrastructure/external/MockWompiPaymentService';
+
+jest.mock('axios');
+import axios from 'axios';
+
+const mockedAxios = axios as jest.Mocked<typeof axios>;
 
 describe('MockWompiPaymentService', () => {
   let service: MockWompiPaymentService;
 
   beforeEach(async () => {
+    mockedAxios.get.mockResolvedValue({ data: {} });
+
     const module: TestingModule = await Test.createTestingModule({
+      imports: [ConfigModule.forRoot()],
       providers: [MockWompiPaymentService],
     }).compile();
 
