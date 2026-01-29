@@ -33,6 +33,8 @@ describe('main', () => {
       getHttpAdapter: jest.fn(),
       use: jest.fn(),
       useGlobalPipes: jest.fn(),
+      enableCors: jest.fn().mockReturnThis(),
+      setGlobalPrefix: jest.fn().mockReturnThis(),
     };
     (NestFactory.create as jest.Mock).mockResolvedValue(mockApp);
     (SwaggerModule.createDocument as jest.Mock).mockReturnValue({});
@@ -48,7 +50,11 @@ describe('main', () => {
 
     expect(NestFactory.create).toHaveBeenCalled();
     expect(SwaggerModule.createDocument).toHaveBeenCalled();
-    expect(SwaggerModule.setup).toHaveBeenCalledWith('api', mockApp, {});
+    expect(SwaggerModule.setup).toHaveBeenCalledWith(
+      'api/docs',
+      mockApp,
+      expect.any(Object),
+    );
     expect(mockApp.listen).toHaveBeenCalledWith(3000);
     expect(mockApp.getUrl).toHaveBeenCalled();
   });

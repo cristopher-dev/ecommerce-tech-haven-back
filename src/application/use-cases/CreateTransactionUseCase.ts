@@ -79,6 +79,15 @@ export class CreateTransactionUseCase {
   ): TaskEither<Error, { id: string }> {
     return tryCatch(
       async () => {
+        // Check if customer already exists by email
+        const existingCustomer = await this.customerRepository.findByEmail(
+          input.customerEmail,
+        );
+        if (existingCustomer) {
+          return { id: existingCustomer.id };
+        }
+
+        // Create new customer if doesn't exist
         const customer = await this.customerRepository.create({
           name: input.customerName,
           email: input.customerEmail,

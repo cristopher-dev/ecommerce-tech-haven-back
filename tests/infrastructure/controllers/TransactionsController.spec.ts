@@ -3,6 +3,7 @@ import { TransactionsController } from '../../../src/infrastructure/controllers/
 import { CreateTransactionUseCase } from '../../../src/application/use-cases/CreateTransactionUseCase';
 import { ProcessPaymentUseCase } from '../../../src/application/use-cases/ProcessPaymentUseCase';
 import { GetTransactionsUseCase } from '../../../src/application/use-cases/GetTransactionsUseCase';
+import { GetTransactionByIdUseCase } from '../../../src/application/use-cases/GetTransactionByIdUseCase';
 import {
   Transaction,
   TransactionStatus,
@@ -13,11 +14,13 @@ describe('TransactionsController', () => {
   let mockCreateUC: jest.Mocked<CreateTransactionUseCase>;
   let mockProcessUC: jest.Mocked<ProcessPaymentUseCase>;
   let mockGetUC: jest.Mocked<GetTransactionsUseCase>;
+  let mockGetByIdUC: jest.Mocked<GetTransactionByIdUseCase>;
 
   beforeEach(async () => {
     const mockCreate = { execute: jest.fn() };
     const mockProcess = { execute: jest.fn() };
     const mockGet = { execute: jest.fn() };
+    const mockGetById = { execute: jest.fn() };
 
     const module: TestingModule = await Test.createTestingModule({
       controllers: [TransactionsController],
@@ -25,6 +28,7 @@ describe('TransactionsController', () => {
         { provide: CreateTransactionUseCase, useValue: mockCreate },
         { provide: ProcessPaymentUseCase, useValue: mockProcess },
         { provide: GetTransactionsUseCase, useValue: mockGet },
+        { provide: GetTransactionByIdUseCase, useValue: mockGetById },
       ],
     }).compile();
 
@@ -32,6 +36,7 @@ describe('TransactionsController', () => {
     mockCreateUC = module.get(CreateTransactionUseCase);
     mockProcessUC = module.get(ProcessPaymentUseCase);
     mockGetUC = module.get(GetTransactionsUseCase);
+    mockGetByIdUC = module.get(GetTransactionByIdUseCase);
   });
 
   it('should get transactions', async () => {

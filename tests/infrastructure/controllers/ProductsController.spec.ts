@@ -1,24 +1,33 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ProductsController } from '../../../src/infrastructure/controllers/ProductsController';
 import { GetProductsUseCase } from '../../../src/application/use-cases/GetProductsUseCase';
+import { GetProductByIdUseCase } from '../../../src/application/use-cases/GetProductByIdUseCase';
 import { Product } from '../../../src/domain/entities/Product';
 
 describe('ProductsController', () => {
   let controller: ProductsController;
   let mockUseCase: jest.Mocked<GetProductsUseCase>;
+  let mockGetProductByIdUseCase: jest.Mocked<GetProductByIdUseCase>;
 
   beforeEach(async () => {
     const mockUC = {
       execute: jest.fn(),
     };
+    const mockByIdUC = {
+      execute: jest.fn(),
+    };
 
     const module: TestingModule = await Test.createTestingModule({
       controllers: [ProductsController],
-      providers: [{ provide: GetProductsUseCase, useValue: mockUC }],
+      providers: [
+        { provide: GetProductsUseCase, useValue: mockUC },
+        { provide: GetProductByIdUseCase, useValue: mockByIdUC },
+      ],
     }).compile();
 
     controller = module.get<ProductsController>(ProductsController);
     mockUseCase = module.get(GetProductsUseCase);
+    mockGetProductByIdUseCase = module.get(GetProductByIdUseCase);
   });
 
   it('should return products', async () => {

@@ -18,7 +18,9 @@ describe('TechHavenPaymentServiceImpl', () => {
       providers: [TechHavenPaymentServiceImpl],
     }).compile();
 
-    service = module.get<TechHavenPaymentServiceImpl>(TechHavenPaymentServiceImpl);
+    service = module.get<TechHavenPaymentServiceImpl>(
+      TechHavenPaymentServiceImpl,
+    );
   });
 
   afterEach(() => {
@@ -43,11 +45,11 @@ describe('TechHavenPaymentServiceImpl', () => {
       });
 
     const cardData = {
-      number: '4111111111111111',
-      expMonth: '12',
-      expYear: '25',
-      cvc: '123',
-      cardHolder: 'Test User',
+      cardNumber: '4111111111111111',
+      expirationMonth: 12,
+      expirationYear: 25,
+      cvv: '123',
+      cardholderName: 'Test User',
     };
     const result = await service.processPayment(
       'trans1',
@@ -77,7 +79,7 @@ describe('TechHavenPaymentServiceImpl', () => {
       });
 
     const cardData = {
-      number: '4111111111111111',
+      cardNumber: '4111111111111111',
       expMonth: '12',
       expYear: '25',
       cvc: '123',
@@ -111,11 +113,11 @@ describe('TechHavenPaymentServiceImpl', () => {
       });
 
     const cardData = {
-      number: '4111111111111111',
-      expMonth: '12',
-      expYear: '25',
-      cvc: '123',
-      cardHolder: 'Test User',
+      cardNumber: '4111111111111111',
+      expirationMonth: 12,
+      expirationYear: 25,
+      cvv: '123',
+      cardholderName: 'Test User',
     };
     const result = await service.processPayment(
       'trans1',
@@ -131,11 +133,11 @@ describe('TechHavenPaymentServiceImpl', () => {
     mockedAxios.post.mockRejectedValue(new Error('API error'));
 
     const cardData = {
-      number: '4111111111111111',
-      expMonth: '12',
-      expYear: '25',
-      cvc: '123',
-      cardHolder: 'Test User',
+      cardNumber: '4111111111111111',
+      expirationMonth: 12,
+      expirationYear: 25,
+      cvv: '123',
+      cardholderName: 'Test User',
     };
     const result = await service.processPayment(
       'trans1',

@@ -1,14 +1,24 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { CustomersController } from '../../../src/infrastructure/controllers/CustomersController';
 import { GetCustomersUseCase } from '../../../src/application/use-cases/GetCustomersUseCase';
+import { GetCustomerByIdUseCase } from '../../../src/application/use-cases/GetCustomerByIdUseCase';
+import { CreateCustomerUseCase } from '../../../src/application/use-cases/CreateCustomerUseCase';
 import { Customer } from '../../../src/domain/entities/Customer';
 
 describe('CustomersController', () => {
   let controller: CustomersController;
   let getCustomersUseCase: jest.Mocked<GetCustomersUseCase>;
+  let getCustomerByIdUseCase: jest.Mocked<GetCustomerByIdUseCase>;
+  let createCustomerUseCase: jest.Mocked<CreateCustomerUseCase>;
 
   beforeEach(async () => {
     const mockGetCustomersUseCase = {
+      execute: jest.fn(),
+    };
+    const mockGetCustomerByIdUseCase = {
+      execute: jest.fn(),
+    };
+    const mockCreateCustomerUseCase = {
       execute: jest.fn(),
     };
 
@@ -19,11 +29,21 @@ describe('CustomersController', () => {
           provide: GetCustomersUseCase,
           useValue: mockGetCustomersUseCase,
         },
+        {
+          provide: GetCustomerByIdUseCase,
+          useValue: mockGetCustomerByIdUseCase,
+        },
+        {
+          provide: CreateCustomerUseCase,
+          useValue: mockCreateCustomerUseCase,
+        },
       ],
     }).compile();
 
     controller = module.get<CustomersController>(CustomersController);
     getCustomersUseCase = module.get(GetCustomersUseCase);
+    getCustomerByIdUseCase = module.get(GetCustomerByIdUseCase);
+    createCustomerUseCase = module.get(CreateCustomerUseCase);
   });
 
   it('should return all customers', async () => {

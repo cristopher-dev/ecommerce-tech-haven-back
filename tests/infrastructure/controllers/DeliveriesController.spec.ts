@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { DeliveriesController } from '../../../src/infrastructure/controllers/DeliveriesController';
 import { GetDeliveriesUseCase } from '../../../src/application/use-cases/GetDeliveriesUseCase';
+import { GetDeliveryByIdUseCase } from '../../../src/application/use-cases/GetDeliveryByIdUseCase';
 import {
   Delivery,
   DeliveryStatus,
@@ -9,9 +10,13 @@ import {
 describe('DeliveriesController', () => {
   let controller: DeliveriesController;
   let getDeliveriesUseCase: jest.Mocked<GetDeliveriesUseCase>;
+  let getDeliveryByIdUseCase: jest.Mocked<GetDeliveryByIdUseCase>;
 
   beforeEach(async () => {
     const mockGetDeliveriesUseCase = {
+      execute: jest.fn(),
+    };
+    const mockGetDeliveryByIdUseCase = {
       execute: jest.fn(),
     };
 
@@ -22,11 +27,16 @@ describe('DeliveriesController', () => {
           provide: GetDeliveriesUseCase,
           useValue: mockGetDeliveriesUseCase,
         },
+        {
+          provide: GetDeliveryByIdUseCase,
+          useValue: mockGetDeliveryByIdUseCase,
+        },
       ],
     }).compile();
 
     controller = module.get<DeliveriesController>(DeliveriesController);
     getDeliveriesUseCase = module.get(GetDeliveriesUseCase);
+    getDeliveryByIdUseCase = module.get(GetDeliveryByIdUseCase);
   });
 
   it('should return all deliveries', async () => {
@@ -36,7 +46,7 @@ describe('DeliveriesController', () => {
         '2',
         'trans2',
         'cust2',
-        DeliveryStatus.COMPLETED,
+        DeliveryStatus.DELIVERED,
         new Date(),
       ),
     ];

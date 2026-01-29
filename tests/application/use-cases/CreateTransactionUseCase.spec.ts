@@ -30,7 +30,9 @@ describe('CreateTransactionUseCase', () => {
     };
     const mockCust = {
       create: jest.fn(),
+      save: jest.fn(),
       findById: jest.fn(),
+      findByEmail: jest.fn(),
       findAll: jest.fn(),
     };
 
@@ -75,6 +77,7 @@ describe('CreateTransactionUseCase', () => {
     );
 
     mockProductRepo.findById.mockResolvedValue(product);
+    mockCustomerRepo.findByEmail.mockResolvedValue(null); // Customer doesn't exist
     mockCustomerRepo.create.mockResolvedValue(customer);
     mockTransactionRepo.create.mockResolvedValue(transaction);
 
