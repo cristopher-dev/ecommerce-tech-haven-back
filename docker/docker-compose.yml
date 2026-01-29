@@ -44,7 +44,7 @@ services:
       dockerfile: Dockerfile
     container_name: tech-haven-app
     environment:
-      NODE_ENV: ${NODE_ENV:-development}
+      NODE_ENV: ${NODE_ENV:-production}
       DATABASE_HOST: ${DATABASE_HOST:-postgres}
       DATABASE_PORT: ${DATABASE_PORT:-5432}
       DATABASE_USER: ${DATABASE_USER:-postgres}
@@ -56,16 +56,11 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
-    volumes:
-      - ../src:/app/src
-      - ../package.json:/app/package.json
-      - ../tsconfig.json:/app/tsconfig.json
-      - /app/node_modules
     networks:
       tech-haven_network:
         ipv4_address: 172.20.0.12
     restart: unless-stopped
-    command: npm run start:dev
+    command: node dist/main.js
 
 volumes:
   postgres_data:

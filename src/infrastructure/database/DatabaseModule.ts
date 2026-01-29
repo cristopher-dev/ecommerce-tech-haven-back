@@ -35,7 +35,7 @@ import { DatabaseSeeder } from './DatabaseSeeder';
             TransactionEntity,
             DeliveryEntity,
           ],
-          synchronize: configService.get('NODE_ENV') !== 'production', // Solo en desarrollo
+          synchronize: true, // Habilitar sincronización de esquema automática
           logging: configService.get('DATABASE_LOGGING', 'false') === 'true',
           retryAttempts: 5,
           retryDelay: 3000,

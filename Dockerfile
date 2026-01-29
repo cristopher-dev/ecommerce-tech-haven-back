@@ -37,6 +37,9 @@ RUN npm ci --only=production && \
 # Copy built application from builder stage
 COPY --from=builder /app/dist ./dist
 
+# Copy seed data files
+COPY src/infrastructure/database/products-seed.json ./dist/infrastructure/database/
+
 # Expose port
 EXPOSE 3000
 

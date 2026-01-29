@@ -25,16 +25,7 @@ export class DatabaseSeeder implements OnModuleInit {
       return;
     }
 
-    const seedFilePath = join(
-      __dirname,
-      '..',
-      '..',
-      '..',
-      'src',
-      'infrastructure',
-      'database',
-      'products-seed.json',
-    );
+    const seedFilePath = join(__dirname, 'products-seed.json');
     const productsData: ProductEntity[] = JSON.parse(
       readFileSync(seedFilePath, 'utf-8'),
     ) as ProductEntity[];
