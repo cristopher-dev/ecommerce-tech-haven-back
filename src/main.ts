@@ -24,13 +24,16 @@ export async function bootstrap() {
 
   app.useGlobalPipes(new ValidationPipe());
 
+  // Set global API prefix
+  app.setGlobalPrefix('api');
+
   const config = new DocumentBuilder()
     .setTitle('TechHaven Payment API')
     .setDescription('API for TechHaven payment onboarding')
     .setVersion('1.0')
     .build();
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document);
+  SwaggerModule.setup('api/docs', app, document);
 
   await app.listen(process.env['PORT'] ?? 3000);
   const url = await app.getUrl();
