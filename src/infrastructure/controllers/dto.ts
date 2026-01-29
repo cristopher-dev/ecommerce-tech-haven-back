@@ -3,7 +3,6 @@ import {
   IsNotEmpty,
   IsEmail,
   IsString,
-  IsUUID,
   Min,
   Max,
   Length,
@@ -36,10 +35,10 @@ export class CreateTransactionInputDto {
   customerAddress!: string;
 
   @IsNotEmpty()
-  @IsUUID()
+  @IsString()
   @ApiProperty({
     description: 'ID of the product',
-    example: 'product-uuid-456',
+    example: 'prod-1',
   })
   productId!: string;
 
@@ -60,23 +59,23 @@ export class CardDataDto {
     description: 'Credit card number (fake data)',
     example: '4111111111111111',
   })
-  number!: string;
+  cardNumber!: string;
 
   @IsNotEmpty()
-  @Length(2, 2)
+  @IsInt()
   @ApiProperty({
     description: 'Expiration month',
-    example: '12',
+    example: 12,
   })
-  expMonth!: string;
+  expirationMonth!: number;
 
   @IsNotEmpty()
-  @Length(2, 2)
+  @IsInt()
   @ApiProperty({
     description: 'Expiration year',
-    example: '25',
+    example: 2026,
   })
-  expYear!: string;
+  expirationYear!: number;
 
   @IsNotEmpty()
   @Length(3, 4)
@@ -84,7 +83,7 @@ export class CardDataDto {
     description: 'CVV',
     example: '123',
   })
-  cvc!: string;
+  cvv!: string;
 
   @IsNotEmpty()
   @IsString()
@@ -92,5 +91,5 @@ export class CardDataDto {
     description: 'Card holder name',
     example: 'John Doe',
   })
-  cardHolder!: string;
+  cardholderName!: string;
 }

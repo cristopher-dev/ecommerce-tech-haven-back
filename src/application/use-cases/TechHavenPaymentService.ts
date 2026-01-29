@@ -2,11 +2,11 @@ import { Either } from 'fp-ts/Either';
 import { TransactionStatus } from '../../domain/entities/Transaction';
 
 export interface CardData {
-  number: string;
-  expMonth: string;
-  expYear: string;
-  cvc: string;
-  cardHolder: string;
+  cardNumber: string;
+  expirationMonth: number;
+  expirationYear: number;
+  cvv: string;
+  cardholderName: string;
 }
 
 export interface TechHavenPaymentService {

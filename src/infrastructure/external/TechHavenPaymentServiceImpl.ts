@@ -40,11 +40,11 @@ export class TechHavenPaymentServiceImpl implements TechHavenPaymentService {
       const tokenResponse = await axios.post<TokenResponse>(
         `${techHavenUrl}/tokens/cards`,
         {
-          number: cardData.number.replace(/\s/g, ''), // Remove spaces
-          exp_month: cardData.expMonth,
-          exp_year: cardData.expYear,
-          cvc: cardData.cvc,
-          card_holder: cardData.cardHolder,
+          number: cardData.cardNumber.replace(/\s/g, ''), // Remove spaces
+          exp_month: String(cardData.expirationMonth).padStart(2, '0'),
+          exp_year: String(cardData.expirationYear),
+          cvc: cardData.cvv,
+          card_holder: cardData.cardholderName,
         },
         {
           headers: {
