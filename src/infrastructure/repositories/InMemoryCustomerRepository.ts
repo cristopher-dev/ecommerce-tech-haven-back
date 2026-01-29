@@ -18,9 +18,25 @@ export class InMemoryCustomerRepository implements CustomerRepository {
     return await Promise.resolve(customer);
   }
 
+  async save(customer: Customer): Promise<Customer> {
+    const existingIndex = this.customers.findIndex((c) => c.id === customer.id);
+    if (existingIndex !== -1) {
+      this.customers[existingIndex] = customer;
+    } else {
+      this.customers.push(customer);
+    }
+    return await Promise.resolve(customer);
+  }
+
   async findById(id: string): Promise<Customer | null> {
     return await Promise.resolve(
       this.customers.find((c) => c.id === id) || null,
+    );
+  }
+
+  async findByEmail(email: string): Promise<Customer | null> {
+    return await Promise.resolve(
+      this.customers.find((c) => c.email === email) || null,
     );
   }
 

@@ -9,7 +9,10 @@ import type { TransactionRepository } from '../../domain/repositories/Transactio
 import type { DeliveryRepository } from '../../domain/repositories/DeliveryRepository';
 import type { ProductRepository } from '../../domain/repositories/ProductRepository';
 import type { CustomerRepository } from '../../domain/repositories/CustomerRepository';
-import type { TechHavenPaymentService, CardData } from './TechHavenPaymentService';
+import type {
+  TechHavenPaymentService,
+  CardData,
+} from './TechHavenPaymentService';
 import { DEFAULT_QUANTITY } from '../../domain/constants';
 
 @Injectable()

@@ -52,6 +52,31 @@ export class CreateTransactionInputDto {
   quantity!: number;
 }
 
+export class CreateCustomerInputDto {
+  @IsNotEmpty()
+  @IsString()
+  @ApiProperty({
+    description: 'Name of the customer',
+    example: 'John Doe',
+  })
+  name!: string;
+
+  @IsNotEmpty()
+  @IsEmail()
+  @ApiProperty({
+    description: 'Email of the customer',
+    example: 'john.doe@example.com',
+  })
+  email!: string;
+
+  @IsNotEmpty()
+  @IsString()
+  @ApiProperty({
+    description: 'Address of the customer',
+    example: '123 Main St, City, Country',
+  })
+  address!: string;
+}
 export class CardDataDto {
   @IsNotEmpty()
   @Length(13, 19)

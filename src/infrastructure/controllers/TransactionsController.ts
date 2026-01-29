@@ -10,6 +10,7 @@ import {
 import { CreateTransactionUseCase } from '../../application/use-cases/CreateTransactionUseCase';
 import { ProcessPaymentUseCase } from '../../application/use-cases/ProcessPaymentUseCase';
 import { GetTransactionsUseCase } from '../../application/use-cases/GetTransactionsUseCase';
+import { GetTransactionByIdUseCase } from '../../application/use-cases/GetTransactionByIdUseCase';
 import { CreateTransactionInputDto, CardDataDto } from './dto';
 
 @ApiTags('Transactions')
@@ -19,6 +20,7 @@ export class TransactionsController {
     private readonly createTransactionUseCase: CreateTransactionUseCase,
     private readonly processPaymentUseCase: ProcessPaymentUseCase,
     private readonly getTransactionsUseCase: GetTransactionsUseCase,
+    private readonly getTransactionByIdUseCase: GetTransactionByIdUseCase,
   ) {}
 
   @Get()
@@ -46,6 +48,36 @@ export class TransactionsController {
   })
   async getTransactions() {
     const result = await this.getTransactionsUseCase.execute();
+    if (result._tag === 'Left') {
+      throw new Error(result.left.message);
+    }
+    return result.right;
+  }
+
+  @Get(':id')
+  @ApiOperation({
+    summary: 'Get a transaction by ID',
+    description: 'Retrieve detailed information about a specific transaction.',
+  })
+  @ApiParam({ name: 'id', description: 'Transaction ID' })
+  @ApiResponse({
+    status: 200,
+    description: 'Transaction found',
+    schema: {
+      example: {
+        id: 'txn-123',
+        customerId: 'cust-456',
+        productId: 'prod-789',
+        amount: 100,
+        status: 'PENDING',
+        createdAt: '2023-01-01T00:00:00.000Z',
+        updatedAt: '2023-01-01T00:00:00.000Z',
+      },
+    },
+  })
+  @ApiResponse({ status: 404, description: 'Transaction not found' })
+  async getTransactionById(@Param('id') id: string) {
+    const result = await this.getTransactionByIdUseCase.execute(id);
     if (result._tag === 'Left') {
       throw new Error(result.left.message);
     }

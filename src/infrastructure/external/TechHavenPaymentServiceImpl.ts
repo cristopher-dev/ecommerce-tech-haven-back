@@ -33,9 +33,15 @@ export class TechHavenPaymentServiceImpl implements TechHavenPaymentService {
     customerEmail: string,
   ): Promise<Either<Error, TransactionStatus>> {
     try {
-      const techHavenUrl = this.configService.get<string>('TECH_HAVEN_SANDBOX_URL')!;
-      const publicKey = this.configService.get<string>('TECH_HAVEN_PUBLIC_KEY')!;
-      const privateKey = this.configService.get<string>('TECH_HAVEN_PRIVATE_KEY')!;
+      const techHavenUrl = this.configService.get<string>(
+        'TECH_HAVEN_SANDBOX_URL',
+      )!;
+      const publicKey = this.configService.get<string>(
+        'TECH_HAVEN_PUBLIC_KEY',
+      )!;
+      const privateKey = this.configService.get<string>(
+        'TECH_HAVEN_PRIVATE_KEY',
+      )!;
 
       const tokenResponse = await axios.post<TokenResponse>(
         `${techHavenUrl}/tokens/cards`,

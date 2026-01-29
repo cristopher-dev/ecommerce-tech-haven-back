@@ -1,12 +1,16 @@
 import 'reflect-metadata';
-import { Controller, Get } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { Controller, Get, Param } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
 import { GetDeliveriesUseCase } from '../../application/use-cases/GetDeliveriesUseCase';
+import { GetDeliveryByIdUseCase } from '../../application/use-cases/GetDeliveryByIdUseCase';
 
 @ApiTags('Deliveries')
 @Controller('deliveries')
 export class DeliveriesController {
-  constructor(private readonly getDeliveriesUseCase: GetDeliveriesUseCase) {}
+  constructor(
+    private readonly getDeliveriesUseCase: GetDeliveriesUseCase,
+    private readonly getDeliveryByIdUseCase: GetDeliveryByIdUseCase,
+  ) {}
 
   @Get()
   @ApiOperation({
@@ -31,6 +35,34 @@ export class DeliveriesController {
   })
   async getDeliveries() {
     const result = await this.getDeliveriesUseCase.execute();
+    if (result._tag === 'Left') {
+      throw new Error(result.left.message);
+    }
+    return result.right;
+  }
+
+  @Get(':id')
+  @ApiOperation({
+    summary: 'Get a delivery by ID',
+    description: 'Retrieve detailed information about a specific delivery.',
+  })
+  @ApiParam({ name: 'id', description: 'Delivery ID' })
+  @ApiResponse({
+    status: 200,
+    description: 'Delivery found',
+    schema: {
+      example: {
+        id: 'del-123',
+        transactionId: 'txn-123',
+        customerId: 'cust-456',
+        status: 'PENDING',
+        createdAt: '2023-01-01T00:00:00.000Z',
+      },
+    },
+  })
+  @ApiResponse({ status: 404, description: 'Delivery not found' })
+  async getDeliveryById(@Param('id') id: string) {
+    const result = await this.getDeliveryByIdUseCase.execute(id);
     if (result._tag === 'Left') {
       throw new Error(result.left.message);
     }

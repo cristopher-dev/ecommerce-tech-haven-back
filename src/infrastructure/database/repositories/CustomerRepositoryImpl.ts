@@ -29,8 +29,32 @@ export class CustomerRepositoryImpl implements CustomerRepository {
     );
   }
 
+  async save(customer: Customer): Promise<Customer> {
+    const entity = this.customerRepository.create({
+      id: customer.id,
+      name: customer.name,
+      email: customer.email,
+      address: customer.address,
+    });
+
+    const savedEntity = await this.customerRepository.save(entity);
+    return new Customer(
+      savedEntity.id,
+      savedEntity.name,
+      savedEntity.email,
+      savedEntity.address,
+    );
+  }
+
   async findById(id: string): Promise<Customer | null> {
     const entity = await this.customerRepository.findOne({ where: { id } });
+    if (!entity) return null;
+
+    return new Customer(entity.id, entity.name, entity.email, entity.address);
+  }
+
+  async findByEmail(email: string): Promise<Customer | null> {
+    const entity = await this.customerRepository.findOne({ where: { email } });
     if (!entity) return null;
 
     return new Customer(entity.id, entity.name, entity.email, entity.address);
