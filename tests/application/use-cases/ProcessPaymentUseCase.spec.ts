@@ -3,7 +3,7 @@ import { ProcessPaymentUseCase } from '../../../src/application/use-cases/Proces
 import { TransactionRepository } from '../../../src/domain/repositories/TransactionRepository';
 import { DeliveryRepository } from '../../../src/domain/repositories/DeliveryRepository';
 import { CustomerRepository } from '../../../src/domain/repositories/CustomerRepository';
-import { WompiPaymentService } from '../../../src/application/use-cases/WompiPaymentService';
+import { TechHavenPaymentService } from '../../../src/application/use-cases/TechHavenPaymentService';
 import {
   Transaction,
   TransactionStatus,
@@ -45,7 +45,7 @@ describe('ProcessPaymentUseCase', () => {
       findById: jest.fn(),
       findAll: jest.fn(),
     };
-    const mockWompi = {
+    const mockTechHaven = {
       processPayment: jest.fn(),
     };
 
@@ -56,7 +56,7 @@ describe('ProcessPaymentUseCase', () => {
         { provide: 'DeliveryRepository', useValue: mockDel },
         { provide: 'ProductRepository', useValue: mockProd },
         { provide: 'CustomerRepository', useValue: mockCust },
-        { provide: 'WompiPaymentService', useValue: mockWompi },
+        { provide: 'TechHavenPaymentService', useValue: mockTechHaven },
       ],
     }).compile();
 
@@ -65,7 +65,7 @@ describe('ProcessPaymentUseCase', () => {
     mockDeliveryRepo = module.get('DeliveryRepository');
     mockProductRepo = module.get('ProductRepository');
     mockCustomerRepo = module.get('CustomerRepository');
-    mockWompiService = module.get('WompiPaymentService');
+    mockTechHavenService = module.get('TechHavenPaymentService');
   });
 
   it('should process approved payment and update stock/delivery', async () => {
@@ -106,7 +106,7 @@ describe('ProcessPaymentUseCase', () => {
       .mockResolvedValueOnce(transaction)
       .mockResolvedValueOnce(updatedTransaction);
     mockCustomerRepo.findById.mockResolvedValue(customer);
-    mockWompiService.processPayment.mockResolvedValue({
+    mockTechHavenService.processPayment.mockResolvedValue({
       _tag: 'Right',
       right: TransactionStatus.APPROVED,
     });
@@ -193,7 +193,7 @@ describe('ProcessPaymentUseCase', () => {
 
     mockTransactionRepo.findById.mockResolvedValue(transaction);
     mockCustomerRepo.findById.mockResolvedValue(customer);
-    mockWompiService.processPayment.mockResolvedValue({
+    mockTechHavenService.processPayment.mockResolvedValue({
       _tag: 'Left',
       left: new Error('Payment declined'),
     });
@@ -242,7 +242,7 @@ describe('ProcessPaymentUseCase', () => {
       .mockResolvedValueOnce(transaction)
       .mockResolvedValueOnce(updatedTransaction);
     mockCustomerRepo.findById.mockResolvedValue(customer);
-    mockWompiService.processPayment.mockResolvedValue({
+    mockTechHavenService.processPayment.mockResolvedValue({
       _tag: 'Right',
       right: TransactionStatus.DECLINED,
     });

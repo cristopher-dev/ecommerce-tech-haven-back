@@ -87,7 +87,7 @@ export class TransactionsController {
   @ApiOperation({
     summary: 'Process payment for a transaction',
     description:
-      'Process the payment for an existing transaction using card data. If the payment is approved by Wompi, the transaction status changes to APPROVED, stock is reduced, and a delivery is assigned. If declined, status remains PENDING.',
+      'Process the payment for an existing transaction using card data. If the payment is approved by TechHaven, the transaction status changes to APPROVED, stock is reduced, and a delivery is assigned. If declined, status remains PENDING.',
   })
   @ApiParam({ name: 'id', description: 'Transaction ID' })
   @ApiBody({ type: CardDataDto })

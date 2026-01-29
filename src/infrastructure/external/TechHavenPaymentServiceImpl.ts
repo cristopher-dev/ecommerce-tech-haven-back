@@ -5,9 +5,9 @@ import axios, { AxiosError } from 'axios';
 import { Either, left, right } from 'fp-ts/Either';
 import { TransactionStatus } from '../../domain/entities/Transaction';
 import {
-  WompiPaymentService,
+  TechHavenPaymentService,
   CardData,
-} from '../../application/use-cases/WompiPaymentService';
+} from '../../application/use-cases/TechHavenPaymentService';
 import { CENTS_PER_UNIT, DEFAULT_INSTALLMENTS } from '../../domain/constants';
 
 interface TokenResponse {
@@ -23,7 +23,7 @@ interface TransactionResponse {
 }
 
 @Injectable()
-export class WompiPaymentServiceImpl implements WompiPaymentService {
+export class TechHavenPaymentServiceImpl implements TechHavenPaymentService {
   constructor(private configService: ConfigService) {}
 
   async processPayment(
@@ -33,12 +33,12 @@ export class WompiPaymentServiceImpl implements WompiPaymentService {
     customerEmail: string,
   ): Promise<Either<Error, TransactionStatus>> {
     try {
-      const wompiUrl = this.configService.get<string>('WOMPI_SANDBOX_URL')!;
-      const publicKey = this.configService.get<string>('WOMPI_PUBLIC_KEY')!;
-      const privateKey = this.configService.get<string>('WOMPI_PRIVATE_KEY')!;
+      const techHavenUrl = this.configService.get<string>('TECH_HAVEN_SANDBOX_URL')!;
+      const publicKey = this.configService.get<string>('TECH_HAVEN_PUBLIC_KEY')!;
+      const privateKey = this.configService.get<string>('TECH_HAVEN_PRIVATE_KEY')!;
 
       const tokenResponse = await axios.post<TokenResponse>(
-        `${wompiUrl}/tokens/cards`,
+        `${techHavenUrl}/tokens/cards`,
         {
           number: cardData.number.replace(/\s/g, ''), // Remove spaces
           exp_month: cardData.expMonth,
@@ -56,9 +56,9 @@ export class WompiPaymentServiceImpl implements WompiPaymentService {
       const token = tokenResponse.data.data.id;
 
       const transactionResponse = await axios.post<TransactionResponse>(
-        `${wompiUrl}/transactions`,
+        `${techHavenUrl}/transactions`,
         {
-          amount_in_cents: amount * CENTS_PER_UNIT, // Wompi expects cents
+          amount_in_cents: amount * CENTS_PER_UNIT, // TechHaven expects cents
           currency: 'COP',
           signature: this.generateSignature(
             amount * CENTS_PER_UNIT,
@@ -93,10 +93,10 @@ export class WompiPaymentServiceImpl implements WompiPaymentService {
     } catch (error) {
       const axiosError = error as AxiosError;
       console.error(
-        'Wompi API error:',
+        'TechHaven API error:',
         axiosError.response?.data || axiosError.message,
       );
-      return left(new Error('Error processing payment with Wompi'));
+      return left(new Error('Error processing payment with TechHaven'));
     }
   }
 

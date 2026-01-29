@@ -1,6 +1,6 @@
 # Configuración de Docker
 
-Esta carpeta contiene la configuración de Docker para el proyecto Wompi Backend.
+Esta carpeta contiene la configuración de Docker para el proyecto TechHaven Backend.
 
 ## Tabla de Contenidos
 
@@ -41,8 +41,8 @@ Esta carpeta contiene la configuración de Docker para el proyecto Wompi Backend
 ## Configuración
 
 - Puerto: 5432
-- Base de datos: wompi_db
-- Usuario: wompi_user
-- Contraseña: wompi_password
+- Base de datos: tech-haven_db
+- Usuario: tech-haven_user
+- Contraseña: tech-haven_password
 
 La base de datos se persiste en un volumen de Docker llamado `postgres_data`.

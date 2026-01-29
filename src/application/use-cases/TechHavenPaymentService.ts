@@ -9,7 +9,7 @@ export interface CardData {
   cardHolder: string;
 }
 
-export interface WompiPaymentService {
+export interface TechHavenPaymentService {
   processPayment(
     transactionId: string,
     amount: number,

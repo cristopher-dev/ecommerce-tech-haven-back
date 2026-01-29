@@ -28,7 +28,7 @@ import { DatabaseSeeder } from './DatabaseSeeder';
           port: configService.get('DATABASE_PORT', 5432),
           username: configService.get('DATABASE_USER', 'postgres'),
           password: configService.get('DATABASE_PASSWORD', 'password'),
-          database: configService.get('DATABASE_NAME', 'wompi_db'),
+          database: configService.get('DATABASE_NAME', 'tech-haven_db'),
           entities: [
             ProductEntity,
             CustomerEntity,

@@ -1,7 +1,7 @@
 {
   "info": {
-    "name": "Wompi Payment Backend API",
-    "description": "API collection for Wompi Payment Onboarding Backend. This collection includes all endpoints for managing products, transactions, customers, and deliveries.",
+    "name": "TechHaven Payment Backend API",
+    "description": "API collection for TechHaven Payment Onboarding Backend. This collection includes all endpoints for managing products, transactions, customers, and deliveries.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
@@ -80,7 +80,7 @@
               "host": ["{{base_url}}"],
               "path": ["transactions", "{{transaction_id}}", "process-payment"]
             },
-            "description": "Process payment for a pending transaction using Wompi API. Requires card data (fake data for testing)."
+            "description": "Process payment for a pending transaction using TechHaven API. Requires card data (fake data for testing)."
           }
         }
       ]

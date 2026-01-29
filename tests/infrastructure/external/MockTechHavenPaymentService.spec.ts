@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ConfigModule } from '@nestjs/config';
-import { MockWompiPaymentService } from '../../../src/infrastructure/external/MockWompiPaymentService';
+import { MockTechHavenPaymentService } from '../../../src/infrastructure/external/MockTechHavenPaymentService';
 import { TransactionStatus } from '../../../src/domain/entities/Transaction';
 
 jest.mock('axios');
@@ -8,18 +8,18 @@ import axios from 'axios';
 
 const mockedAxios = axios as jest.Mocked<typeof axios>;
 
-describe('MockWompiPaymentService', () => {
-  let service: MockWompiPaymentService;
+describe('MockTechHavenPaymentService', () => {
+  let service: MockTechHavenPaymentService;
 
   beforeEach(async () => {
     mockedAxios.get.mockResolvedValue({ data: {} });
 
     const module: TestingModule = await Test.createTestingModule({
       imports: [ConfigModule.forRoot()],
-      providers: [MockWompiPaymentService],
+      providers: [MockTechHavenPaymentService],
     }).compile();
 
-    service = module.get<MockWompiPaymentService>(MockWompiPaymentService);
+    service = module.get<MockTechHavenPaymentService>(MockTechHavenPaymentService);
   });
 
   it('should approve payment if amount < 500', async () => {

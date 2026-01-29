@@ -1,10 +1,10 @@
-# Backend de Pagos Wompi
+# Backend de Pagos TechHaven
 
-API backend para el procesamiento de pagos de Wompi, implementada con NestJS y arquitectura hexagonal.
+API backend para el procesamiento de pagos de TechHaven, implementada con NestJS y arquitectura hexagonal.
 
 ## Tabla de Contenidos
 
-- [Backend de Pagos Wompi](#backend-de-pagos-wompi)
+- [Backend de Pagos TechHaven](#backend-de-pagos-tech-haven)
   - [Tabla de Contenidos](#tabla-de-contenidos)
   - [Arquitectura](#arquitectura)
   - [Estructura del Proyecto](#estructura-del-proyecto)
@@ -139,7 +139,7 @@ erDiagram
 - GET /products - Listar productos con stock
 - GET /transactions - Listar transacciones
 - POST /transactions - Crear transacción pendiente
-- PUT /transactions/:id/process-payment - Procesar pago con Wompi
+- PUT /transactions/:id/process-payment - Procesar pago con TechHaven
 - GET /customers - Listar clientes
 - GET /deliveries - Listar entregas
 
@@ -151,19 +151,19 @@ erDiagram
 # Base de Datos
 DATABASE_HOST=localhost
 DATABASE_PORT=5432
-DATABASE_USER=wompi_user
-DATABASE_PASSWORD=wompi_password
-DATABASE_NAME=wompi_db
+DATABASE_USER=tech-haven_user
+DATABASE_PASSWORD=tech-haven_password
+DATABASE_NAME=tech-haven_db
 
 # Entorno
 NODE_ENV=development
 
-# API de Wompi - Sandbox
-WOMPI_SANDBOX_URL=https://api-sandbox.co.uat.wompi.dev/v1
-WOMPI_PUBLIC_KEY=pub_stagtest_g2u0HQd3ZMh05hsSgTS2lUV8t3s4mOt7
-WOMPI_PRIVATE_KEY=prv_stagtest_5i0ZGIGiFcDQifYsXxvsny7Y37tKqFWg
-WOMPI_EVENTS_KEY=stagtest_events_2PDUmhMywUkvb1LvxYnayFbmofT7w39N
-WOMPI_INTEGRITY_KEY=nAIBuqayW70XpUqJS4qf4STYiISd89Fp
+# API de TechHaven - Sandbox
+TECH_HAVEN_SANDBOX_URL=https://api-sandbox.co.uat.tech-haven.dev/v1
+TECH_HAVEN_PUBLIC_KEY=pub_stagtest_g2u0HQd3ZMh05hsSgTS2lUV8t3s4mOt7
+TECH_HAVEN_PRIVATE_KEY=prv_stagtest_5i0ZGIGiFcDQifYsXxvsny7Y37tKqFWg
+TECH_HAVEN_EVENTS_KEY=stagtest_events_2PDUmhMywUkvb1LvxYnayFbmofT7w39N
+TECH_HAVEN_INTEGRITY_KEY=nAIBuqayW70XpUqJS4qf4STYiISd89Fp
 ```
 
 ## Desarrollo Local
@@ -190,7 +190,7 @@ docker-compose up -d
 
 Opción 2: PostgreSQL Local
 
-Asegúrate de que PostgreSQL esté ejecutándose y crea la base de datos `wompi_db`.
+Asegúrate de que PostgreSQL esté ejecutándose y crea la base de datos `tech-haven_db`.
 
 ### Ejecutar
 
@@ -271,6 +271,6 @@ Obligatorio en producción. Configurar certificados SSL en el servidor.
 
 ## Colección de Postman
 
-Importa la colección de Postman desde el archivo: [`Wompi Payment Backend.postman_collection.json`](./Wompi%20Payment%20Backend.postman_collection.json)
+Importa la colección de Postman desde el archivo: [`TechHaven Payment Backend.postman_collection.json`](./TechHaven%20Payment%20Backend.postman_collection.json)
 
 Esta colección incluye todos los endpoints de la API con solicitudes de ejemplo y variables para facilitar las pruebas.

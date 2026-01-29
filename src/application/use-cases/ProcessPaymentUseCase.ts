@@ -9,7 +9,7 @@ import type { TransactionRepository } from '../../domain/repositories/Transactio
 import type { DeliveryRepository } from '../../domain/repositories/DeliveryRepository';
 import type { ProductRepository } from '../../domain/repositories/ProductRepository';
 import type { CustomerRepository } from '../../domain/repositories/CustomerRepository';
-import type { WompiPaymentService, CardData } from './WompiPaymentService';
+import type { TechHavenPaymentService, CardData } from './TechHavenPaymentService';
 import { DEFAULT_QUANTITY } from '../../domain/constants';
 
 @Injectable()
@@ -23,8 +23,8 @@ export class ProcessPaymentUseCase {
     private readonly productRepository: ProductRepository,
     @Inject('CustomerRepository')
     private readonly customerRepository: CustomerRepository,
-    @Inject('WompiPaymentService')
-    private readonly wompiService: WompiPaymentService,
+    @Inject('TechHavenPaymentService')
+    private readonly techHavenService: TechHavenPaymentService,
   ) {}
 
   async execute(
@@ -40,7 +40,7 @@ export class ProcessPaymentUseCase {
     );
     if (!customer) return left(new Error('Customer not found'));
 
-    const result = await this.wompiService.processPayment(
+    const result = await this.techHavenService.processPayment(
       transactionId,
       transaction.amount,
       cardData,

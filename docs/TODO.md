@@ -1,4 +1,4 @@
-# TODO.md - Checklist para Verificación Completa del Backend Wompi Payment
+# TODO.md - Checklist para Verificación Completa del Backend TechHaven Payment
 
 Este archivo contiene checklists detallados basados en los requisitos del test para asegurar que el backend esté completamente funcional y cumpla con todas las especificaciones.
 
@@ -77,7 +77,7 @@ Este archivo contiene checklists detallados basados en los requisitos del test p
 - [x] Uso de HTTPS en producción
 - [x] Headers de seguridad (bonus)
 
-## Integración Wompi
+## Integración TechHaven
 
 ### Configuración Sandbox
 
@@ -87,9 +87,9 @@ Este archivo contiene checklists detallados basados en los requisitos del test p
 
 ### Servicio de Pago
 
-- [x] Interfaz WompiPaymentService
-- [x] Implementación MockWompiPaymentService
-- [x] Implementación real de Wompi API (llamada completa)
+- [x] Interfaz TechHavenPaymentService
+- [x] Implementación MockTechHavenPaymentService
+- [x] Implementación real de TechHaven API (llamada completa)
 - [x] Llamada de verificación de conectividad
 - [x] Lógica de aprobación/declinación
 - [x] Manejo de errores
@@ -97,7 +97,7 @@ Este archivo contiene checklists detallados basados en los requisitos del test p
 ### Flujo de Pago
 
 - [x] Crear transacción PENDING
-- [x] Llamar a Wompi API
+- [x] Llamar a TechHaven API
 - [x] Actualizar status de transacción
 - [x] Actualizar stock si aprobado
 - [x] Asignar delivery si aprobado
@@ -232,7 +232,7 @@ Este archivo contiene checklists detallados basados en los requisitos del test p
 ### Funcionalidad Completa
 
 - [x] Crear transacción pendiente
-- [x] Procesar pago con Wompi
+- [x] Procesar pago con TechHaven
 - [x] Actualizar stock
 - [x] Asignar delivery
 - [x] Listar recursos
@@ -264,7 +264,7 @@ Este archivo contiene checklists detallados basados en los requisitos del test p
 - [x] Seeding productos funciona
 - [x] Endpoints mapeados correctamente
 - [x] Swagger configurado
-- [x] Integración Wompi API implementada (tokenización + transacción)
+- [x] Integración TechHaven API implementada (tokenización + transacción)
 
 - Marcar [x] cuando esté implementado y verificado
 - Agregar comentarios si algo está parcialmente implementado

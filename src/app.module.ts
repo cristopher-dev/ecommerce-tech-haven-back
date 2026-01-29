@@ -12,7 +12,7 @@ import { GetTransactionsUseCase } from './application/use-cases/GetTransactionsU
 import { GetCustomersUseCase } from './application/use-cases/GetCustomersUseCase';
 import { GetDeliveriesUseCase } from './application/use-cases/GetDeliveriesUseCase';
 import { DatabaseModule } from './infrastructure/database/DatabaseModule';
-import { MockWompiPaymentService } from './infrastructure/external/MockWompiPaymentService';
+import { MockTechHavenPaymentService } from './infrastructure/external/MockTechHavenPaymentService';
 
 @Module({
   imports: [ConfigModule.forRoot(), DatabaseModule],
@@ -30,8 +30,8 @@ import { MockWompiPaymentService } from './infrastructure/external/MockWompiPaym
     GetCustomersUseCase,
     GetDeliveriesUseCase,
     {
-      provide: 'WompiPaymentService',
-      useClass: MockWompiPaymentService,
+      provide: 'TechHavenPaymentService',
+      useClass: MockTechHavenPaymentService,
     },
   ],
 })

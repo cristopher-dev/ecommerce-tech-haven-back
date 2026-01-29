@@ -3,32 +3,32 @@ version: '3.8'
 services:
   postgres:
     image: postgres:alpine
-    container_name: wompi-postgres
+    container_name: tech-haven-postgres
     environment:
-      POSTGRES_DB: wompi_db
-      POSTGRES_USER: wompi_user
-      POSTGRES_PASSWORD: wompi_password
+      POSTGRES_DB: tech-haven_db
+      POSTGRES_USER: tech-haven_user
+      POSTGRES_PASSWORD: tech-haven_password
     ports:
       - '5432:5432'
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
-      wompi_network:
+      tech-haven_network:
         ipv4_address: 172.20.0.10
     restart: unless-stopped
 
   pgadmin:
     image: dpage/pgadmin4
-    container_name: wompi-pgadmin
+    container_name: tech-haven-pgadmin
     environment:
-      PGADMIN_DEFAULT_EMAIL: admin@wompi.com
+      PGADMIN_DEFAULT_EMAIL: admin@tech-haven.com
       PGADMIN_DEFAULT_PASSWORD: admin
     ports:
       - '5050:80'
     depends_on:
       - postgres
     networks:
-      wompi_network:
+      tech-haven_network:
         ipv4_address: 172.20.0.11
     restart: unless-stopped
 
@@ -36,7 +36,7 @@ volumes:
   postgres_data:
 
 networks:
-  wompi_network:
+  tech-haven_network:
     driver: bridge
     ipam:
       config:

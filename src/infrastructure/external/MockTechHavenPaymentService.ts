@@ -2,13 +2,13 @@ import { Injectable } from '@nestjs/common';
 import { Either, right } from 'fp-ts/Either';
 import { TransactionStatus } from '../../domain/entities/Transaction';
 import {
-  WompiPaymentService,
+  TechHavenPaymentService,
   CardData,
-} from '../../application/use-cases/WompiPaymentService';
+} from '../../application/use-cases/TechHavenPaymentService';
 import { MOCK_DECLINE_THRESHOLD } from '../../domain/constants';
 
 @Injectable()
-export class MockWompiPaymentService implements WompiPaymentService {
+export class MockTechHavenPaymentService implements TechHavenPaymentService {
   constructor() {}
 
   async processPayment(

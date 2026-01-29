@@ -1,24 +1,24 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ConfigModule } from '@nestjs/config';
-import { WompiPaymentServiceImpl } from '../../../src/infrastructure/external/WompiPaymentServiceImpl';
+import { TechHavenPaymentServiceImpl } from '../../../src/infrastructure/external/TechHavenPaymentServiceImpl';
 
 jest.mock('axios');
 import axios from 'axios';
 
 const mockedAxios = axios as jest.Mocked<typeof axios>;
 
-describe('WompiPaymentServiceImpl', () => {
-  let service: WompiPaymentServiceImpl;
+describe('TechHavenPaymentServiceImpl', () => {
+  let service: TechHavenPaymentServiceImpl;
   let consoleErrorSpy: jest.SpyInstance;
 
   beforeEach(async () => {
     consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
     const module: TestingModule = await Test.createTestingModule({
       imports: [ConfigModule.forRoot()],
-      providers: [WompiPaymentServiceImpl],
+      providers: [TechHavenPaymentServiceImpl],
     }).compile();
 
-    service = module.get<WompiPaymentServiceImpl>(WompiPaymentServiceImpl);
+    service = module.get<TechHavenPaymentServiceImpl>(TechHavenPaymentServiceImpl);
   });
 
   afterEach(() => {

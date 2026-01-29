@@ -1,6 +1,6 @@
 {
   "sonarlint.connectedMode.project": {
     "connectionId": "sonarqube-server",
-    "projectKey": "wompi-back"
+    "projectKey": "tech-haven-back"
   }
 }

@@ -17,8 +17,8 @@ export async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe());
 
   const config = new DocumentBuilder()
-    .setTitle('Wompi Payment API')
-    .setDescription('API for Wompi payment onboarding')
+    .setTitle('TechHaven Payment API')
+    .setDescription('API for TechHaven payment onboarding')
     .setVersion('1.0')
     .build();
   const document = SwaggerModule.createDocument(app, config);
