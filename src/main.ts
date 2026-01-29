@@ -14,6 +14,14 @@ export async function bootstrap() {
     app.use(helmet());
   }
 
+  // Enable CORS for all origins
+  app.enableCors({
+    origin: true,
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+  });
+
   app.useGlobalPipes(new ValidationPipe());
 
   const config = new DocumentBuilder()
