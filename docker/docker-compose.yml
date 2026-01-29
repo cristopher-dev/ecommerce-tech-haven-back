@@ -2,35 +2,70 @@ version: '3.8'
 
 services:
   postgres:
-    image: postgres:alpine
+    image: postgres:15-alpine
     container_name: tech-haven-postgres
     environment:
-      POSTGRES_DB: tech-haven_db
-      POSTGRES_USER: tech-haven_user
-      POSTGRES_PASSWORD: tech-haven_password
+      POSTGRES_DB: ${DATABASE_NAME:-tech-haven_db}
+      POSTGRES_USER: ${DATABASE_USER:-postgres}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD:-password}
     ports:
-      - '5432:5432'
+      - '${DATABASE_PORT:-5432}:5432'
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
       tech-haven_network:
         ipv4_address: 172.20.0.10
     restart: unless-stopped
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${DATABASE_USER:-postgres}']
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   pgadmin:
-    image: dpage/pgadmin4
+    image: dpage/pgadmin4:latest
     container_name: tech-haven-pgadmin
     environment:
-      PGADMIN_DEFAULT_EMAIL: admin@tech-haven.com
-      PGADMIN_DEFAULT_PASSWORD: admin
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL:-admin@tech-haven.com}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD:-admin}
     ports:
       - '5050:80'
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     networks:
       tech-haven_network:
         ipv4_address: 172.20.0.11
     restart: unless-stopped
+
+  app:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    container_name: tech-haven-app
+    environment:
+      NODE_ENV: ${NODE_ENV:-development}
+      DATABASE_HOST: ${DATABASE_HOST:-postgres}
+      DATABASE_PORT: ${DATABASE_PORT:-5432}
+      DATABASE_USER: ${DATABASE_USER:-postgres}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD:-password}
+      DATABASE_NAME: ${DATABASE_NAME:-tech-haven_db}
+      DATABASE_LOGGING: ${DATABASE_LOGGING:-false}
+    ports:
+      - '${APP_PORT:-3000}:3000'
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ../src:/app/src
+      - ../package.json:/app/package.json
+      - ../tsconfig.json:/app/tsconfig.json
+      - /app/node_modules
+    networks:
+      tech-haven_network:
+        ipv4_address: 172.20.0.12
+    restart: unless-stopped
+    command: npm run start:dev
 
 volumes:
   postgres_data:

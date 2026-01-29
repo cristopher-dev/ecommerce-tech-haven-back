@@ -1,5 +1,11 @@
 import 'reflect-metadata';
-import { Controller, Get, Param } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Param,
+  HttpException,
+  HttpStatus,
+} from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
 import { GetProductsUseCase } from '../../application/use-cases/GetProductsUseCase';
 import { GetProductByIdUseCase } from '../../application/use-cases/GetProductByIdUseCase';
@@ -65,7 +71,7 @@ export class ProductsController {
   async getProductById(@Param('id') id: string) {
     const result = await this.getProductByIdUseCase.execute(id);
     if (result._tag === 'Left') {
-      throw new Error(result.left.message);
+      throw new HttpException(result.left.message, HttpStatus.NOT_FOUND);
     }
     return result.right;
   }
