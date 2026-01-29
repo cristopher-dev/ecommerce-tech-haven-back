@@ -4,34 +4,159 @@
     "name": "Laptop Gaming Pro",
     "description": "High-performance gaming laptop with RTX 4070",
     "price": 2500,
-    "stock": 10
+    "stock": 10,
+    "imageUrl": "https://images.unsplash.com/photo-1515705576902-9de428e8a6a6?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=300&q=80"
   },
   {
     "id": "prod-2",
     "name": "Wireless Headphones",
     "description": "Noise-cancelling wireless headphones with 30h battery",
     "price": 299.99,
-    "stock": 25
+    "stock": 25,
+    "imageUrl": "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=300&q=80"
   },
   {
     "id": "prod-3",
     "name": "Smartphone Ultra",
     "description": "Latest smartphone with 512GB storage and triple camera",
     "price": 1199,
-    "stock": 15
+    "stock": 15,
+    "imageUrl": "https://images.unsplash.com/photo-1511707267537-b85faf00021e?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=300&q=80"
   },
   {
     "id": "prod-4",
     "name": "Mechanical Keyboard",
     "description": "RGB mechanical keyboard with blue switches",
     "price": 149.99,
-    "stock": 30
+    "stock": 30,
+    "imageUrl": "https://images.unsplash.com/photo-1587829191301-ce8cdc4ecda9?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=300&q=80"
   },
   {
     "id": "prod-5",
     "name": "4K Monitor 32\"",
     "description": "32-inch 4K UHD monitor with HDR support",
     "price": 699.99,
-    "stock": 8
+    "stock": 8,
+    "imageUrl": "https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=300&q=80"
+  },
+  {
+    "id": "prod-6",
+    "name": "Smart Watch Pro",
+    "description": "Fitness tracking smartwatch with heart rate monitor",
+    "price": 399.99,
+    "stock": 20,
+    "imageUrl": "https://images.unsplash.com/photo-1523275335684-37898b6baf30?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=300&q=80"
+  },
+  {
+    "id": "prod-7",
+    "name": "USB-C Hub 7in1",
+    "description": "Multi-port USB-C hub with HDMI and SD card reader",
+    "price": 79.99,
+    "stock": 50,
+    "imageUrl": "https://images.unsplash.com/photo-1625948515291-69613efd103f?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=300&q=80"
+  },
+  {
+    "id": "prod-8",
+    "name": "Wireless Mouse",
+    "description": "Silent ergonomic wireless mouse",
+    "price": 49.99,
+    "stock": 40,
+    "imageUrl": "https://images.unsplash.com/photo-1527814050087-3793815479db?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=300&q=80"
+  },
+  {
+    "id": "prod-9",
+    "name": "Portable SSD 1TB",
+    "description": "External solid state drive with 1050MB/s speed",
+    "price": 129.99,
+    "stock": 35,
+    "imageUrl": "https://images.unsplash.com/photo-1597872200969-2b65d56bd16b?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=300&q=80"
+  },
+  {
+    "id": "prod-10",
+    "name": "Webcam 4K",
+    "description": "Professional 4K webcam with auto focus",
+    "price": 179.99,
+    "stock": 18,
+    "imageUrl": "https://images.unsplash.com/photo-1598327105666-5b89351aff97?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=300&q=80"
+  },
+  {
+    "id": "prod-11",
+    "name": "Tablet Pro 12.9\"",
+    "description": "Powerful tablet for creative professionals",
+    "price": 1099,
+    "stock": 12,
+    "imageUrl": "https://images.unsplash.com/photo-1526765260-f10f8aa7e745?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=300&q=80"
+  },
+  {
+    "id": "prod-12",
+    "name": "Bluetooth Speaker Premium",
+    "description": "Waterproof premium speaker with 360° sound",
+    "price": 199.99,
+    "stock": 28,
+    "imageUrl": "https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=300&q=80"
+  },
+  {
+    "id": "prod-13",
+    "name": "Portable Charger 65W",
+    "description": "Fast charging power bank with 30000mAh capacity",
+    "price": 89.99,
+    "stock": 45,
+    "imageUrl": "https://images.unsplash.com/photo-1609091839311-d5365f9ff1c5?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=300&q=80"
+  },
+  {
+    "id": "prod-14",
+    "name": "WiFi 6 Router",
+    "description": "Ultra-fast WiFi 6 mesh router system",
+    "price": 299.99,
+    "stock": 14,
+    "imageUrl": "https://images.unsplash.com/photo-1631862550519-c7bc9d1ee5f9?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=300&q=80"
+  },
+  {
+    "id": "prod-15",
+    "name": "Gaming Headset RGB",
+    "description": "7.1 surround sound gaming headset with RGB",
+    "price": 149.99,
+    "stock": 32,
+    "imageUrl": "https://images.unsplash.com/photo-1484704849700-f032a568e944?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=300&q=80"
+  },
+  {
+    "id": "prod-16",
+    "name": "Mechanical Keyboard Wireless",
+    "description": "Wireless mechanical keyboard with hot-swap switches",
+    "price": 199.99,
+    "stock": 22,
+    "imageUrl": "https://images.unsplash.com/photo-1587829191301-ce8cdc4ecda9?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=300&q=80"
+  },
+  {
+    "id": "prod-17",
+    "name": "27\" IPS Monitor",
+    "description": "Professional IPS monitor with 100% sRGB coverage",
+    "price": 449.99,
+    "stock": 9,
+    "imageUrl": "https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=300&q=80"
+  },
+  {
+    "id": "prod-18",
+    "name": "Graphics Tablet",
+    "description": "Pressure-sensitive graphics tablet for artists",
+    "price": 299.99,
+    "stock": 16,
+    "imageUrl": "https://images.unsplash.com/photo-1554866585-acbb2b90556e?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=300&q=80"
+  },
+  {
+    "id": "prod-19",
+    "name": "Microphone Condenser",
+    "description": "Studio-quality condenser microphone with shock mount",
+    "price": 199.99,
+    "stock": 19,
+    "imageUrl": "https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=300&q=80"
+  },
+  {
+    "id": "prod-20",
+    "name": "Laptop Cooling Pad",
+    "description": "Aluminum laptop cooling pad with dual fans",
+    "price": 59.99,
+    "stock": 55,
+    "imageUrl": "https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=300&q=80"
   }
 ]

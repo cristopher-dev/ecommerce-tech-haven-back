@@ -22,6 +22,7 @@ export class ProductRepositoryImpl implements ProductRepository {
           entity.description,
           Number(entity.price),
           entity.stock,
+          entity.imageUrl,
         ),
     );
   }
@@ -36,6 +37,7 @@ export class ProductRepositoryImpl implements ProductRepository {
       entity.description,
       Number(entity.price),
       entity.stock,
+      entity.imageUrl,
     );
   }
 

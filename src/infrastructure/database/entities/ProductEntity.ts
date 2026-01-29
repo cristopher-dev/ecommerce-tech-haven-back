@@ -16,4 +16,7 @@ export class ProductEntity {
 
   @Column('int')
   stock!: number;
+
+  @Column({ nullable: true })
+  imageUrl?: string;
 }
