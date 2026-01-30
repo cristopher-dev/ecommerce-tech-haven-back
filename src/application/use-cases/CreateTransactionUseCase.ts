@@ -4,6 +4,8 @@ import { pipe } from 'fp-ts/function';
 import {
   Transaction,
   TransactionStatus,
+  TransactionItem,
+  DeliveryInfoData,
 } from '../../domain/entities/Transaction';
 import type { ProductRepository } from '../../domain/repositories/ProductRepository';
 import type { TransactionRepository } from '../../domain/repositories/TransactionRepository';
@@ -13,9 +15,13 @@ export interface CreateTransactionInput {
   customerName: string;
   customerEmail: string;
   customerAddress: string;
-  productId: string | number;
-  quantity: number;
+  deliveryInfo: DeliveryInfoData;
+  items: Array<{ productId: string; quantity: number }>;
 }
+
+// Constants for fees
+const BASE_FEE = 50.0;
+const DELIVERY_FEE = 100.0;
 
 @Injectable()
 export class CreateTransactionUseCase {
@@ -31,7 +37,7 @@ export class CreateTransactionUseCase {
   execute(input: CreateTransactionInput): TaskEither<Error, Transaction> {
     return pipe(
       this.validateInput(input),
-      chain(() => this.checkStock(input.productId, input.quantity)),
+      chain(() => this.checkAllStocks(input.items)),
       chain(() => this.createCustomer(input)),
       chain((customer: { id: string }) =>
         this.createTransaction(input, customer.id),
@@ -44,18 +50,27 @@ export class CreateTransactionUseCase {
   ): TaskEither<Error, CreateTransactionInput> {
     return tryCatch(
       () => {
-        // Validate productId: must exist and not be empty
+        // Validate items array
         if (
-          !input.productId ||
-          (typeof input.productId === 'string' && input.productId.trim() === '')
+          !input.items ||
+          !Array.isArray(input.items) ||
+          input.items.length === 0
         ) {
-          throw new Error('productId should not be empty');
+          throw new Error('items array cannot be empty');
         }
 
-        // Validate productId is a valid number
-        const productIdNum = Number(input.productId);
-        if (isNaN(productIdNum) || productIdNum <= 0) {
-          throw new Error('productId should not be empty');
+        // Validate each item
+        for (const item of input.items) {
+          if (!item.productId || String(item.productId).trim() === '') {
+            throw new Error('productId should not be empty');
+          }
+          if (
+            !item.quantity ||
+            item.quantity <= 0 ||
+            !Number.isInteger(item.quantity)
+          ) {
+            throw new Error('quantity must be positive integer');
+          }
         }
 
         // Validate customerName
@@ -73,13 +88,22 @@ export class CreateTransactionUseCase {
           throw new Error('customerAddress should not be empty');
         }
 
-        // Validate quantity
+        // Validate deliveryInfo
+        if (!input.deliveryInfo) {
+          throw new Error('deliveryInfo should not be empty');
+        }
+        const { firstName, lastName, address, city, state, postalCode, phone } =
+          input.deliveryInfo;
         if (
-          !input.quantity ||
-          input.quantity <= 0 ||
-          !Number.isInteger(input.quantity)
+          !firstName ||
+          !lastName ||
+          !address ||
+          !city ||
+          !state ||
+          !postalCode ||
+          !phone
         ) {
-          throw new Error('quantity must be positive integer');
+          throw new Error('deliveryInfo is incomplete');
         }
 
         return Promise.resolve(input);
@@ -88,21 +112,23 @@ export class CreateTransactionUseCase {
     );
   }
 
-  private checkStock(
-    productId: string | number,
-    quantity: number,
+  private checkAllStocks(
+    items: Array<{ productId: string; quantity: number }>,
   ): TaskEither<Error, void> {
     return tryCatch(
       async () => {
-        const productIdNum = Number(productId);
-        const product = await this.productRepository.findById(
-          String(productIdNum),
-        );
-        if (!product) {
-          throw new Error('Product not found');
-        }
-        if (product.stock < quantity) {
-          throw new Error('Insufficient stock');
+        for (const item of items) {
+          const product = await this.productRepository.findById(
+            String(item.productId),
+          );
+          if (!product) {
+            throw new Error(`Product '${item.productId}' not found`);
+          }
+          if (product.stock < item.quantity) {
+            throw new Error(
+              `Insufficient stock for product '${item.productId}'`,
+            );
+          }
         }
       },
       (error) => (error instanceof Error ? error : new Error(String(error))),
@@ -140,13 +166,24 @@ export class CreateTransactionUseCase {
   ): TaskEither<Error, Transaction> {
     return tryCatch(
       async () => {
-        const productIdNum = Number(input.productId);
-        const product = await this.productRepository.findById(
-          String(productIdNum),
-        );
-        if (!product) {
-          throw new Error('Product not found');
+        // Prepare transaction items
+        const transactionItems: TransactionItem[] = input.items.map((item) => ({
+          productId: String(item.productId),
+          quantity: item.quantity,
+        }));
+
+        // Calculate total amount
+        let subtotal = 0;
+        for (const item of input.items) {
+          const product = await this.productRepository.findById(
+            String(item.productId),
+          );
+          if (product) {
+            subtotal += product.price * item.quantity;
+          }
         }
+
+        const amount = subtotal + BASE_FEE + DELIVERY_FEE;
 
         // Generate unique transactionId and orderId
         const timestamp = new Date()
@@ -161,12 +198,15 @@ export class CreateTransactionUseCase {
 
         const transaction = await this.transactionRepository.create({
           customerId,
-          productId: String(productIdNum),
-          amount: product.price * input.quantity,
+          amount,
           status: TransactionStatus.PENDING,
+          items: transactionItems,
+          deliveryInfo: input.deliveryInfo,
+          baseFee: BASE_FEE,
+          deliveryFee: DELIVERY_FEE,
+          subtotal,
           transactionId,
           orderId,
-          quantity: input.quantity,
         });
         return transaction;
       },

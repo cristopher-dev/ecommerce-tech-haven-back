@@ -7,4 +7,5 @@ export interface TransactionRepository {
   findById(id: string): Promise<Transaction | null>;
   updateStatus(id: string, status: TransactionStatus): Promise<void>;
   findAll(): Promise<Transaction[]>;
+  findByTransactionId(transactionId: string): Promise<Transaction | null>;
 }

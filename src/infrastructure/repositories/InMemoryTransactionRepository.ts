@@ -16,14 +16,19 @@ export class InMemoryTransactionRepository implements TransactionRepository {
     const transaction = new Transaction(
       uuidv4(),
       data.customerId,
-      data.productId,
       data.amount,
       data.status,
+      data.items,
+      data.deliveryInfo,
+      data.baseFee,
+      data.deliveryFee,
+      data.subtotal,
       new Date(),
       new Date(),
       data.transactionId,
       data.orderId,
-      data.quantity,
+      data.productId, // backwards compatibility
+      data.quantity, // backwards compatibility
     );
     this.transactions.push(transaction);
     return await Promise.resolve(transaction);
@@ -46,5 +51,13 @@ export class InMemoryTransactionRepository implements TransactionRepository {
 
   async findAll(): Promise<Transaction[]> {
     return await Promise.resolve(this.transactions);
+  }
+
+  async findByTransactionId(
+    transactionId: string,
+  ): Promise<Transaction | null> {
+    return await Promise.resolve(
+      this.transactions.find((t) => t.transactionId === transactionId) || null,
+    );
   }
 }

@@ -21,10 +21,13 @@ export class TransactionRepositoryImpl implements TransactionRepository {
     const entityData: any = {
       id: crypto.randomUUID(),
       customerId: transactionData.customerId,
-      productId: transactionData.productId,
+      items: transactionData.items,
+      deliveryInfo: transactionData.deliveryInfo,
       amount: transactionData.amount,
+      baseFee: transactionData.baseFee,
+      deliveryFee: transactionData.deliveryFee,
+      subtotal: transactionData.subtotal,
       status: transactionData.status,
-      quantity: transactionData.quantity || 1,
     };
 
     if (transactionData.transactionId) {
@@ -38,36 +41,13 @@ export class TransactionRepositoryImpl implements TransactionRepository {
     const savedEntity = (await this.transactionRepository.save(
       entity,
     )) as unknown as TransactionEntity;
-    return new Transaction(
-      savedEntity.id,
-      savedEntity.customerId,
-      savedEntity.productId,
-      Number(savedEntity.amount),
-      savedEntity.status,
-      savedEntity.createdAt,
-      savedEntity.updatedAt,
-      savedEntity.transactionId,
-      savedEntity.orderId,
-      savedEntity.quantity,
-    );
+    return this.mapEntityToTransaction(savedEntity);
   }
 
   async findById(id: string): Promise<Transaction | null> {
     const entity = await this.transactionRepository.findOne({ where: { id } });
     if (!entity) return null;
-
-    return new Transaction(
-      entity.id,
-      entity.customerId,
-      entity.productId,
-      Number(entity.amount),
-      entity.status,
-      entity.createdAt,
-      entity.updatedAt,
-      entity.transactionId,
-      entity.orderId,
-      entity.quantity,
-    );
+    return this.mapEntityToTransaction(entity);
   }
 
   async updateStatus(id: string, status: TransactionStatus): Promise<void> {
@@ -78,20 +58,36 @@ export class TransactionRepositoryImpl implements TransactionRepository {
     const entities = await this.transactionRepository.find({
       order: { createdAt: 'DESC' },
     });
-    return entities.map(
-      (entity) =>
-        new Transaction(
-          entity.id,
-          entity.customerId,
-          entity.productId,
-          Number(entity.amount),
-          entity.status,
-          entity.createdAt,
-          entity.updatedAt,
-          entity.transactionId,
-          entity.orderId,
-          entity.quantity,
-        ),
+    return entities.map((entity) => this.mapEntityToTransaction(entity));
+  }
+
+  async findByTransactionId(
+    transactionId: string,
+  ): Promise<Transaction | null> {
+    const entity = await this.transactionRepository.findOne({
+      where: { transactionId },
+    });
+    if (!entity) return null;
+    return this.mapEntityToTransaction(entity);
+  }
+
+  private mapEntityToTransaction(entity: TransactionEntity): Transaction {
+    return new Transaction(
+      entity.id,
+      entity.customerId,
+      Number(entity.amount),
+      entity.status,
+      entity.items || [],
+      entity.deliveryInfo,
+      Number(entity.baseFee),
+      Number(entity.deliveryFee),
+      Number(entity.subtotal),
+      entity.createdAt,
+      entity.updatedAt,
+      entity.transactionId,
+      entity.orderId,
+      entity.productId, // backwards compatibility
+      entity.quantity, // backwards compatibility
     );
   }
 }

@@ -13,7 +13,6 @@ import type {
   TechHavenPaymentService,
   CardData,
 } from './TechHavenPaymentService';
-import { DEFAULT_QUANTITY } from '../../domain/constants';
 
 @Injectable()
 export class ProcessPaymentUseCase {
@@ -35,7 +34,7 @@ export class ProcessPaymentUseCase {
     cardData: CardData,
   ): Promise<Either<Error, Transaction>> {
     const transaction =
-      await this.transactionRepository.findById(transactionId);
+      await this.transactionRepository.findByTransactionId(transactionId);
     if (!transaction) return left(new Error('Transaction not found'));
 
     const customer = await this.customerRepository.findById(
@@ -52,27 +51,32 @@ export class ProcessPaymentUseCase {
     if (result._tag === 'Left') return left(result.left);
 
     const status = result.right;
-    await this.transactionRepository.updateStatus(transactionId, status);
+    await this.transactionRepository.updateStatus(transaction.id, status);
 
     if (status === TransactionStatus.APPROVED) {
-      await this.updateStock(transaction.productId);
+      await this.updateStocks(transaction.items);
       await this.assignDelivery(transaction);
     }
 
-    const updatedTransaction =
-      await this.transactionRepository.findById(transactionId);
+    const updatedTransaction = await this.transactionRepository.findById(
+      transaction.id,
+    );
     return updatedTransaction
       ? right(updatedTransaction)
       : left(new Error('Transaction not found after update'));
   }
 
-  private async updateStock(productId: string): Promise<void> {
-    const product = await this.productRepository.findById(productId);
-    if (product) {
-      await this.productRepository.updateStock(
-        productId,
-        product.stock - DEFAULT_QUANTITY,
-      );
+  private async updateStocks(
+    items: Array<{ productId: string; quantity: number }>,
+  ): Promise<void> {
+    for (const item of items) {
+      const product = await this.productRepository.findById(item.productId);
+      if (product) {
+        await this.productRepository.updateStock(
+          item.productId,
+          product.stock - item.quantity,
+        );
+      }
     }
   }
 

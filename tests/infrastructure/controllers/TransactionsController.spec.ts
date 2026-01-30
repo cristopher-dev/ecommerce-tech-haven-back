@@ -22,6 +22,22 @@ describe('TransactionsController', () => {
     const mockProcess = { execute: jest.fn() };
     const mockGet = { execute: jest.fn() };
     const mockGetById = { execute: jest.fn() };
+    const mockCustomerRepo = {
+      create: jest.fn(),
+      findById: jest.fn(),
+      findByEmail: jest.fn(),
+      findAll: jest.fn(),
+    };
+    const mockProductRepo = {
+      findAll: jest.fn(),
+      findById: jest.fn(),
+      updateStock: jest.fn(),
+    };
+    const mockDeliveryRepo = {
+      create: jest.fn(),
+      findById: jest.fn(),
+      findAll: jest.fn(),
+    };
 
     const module: TestingModule = await Test.createTestingModule({
       controllers: [TransactionsController],
@@ -30,6 +46,9 @@ describe('TransactionsController', () => {
         { provide: ProcessPaymentUseCase, useValue: mockProcess },
         { provide: GetTransactionsUseCase, useValue: mockGet },
         { provide: GetTransactionByIdUseCase, useValue: mockGetById },
+        { provide: 'CustomerRepository', useValue: mockCustomerRepo },
+        { provide: 'ProductRepository', useValue: mockProductRepo },
+        { provide: 'DeliveryRepository', useValue: mockDeliveryRepo },
       ],
     }).compile();
 
@@ -45,14 +64,25 @@ describe('TransactionsController', () => {
       new Transaction(
         '1',
         'cust1',
-        'prod1',
         100,
         TransactionStatus.PENDING,
+        [{ productId: 'prod-1', quantity: 1 }],
+        {
+          firstName: 'John',
+          lastName: 'Doe',
+          address: '123 Main',
+          city: 'NYC',
+          state: 'NY',
+          postalCode: '10001',
+          phone: '+1234567890',
+        },
+        50,
+        100,
+        50,
         new Date(),
         new Date(),
         'TXN-20250130-0001',
         'ORD-20250130-0001',
-        1,
       ),
     ];
     mockGetUC.execute.mockResolvedValue({ _tag: 'Right', right: transactions });
