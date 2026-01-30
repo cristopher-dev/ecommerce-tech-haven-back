@@ -10,6 +10,7 @@ import {
   MinLength,
   IsArray,
   ValidateNested,
+  ArrayMinSize,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import {
@@ -147,9 +148,9 @@ export class CreateTransactionInputDto {
 
   @IsNotEmpty({ message: 'items should not be empty' })
   @IsArray({ message: 'items must be an array' })
+  @ArrayMinSize(1, { message: 'items array cannot be empty' })
   @ValidateNested({ each: true })
   @Type(() => TransactionItemInputDto)
-  @Min(1, { message: 'items array cannot be empty' })
   @ApiProperty({
     description: 'Array of items in the transaction',
     type: [TransactionItemInputDto],
