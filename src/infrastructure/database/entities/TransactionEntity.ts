@@ -12,6 +12,12 @@ export class TransactionEntity {
   @PrimaryColumn()
   id!: string;
 
+  @Column({ unique: true, nullable: true })
+  transactionId?: string;
+
+  @Column({ unique: true, nullable: true })
+  orderId?: string;
+
   @Column()
   customerId!: string;
 
@@ -20,6 +26,9 @@ export class TransactionEntity {
 
   @Column('decimal', { precision: 10, scale: 2 })
   amount!: number;
+
+  @Column({ default: 1 })
+  quantity!: number;
 
   @Column({
     type: 'enum',

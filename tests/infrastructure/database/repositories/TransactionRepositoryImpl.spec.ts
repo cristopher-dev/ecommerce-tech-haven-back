@@ -50,6 +50,9 @@ describe('TransactionRepositoryImpl', () => {
         productId: 'prod-1',
         amount: 100,
         status: TransactionStatus.PENDING,
+        transactionId: 'TXN-20250130-0001',
+        orderId: 'ORD-20250130-0001',
+        quantity: 1,
       };
       const entity = {
         id: '1',
@@ -68,6 +71,9 @@ describe('TransactionRepositoryImpl', () => {
       expect(result.productId).toBe('prod-1');
       expect(result.amount).toBe(100);
       expect(result.status).toBe(TransactionStatus.PENDING);
+      expect(result.transactionId).toBe('TXN-20250130-0001');
+      expect(result.orderId).toBe('ORD-20250130-0001');
+      expect(result.quantity).toBe(1);
       expect(mockTransactionEntityRepository.create).toHaveBeenCalledWith({
         id: expect.any(String),
         ...transactionData,
@@ -84,6 +90,9 @@ describe('TransactionRepositoryImpl', () => {
         productId: 'prod-1',
         amount: 100,
         status: TransactionStatus.PENDING,
+        transactionId: 'TXN-20250130-0001',
+        orderId: 'ORD-20250130-0001',
+        quantity: 1,
         createdAt: new Date(),
         updatedAt: new Date(),
       };
@@ -93,6 +102,9 @@ describe('TransactionRepositoryImpl', () => {
 
       expect(result).toBeInstanceOf(Transaction);
       expect(result!.id).toBe('1');
+      expect(result!.transactionId).toBe('TXN-20250130-0001');
+      expect(result!.orderId).toBe('ORD-20250130-0001');
+      expect(result!.quantity).toBe(1);
       expect(mockTransactionEntityRepository.findOne).toHaveBeenCalledWith({
         where: { id: '1' },
       });
@@ -130,6 +142,9 @@ describe('TransactionRepositoryImpl', () => {
           productId: 'prod-1',
           amount: 100,
           status: TransactionStatus.PENDING,
+          transactionId: 'TXN-20250130-0001',
+          orderId: 'ORD-20250130-0001',
+          quantity: 1,
           createdAt: new Date(),
           updatedAt: new Date(),
         },
@@ -141,6 +156,7 @@ describe('TransactionRepositoryImpl', () => {
       expect(result).toHaveLength(1);
       expect(result[0]).toBeInstanceOf(Transaction);
       expect(result[0].id).toBe('1');
+      expect(result[0].transactionId).toBe('TXN-20250130-0001');
       expect(mockTransactionEntityRepository.find).toHaveBeenCalledWith({
         order: { createdAt: 'DESC' },
       });

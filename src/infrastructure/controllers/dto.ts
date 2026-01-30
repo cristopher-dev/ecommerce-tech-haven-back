@@ -7,49 +7,135 @@ import {
   Max,
   Length,
   IsInt,
+  MinLength,
+  IsOptional,
 } from 'class-validator';
 
 export class CreateTransactionInputDto {
-  @IsNotEmpty()
-  @IsString()
+  @IsNotEmpty({ message: 'customerName should not be empty' })
+  @IsString({ message: 'customerName must be a string' })
+  @MinLength(2, { message: 'customerName must be at least 2 characters long' })
   @ApiProperty({
-    description: 'Name of the customer',
-    example: 'John Doe',
+    description: 'Full name of the customer',
+    example: 'María López',
+    minLength: 2,
   })
   customerName!: string;
 
-  @IsNotEmpty()
-  @IsEmail()
+  @IsNotEmpty({ message: 'customerEmail should not be empty' })
+  @IsEmail({}, { message: 'customerEmail must be a valid email address' })
   @ApiProperty({
-    description: 'Email of the customer',
-    example: 'john.doe@example.com',
+    description: 'Email address of the customer',
+    example: 'maria@example.com',
   })
   customerEmail!: string;
 
-  @IsNotEmpty()
-  @IsString()
+  @IsNotEmpty({ message: 'customerAddress should not be empty' })
+  @IsString({ message: 'customerAddress must be a string' })
+  @MinLength(5, {
+    message: 'customerAddress must be at least 5 characters long',
+  })
   @ApiProperty({
-    description: 'Address of the customer',
-    example: '123 Main St, City, Country',
+    description: 'Complete address of the customer',
+    example: 'Calle secundaria 456, Medellín, Antioquia 050001',
+    minLength: 5,
   })
   customerAddress!: string;
 
-  @IsNotEmpty()
-  @IsString()
+  @IsNotEmpty({ message: 'productId should not be empty' })
   @ApiProperty({
-    description: 'ID of the product',
-    example: 'prod-1',
+    description: 'Product ID - can be string or number',
+    example: '1',
+    oneOf: [
+      { type: 'string', example: '1' },
+      { type: 'number', example: 1 },
+    ],
   })
-  productId!: string;
+  productId!: string | number;
 
-  @IsInt()
-  @Min(1)
-  @Max(10)
+  @IsNotEmpty({ message: 'quantity should not be empty' })
+  @IsInt({ message: 'quantity must be an integer' })
+  @Min(1, { message: 'quantity must be at least 1' })
+  @Max(10, { message: 'quantity cannot exceed 10' })
   @ApiProperty({
-    description: 'Quantity of the product',
+    description: 'Quantity of the product to order',
     example: 1,
+    minimum: 1,
+    maximum: 10,
   })
   quantity!: number;
+}
+
+export class TransactionResponseDto {
+  @ApiProperty({
+    description: 'Indicates if the transaction was created successfully',
+    example: true,
+  })
+  success!: boolean;
+
+  @ApiProperty({
+    description: 'Unique transaction identifier',
+    example: 'TXN-20250130-001',
+  })
+  transactionId!: string;
+
+  @ApiProperty({
+    description: 'Order tracking ID',
+    example: 'ORD-20250130-001',
+  })
+  orderId!: string;
+
+  @ApiProperty({
+    description: 'Total amount charged for the transaction',
+    example: 175.0,
+  })
+  amount!: number;
+
+  @ApiProperty({
+    description: 'Current status of the transaction',
+    enum: ['PENDING', 'APPROVED', 'DECLINED'],
+    example: 'PENDING',
+  })
+  status!: string;
+
+  @ApiProperty({
+    description: 'Customer information',
+    type: 'object',
+    properties: {
+      name: { type: 'string', example: 'María López' },
+      email: { type: 'string', example: 'maria@example.com' },
+    },
+  })
+  customer?: { name: string; email: string };
+
+  @ApiProperty({
+    description: 'Product information',
+    type: 'object',
+    properties: {
+      id: { type: 'number', example: 1 },
+      name: { type: 'string', example: 'Laptop Gaming Pro' },
+    },
+  })
+  product?: { id: number; name: string };
+
+  @ApiProperty({
+    description: 'Ordered quantity',
+    example: 1,
+  })
+  quantity?: number;
+
+  @ApiProperty({
+    description: 'Transaction creation timestamp',
+    example: '2025-01-30T12:34:56Z',
+  })
+  createdAt?: string;
+
+  @IsOptional()
+  @ApiProperty({
+    description: 'Optional error message if transaction creation failed',
+    example: 'Product not found',
+  })
+  message?: string;
 }
 
 export class CreateCustomerInputDto {

@@ -15,6 +15,7 @@ jest.mock('@nestjs/swagger', () => ({
     setTitle: jest.fn().mockReturnThis(),
     setDescription: jest.fn().mockReturnThis(),
     setVersion: jest.fn().mockReturnThis(),
+    addBearerAuth: jest.fn().mockReturnThis(),
     build: jest.fn().mockReturnValue({}),
   })),
   SwaggerModule: {
@@ -54,6 +55,11 @@ describe('main', () => {
       'api/docs',
       mockApp,
       expect.any(Object),
+      {
+        swaggerOptions: {
+          persistAuthorization: true,
+        },
+      },
     );
     expect(mockApp.listen).toHaveBeenCalledWith(3000);
     expect(mockApp.getUrl).toHaveBeenCalled();

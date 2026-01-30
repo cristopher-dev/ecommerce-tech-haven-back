@@ -18,15 +18,26 @@ export class TransactionRepositoryImpl implements TransactionRepository {
   async create(
     transactionData: Omit<Transaction, 'id' | 'createdAt' | 'updatedAt'>,
   ): Promise<Transaction> {
-    const entity = this.transactionRepository.create({
+    const entityData: any = {
       id: crypto.randomUUID(),
       customerId: transactionData.customerId,
       productId: transactionData.productId,
       amount: transactionData.amount,
       status: transactionData.status,
-    });
+      quantity: transactionData.quantity || 1,
+    };
 
-    const savedEntity = await this.transactionRepository.save(entity);
+    if (transactionData.transactionId) {
+      entityData.transactionId = transactionData.transactionId;
+    }
+    if (transactionData.orderId) {
+      entityData.orderId = transactionData.orderId;
+    }
+
+    const entity = this.transactionRepository.create(entityData);
+    const savedEntity = (await this.transactionRepository.save(
+      entity,
+    )) as unknown as TransactionEntity;
     return new Transaction(
       savedEntity.id,
       savedEntity.customerId,
@@ -35,6 +46,9 @@ export class TransactionRepositoryImpl implements TransactionRepository {
       savedEntity.status,
       savedEntity.createdAt,
       savedEntity.updatedAt,
+      savedEntity.transactionId,
+      savedEntity.orderId,
+      savedEntity.quantity,
     );
   }
 
@@ -50,6 +64,9 @@ export class TransactionRepositoryImpl implements TransactionRepository {
       entity.status,
       entity.createdAt,
       entity.updatedAt,
+      entity.transactionId,
+      entity.orderId,
+      entity.quantity,
     );
   }
 
@@ -71,6 +88,9 @@ export class TransactionRepositoryImpl implements TransactionRepository {
           entity.status,
           entity.createdAt,
           entity.updatedAt,
+          entity.transactionId,
+          entity.orderId,
+          entity.quantity,
         ),
     );
   }

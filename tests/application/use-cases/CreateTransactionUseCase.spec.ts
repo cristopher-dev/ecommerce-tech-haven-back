@@ -51,11 +51,11 @@ describe('CreateTransactionUseCase', () => {
     mockCustomerRepo = module.get('CustomerRepository');
   });
 
-  it('should create transaction successfully', async () => {
+  it('should create transaction successfully with string productId', async () => {
     const input = {
       customerName: 'John Doe',
       customerEmail: 'john@example.com',
-      customerAddress: '123 Main St',
+      customerAddress: '123 Main St, City',
       productId: '1',
       quantity: 1,
     };
@@ -64,7 +64,7 @@ describe('CreateTransactionUseCase', () => {
       'cust1',
       'John Doe',
       'john@example.com',
-      '123 Main St',
+      '123 Main St, City',
     );
     const transaction = new Transaction(
       'trans1',
@@ -74,10 +74,52 @@ describe('CreateTransactionUseCase', () => {
       TransactionStatus.PENDING,
       new Date(),
       new Date(),
+      'TXN-20250130-0001',
+      'ORD-20250130-0001',
+      1,
     );
 
     mockProductRepo.findById.mockResolvedValue(product);
-    mockCustomerRepo.findByEmail.mockResolvedValue(null); // Customer doesn't exist
+    mockCustomerRepo.findByEmail.mockResolvedValue(null);
+    mockCustomerRepo.create.mockResolvedValue(customer);
+    mockTransactionRepo.create.mockResolvedValue(transaction);
+
+    const result = await useCase.execute(input)();
+
+    expect(result._tag).toBe('Right');
+    expect((result as any).right).toEqual(transaction);
+  });
+
+  it('should create transaction successfully with number productId', async () => {
+    const input = {
+      customerName: 'John Doe',
+      customerEmail: 'john@example.com',
+      customerAddress: '123 Main St, City',
+      productId: 1,
+      quantity: 1,
+    };
+    const product = new Product('1', 'Prod', 'Desc', 100, 10);
+    const customer = new Customer(
+      'cust1',
+      'John Doe',
+      'john@example.com',
+      '123 Main St, City',
+    );
+    const transaction = new Transaction(
+      'trans1',
+      'cust1',
+      '1',
+      100,
+      TransactionStatus.PENDING,
+      new Date(),
+      new Date(),
+      'TXN-20250130-0001',
+      'ORD-20250130-0001',
+      1,
+    );
+
+    mockProductRepo.findById.mockResolvedValue(product);
+    mockCustomerRepo.findByEmail.mockResolvedValue(null);
     mockCustomerRepo.create.mockResolvedValue(customer);
     mockTransactionRepo.create.mockResolvedValue(transaction);
 
@@ -91,8 +133,8 @@ describe('CreateTransactionUseCase', () => {
     const input = {
       customerName: 'John Doe',
       customerEmail: 'john@example.com',
-      customerAddress: '123 Main St',
-      productId: '1',
+      customerAddress: '123 Main St, City',
+      productId: '999',
       quantity: 1,
     };
 
@@ -101,14 +143,14 @@ describe('CreateTransactionUseCase', () => {
     const result = await useCase.execute(input)();
 
     expect(result._tag).toBe('Left');
-    expect((result as any).left.message).toBe('Stock check failed');
+    expect((result as any).left.message).toBe('Product not found');
   });
 
   it('should fail if insufficient stock', async () => {
     const input = {
       customerName: 'John Doe',
       customerEmail: 'john@example.com',
-      customerAddress: '123 Main St',
+      customerAddress: '123 Main St, City',
       productId: '1',
       quantity: 5,
     };
@@ -119,14 +161,14 @@ describe('CreateTransactionUseCase', () => {
     const result = await useCase.execute(input)();
 
     expect(result._tag).toBe('Left');
-    expect((result as any).left.message).toBe('Stock check failed');
+    expect((result as any).left.message).toBe('Insufficient stock');
   });
 
-  it('should fail if input is invalid', async () => {
+  it('should fail if customerName is empty', async () => {
     const input = {
       customerName: '',
       customerEmail: 'john@example.com',
-      customerAddress: '123 Main St',
+      customerAddress: '123 Main St, City',
       productId: '1',
       quantity: 1,
     };
@@ -134,14 +176,31 @@ describe('CreateTransactionUseCase', () => {
     const result = await useCase.execute(input)();
 
     expect(result._tag).toBe('Left');
-    expect((result as any).left.message).toBe('Invalid input');
+    expect((result as any).left.message).toBe(
+      'customerName should not be empty',
+    );
+  });
+
+  it('should fail if productId is empty', async () => {
+    const input = {
+      customerName: 'John Doe',
+      customerEmail: 'john@example.com',
+      customerAddress: '123 Main St, City',
+      productId: '',
+      quantity: 1,
+    };
+
+    const result = await useCase.execute(input)();
+
+    expect(result._tag).toBe('Left');
+    expect((result as any).left.message).toBe('productId should not be empty');
   });
 
   it('should fail if quantity is invalid', async () => {
     const input = {
       customerName: 'John Doe',
       customerEmail: 'john@example.com',
-      customerAddress: '123 Main St',
+      customerAddress: '123 Main St, City',
       productId: '1',
       quantity: 0,
     };
@@ -149,6 +208,42 @@ describe('CreateTransactionUseCase', () => {
     const result = await useCase.execute(input)();
 
     expect(result._tag).toBe('Left');
-    expect((result as any).left.message).toBe('Invalid input');
+    expect((result as any).left.message).toBe(
+      'quantity must be positive integer',
+    );
+  });
+
+  it('should fail if customerEmail is invalid', async () => {
+    const input = {
+      customerName: 'John Doe',
+      customerEmail: 'invalid-email',
+      customerAddress: '123 Main St, City',
+      productId: '1',
+      quantity: 1,
+    };
+
+    const result = await useCase.execute(input)();
+
+    expect(result._tag).toBe('Left');
+    expect((result as any).left.message).toBe(
+      'customerEmail should not be empty',
+    );
+  });
+
+  it('should fail if customerAddress is too short', async () => {
+    const input = {
+      customerName: 'John Doe',
+      customerEmail: 'john@example.com',
+      customerAddress: 'St',
+      productId: '1',
+      quantity: 1,
+    };
+
+    const result = await useCase.execute(input)();
+
+    expect(result._tag).toBe('Left');
+    expect((result as any).left.message).toBe(
+      'customerAddress should not be empty',
+    );
   });
 });

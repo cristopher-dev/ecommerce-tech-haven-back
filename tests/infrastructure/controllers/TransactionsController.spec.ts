@@ -1,4 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { TransactionsController } from '../../../src/infrastructure/controllers/TransactionsController';
 import { CreateTransactionUseCase } from '../../../src/application/use-cases/CreateTransactionUseCase';
 import { ProcessPaymentUseCase } from '../../../src/application/use-cases/ProcessPaymentUseCase';
@@ -49,6 +50,9 @@ describe('TransactionsController', () => {
         TransactionStatus.PENDING,
         new Date(),
         new Date(),
+        'TXN-20250130-0001',
+        'ORD-20250130-0001',
+        1,
       ),
     ];
     mockGetUC.execute.mockResolvedValue({ _tag: 'Right', right: transactions });
@@ -58,22 +62,25 @@ describe('TransactionsController', () => {
     expect(result).toEqual(transactions);
   });
 
-  it('should create transaction', async () => {
+  it('should create transaction with string productId', async () => {
     const input = {
-      customerName: 'John',
+      customerName: 'John Doe',
       customerEmail: 'john@example.com',
-      customerAddress: 'Addr',
+      customerAddress: '123 Main St, City',
       productId: '1',
       quantity: 1,
     };
     const transaction = new Transaction(
       '1',
       'cust1',
-      'prod1',
+      '1',
       100,
       TransactionStatus.PENDING,
       new Date(),
       new Date(),
+      'TXN-20250130-0001',
+      'ORD-20250130-0001',
+      1,
     );
     mockCreateUC.execute.mockReturnValue(() =>
       Promise.resolve({ _tag: 'Right', right: transaction }),
@@ -81,7 +88,39 @@ describe('TransactionsController', () => {
 
     const result = await controller.createTransaction(input);
 
-    expect(result).toEqual(transaction);
+    expect(result.success).toBe(true);
+    expect(result.transactionId).toBe('TXN-20250130-0001');
+    expect(result.orderId).toBe('ORD-20250130-0001');
+  });
+
+  it('should create transaction with number productId', async () => {
+    const input = {
+      customerName: 'John Doe',
+      customerEmail: 'john@example.com',
+      customerAddress: '123 Main St, City',
+      productId: 1,
+      quantity: 1,
+    };
+    const transaction = new Transaction(
+      '1',
+      'cust1',
+      '1',
+      100,
+      TransactionStatus.PENDING,
+      new Date(),
+      new Date(),
+      'TXN-20250130-0001',
+      'ORD-20250130-0001',
+      1,
+    );
+    mockCreateUC.execute.mockReturnValue(() =>
+      Promise.resolve({ _tag: 'Right', right: transaction }),
+    );
+
+    const result = await controller.createTransaction(input);
+
+    expect(result.success).toBe(true);
+    expect(result.transactionId).toBe('TXN-20250130-0001');
   });
 
   it('should process payment', async () => {
@@ -93,13 +132,22 @@ describe('TransactionsController', () => {
       TransactionStatus.APPROVED,
       new Date(),
       new Date(),
+      'TXN-20250130-0001',
+      'ORD-20250130-0001',
+      1,
     );
     mockProcessUC.execute.mockResolvedValue({
       _tag: 'Right',
       right: transaction,
     });
 
-    const result = await controller.processPayment('1');
+    const result = await controller.processPayment('1', {
+      cardNumber: '4111111111111111',
+      expirationMonth: 12,
+      expirationYear: 2026,
+      cvv: '123',
+      cardholderName: 'John Doe',
+    });
 
     expect(result).toEqual(transaction);
   });
@@ -115,20 +163,43 @@ describe('TransactionsController', () => {
     );
   });
 
-  it('should throw error on create transaction failure', async () => {
+  it('should throw BadRequestException on validation error', async () => {
     const input = {
       customerName: 'John',
       customerEmail: 'john@example.com',
-      customerAddress: 'Addr',
-      productId: '1',
+      customerAddress: '123 Main St, City',
+      productId: '',
       quantity: 1,
     };
     mockCreateUC.execute.mockReturnValue(() =>
-      Promise.resolve({ _tag: 'Left', left: new Error('Invalid input') }),
+      Promise.resolve({
+        _tag: 'Left',
+        left: new Error('productId should not be empty'),
+      }),
     );
 
     await expect(controller.createTransaction(input)).rejects.toThrow(
-      'Invalid input',
+      BadRequestException,
+    );
+  });
+
+  it('should throw NotFoundException on product not found', async () => {
+    const input = {
+      customerName: 'John',
+      customerEmail: 'john@example.com',
+      customerAddress: '123 Main St, City',
+      productId: '999999',
+      quantity: 1,
+    };
+    mockCreateUC.execute.mockReturnValue(() =>
+      Promise.resolve({
+        _tag: 'Left',
+        left: new Error('Product not found'),
+      }),
+    );
+
+    await expect(controller.createTransaction(input)).rejects.toThrow(
+      NotFoundException,
     );
   });
 
@@ -138,8 +209,14 @@ describe('TransactionsController', () => {
       left: new Error('Payment failed'),
     });
 
-    await expect(controller.processPayment('1')).rejects.toThrow(
-      'Payment failed',
-    );
+    await expect(
+      controller.processPayment('1', {
+        cardNumber: '4111111111111111',
+        expirationMonth: 12,
+        expirationYear: 2026,
+        cvv: '123',
+        cardholderName: 'John Doe',
+      }),
+    ).rejects.toThrow('Payment failed');
   });
 });

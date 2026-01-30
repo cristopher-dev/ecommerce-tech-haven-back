@@ -7,6 +7,10 @@ import {
   Put,
   Get,
   UseGuards,
+  HttpCode,
+  HttpStatus,
+  BadRequestException,
+  NotFoundException,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -21,7 +25,11 @@ import { CreateTransactionUseCase } from '../../application/use-cases/CreateTran
 import { ProcessPaymentUseCase } from '../../application/use-cases/ProcessPaymentUseCase';
 import { GetTransactionsUseCase } from '../../application/use-cases/GetTransactionsUseCase';
 import { GetTransactionByIdUseCase } from '../../application/use-cases/GetTransactionByIdUseCase';
-import { CreateTransactionInputDto, CardDataDto } from './dto';
+import {
+  CreateTransactionInputDto,
+  CardDataDto,
+  TransactionResponseDto,
+} from './dto';
 
 @ApiTags('Transactions')
 @Controller('transactions')
@@ -52,6 +60,9 @@ export class TransactionsController {
           productId: 'prod-789',
           amount: 100,
           status: 'PENDING',
+          transactionId: 'TXN-20250130-001',
+          orderId: 'ORD-20250130-001',
+          quantity: 1,
           createdAt: '2023-01-01T00:00:00.000Z',
           updatedAt: '2023-01-01T00:00:00.000Z',
         },
@@ -82,6 +93,9 @@ export class TransactionsController {
         productId: 'prod-789',
         amount: 100,
         status: 'PENDING',
+        transactionId: 'TXN-20250130-001',
+        orderId: 'ORD-20250130-001',
+        quantity: 1,
         createdAt: '2023-01-01T00:00:00.000Z',
         updatedAt: '2023-01-01T00:00:00.000Z',
       },
@@ -97,6 +111,7 @@ export class TransactionsController {
   }
 
   @Post()
+  @HttpCode(HttpStatus.CREATED)
   @ApiOperation({
     summary: 'Create a new transaction',
     description:
@@ -105,26 +120,97 @@ export class TransactionsController {
   @ApiBody({ type: CreateTransactionInputDto })
   @ApiResponse({
     status: 201,
-    description: 'Transaction created',
+    description: 'Transaction created successfully',
+    type: TransactionResponseDto,
     schema: {
       example: {
-        id: 'txn-123',
-        customerId: 'cust-456',
-        productId: 'prod-789',
-        amount: 100,
+        success: true,
+        transactionId: 'TXN-20250130-001',
+        orderId: 'ORD-20250130-001',
+        amount: 175.0,
         status: 'PENDING',
-        createdAt: '2023-01-01T00:00:00.000Z',
-        updatedAt: '2023-01-01T00:00:00.000Z',
+        customer: {
+          name: 'María López',
+          email: 'maria@example.com',
+        },
+        product: {
+          id: 1,
+          name: 'Laptop Gaming Pro',
+        },
+        quantity: 1,
+        createdAt: '2025-01-30T12:34:56Z',
       },
     },
   })
-  @ApiResponse({ status: 400, description: 'Bad request' })
-  async createTransaction(@Body() input: CreateTransactionInputDto) {
+  @ApiResponse({
+    status: 400,
+    description: 'Validation error',
+    schema: {
+      example: {
+        success: false,
+        error: 'productId should not be empty',
+        code: 'VALIDATION_ERROR',
+      },
+    },
+  })
+  async createTransaction(
+    @Body() input: CreateTransactionInputDto,
+  ): Promise<TransactionResponseDto> {
     const result = await this.createTransactionUseCase.execute(input)();
     if (result._tag === 'Left') {
-      throw new Error(result.left.message);
+      const errorMessage = result.left.message;
+
+      // Handle specific validation errors
+      if (
+        errorMessage.includes('productId') ||
+        errorMessage.includes('quantity') ||
+        errorMessage.includes('customerName') ||
+        errorMessage.includes('customerEmail') ||
+        errorMessage.includes('customerAddress') ||
+        errorMessage.includes('stock')
+      ) {
+        throw new BadRequestException({
+          success: false,
+          error: errorMessage,
+          code: 'VALIDATION_ERROR',
+        });
+      }
+
+      // Handle product not found
+      if (errorMessage.includes('Product not found')) {
+        throw new NotFoundException({
+          success: false,
+          error: 'Product not found',
+          code: 'PRODUCT_NOT_FOUND',
+        });
+      }
+
+      throw new BadRequestException({
+        success: false,
+        error: errorMessage,
+        code: 'ERROR',
+      });
     }
-    return result.right;
+
+    const transaction = result.right;
+
+    return {
+      success: true,
+      transactionId: transaction.transactionId || '',
+      orderId: transaction.orderId || '',
+      amount: transaction.amount,
+      status: transaction.status,
+      customer: {
+        name: '',
+        email: '',
+      },
+      product: {
+        id: parseInt(transaction.productId, 10),
+        name: '',
+      },
+      quantity: transaction.quantity || 1,
+      createdAt: transaction.createdAt.toISOString(),
+    };
   }
 
   @Put(':id/process-payment')
@@ -145,6 +231,9 @@ export class TransactionsController {
         productId: 'prod-789',
         amount: 100,
         status: 'APPROVED',
+        transactionId: 'TXN-20250130-001',
+        orderId: 'ORD-20250130-001',
+        quantity: 1,
         createdAt: '2023-01-01T00:00:00.000Z',
         updatedAt: '2023-01-01T00:00:00.000Z',
       },

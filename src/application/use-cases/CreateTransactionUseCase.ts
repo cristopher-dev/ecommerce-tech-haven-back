@@ -13,7 +13,7 @@ export interface CreateTransactionInput {
   customerName: string;
   customerEmail: string;
   customerAddress: string;
-  productId: string;
+  productId: string | number;
   quantity: number;
 }
 
@@ -42,35 +42,70 @@ export class CreateTransactionUseCase {
   private validateInput(
     input: CreateTransactionInput,
   ): TaskEither<Error, CreateTransactionInput> {
-    if (
-      !input.customerName ||
-      !input.customerEmail ||
-      !input.productId ||
-      input.quantity <= 0
-    ) {
-      return tryCatch(
-        () => Promise.reject(new Error('Invalid input')),
-        () => new Error('Invalid input'),
-      );
-    }
     return tryCatch(
-      () => Promise.resolve(input),
-      () => new Error('Unexpected error'),
+      () => {
+        // Validate productId: must exist and not be empty
+        if (
+          !input.productId ||
+          (typeof input.productId === 'string' && input.productId.trim() === '')
+        ) {
+          throw new Error('productId should not be empty');
+        }
+
+        // Validate productId is a valid number
+        const productIdNum = Number(input.productId);
+        if (isNaN(productIdNum) || productIdNum <= 0) {
+          throw new Error('productId should not be empty');
+        }
+
+        // Validate customerName
+        if (!input.customerName || input.customerName.trim().length < 2) {
+          throw new Error('customerName should not be empty');
+        }
+
+        // Validate customerEmail
+        if (!input.customerEmail || !input.customerEmail.includes('@')) {
+          throw new Error('customerEmail should not be empty');
+        }
+
+        // Validate customerAddress
+        if (!input.customerAddress || input.customerAddress.trim().length < 5) {
+          throw new Error('customerAddress should not be empty');
+        }
+
+        // Validate quantity
+        if (
+          !input.quantity ||
+          input.quantity <= 0 ||
+          !Number.isInteger(input.quantity)
+        ) {
+          throw new Error('quantity must be positive integer');
+        }
+
+        return Promise.resolve(input);
+      },
+      (error) => (error instanceof Error ? error : new Error(String(error))),
     );
   }
 
   private checkStock(
-    productId: string,
+    productId: string | number,
     quantity: number,
   ): TaskEither<Error, void> {
     return tryCatch(
       async () => {
-        const product = await this.productRepository.findById(productId);
-        if (!product || product.stock < quantity) {
+        const productIdNum = Number(productId);
+        const product = await this.productRepository.findById(
+          String(productIdNum),
+        );
+        if (!product) {
+          throw new Error('Product not found');
+        }
+        if (product.stock < quantity) {
           throw new Error('Insufficient stock');
         }
       },
-      () => new Error('Stock check failed'),
+      (error) => (error instanceof Error ? error : new Error(String(error))),
     );
   }
 
@@ -95,7 +130,7 @@ export class CreateTransactionUseCase {
         });
         return { id: customer.id };
       },
-      () => new Error('Customer creation failed'),
+      (error) => (error instanceof Error ? error : new Error(String(error))),
     );
   }
 
@@ -105,18 +140,37 @@ export class CreateTransactionUseCase {
   ): TaskEither<Error, Transaction> {
     return tryCatch(
       async () => {
-        const product = await this.productRepository.findById(input.productId);
-        if (!product) throw new Error('Product not found');
+        const productIdNum = Number(input.productId);
+        const product = await this.productRepository.findById(
+          String(productIdNum),
+        );
+        if (!product) {
+          throw new Error('Product not found');
+        }
+
+        // Generate unique transactionId and orderId
+        const timestamp = new Date()
+          .toISOString()
+          .replace(/[-:T.]/g, '')
+          .substring(0, 14);
+        const randomSuffix = Math.floor(Math.random() * 10000)
+          .toString()
+          .padStart(4, '0');
+        const transactionId = `TXN-${timestamp}-${randomSuffix}`;
+        const orderId = `ORD-${timestamp}-${randomSuffix}`;
 
         const transaction = await this.transactionRepository.create({
           customerId,
-          productId: input.productId,
+          productId: String(productIdNum),
           amount: product.price * input.quantity,
           status: TransactionStatus.PENDING,
+          transactionId,
+          orderId,
+          quantity: input.quantity,
         });
         return transaction;
       },
-      () => new Error('Transaction creation failed'),
+      (error) => (error instanceof Error ? error : new Error(String(error))),
     );
   }
 }

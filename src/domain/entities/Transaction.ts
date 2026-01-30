@@ -13,5 +13,8 @@ export class Transaction {
     public status: TransactionStatus,
     public readonly createdAt: Date,
     public updatedAt: Date,
+    public readonly transactionId?: string,
+    public readonly orderId?: string,
+    public readonly quantity?: number,
   ) {}
 }

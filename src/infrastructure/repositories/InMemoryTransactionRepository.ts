@@ -21,6 +21,9 @@ export class InMemoryTransactionRepository implements TransactionRepository {
       data.status,
       new Date(),
       new Date(),
+      data.transactionId,
+      data.orderId,
+      data.quantity,
     );
     this.transactions.push(transaction);
     return await Promise.resolve(transaction);
