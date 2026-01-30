@@ -62,7 +62,7 @@ PASO 2: Crear Transacción + Datos del Cliente
 PASO 3: Procesar Pago + Datos de Entrega
 ├─ API: PUT /api/transactions/:id/process-payment
 ├─ Datos: Tarjeta (números), fecha vencimiento
-└─ Integración: Wompi (Real o Mock)
+└─ Integración: TechHavenPay (Real o Mock)
 
 PASO 4: Confirmación de Transacción
 ├─ API: GET /api/transactions/:id
@@ -81,7 +81,7 @@ PASO 5: Inventario Actualizado
 - ✅ **Railway Oriented Programming (ROP)**: Manejo de errores funcional con `fp-ts`
 - ✅ **Autenticación JWT**: Protección de endpoints sensibles
 - ✅ **Gestión de Inventario**: Control de stock en tiempo real
-- ✅ **Procesamiento de Pagos**: Integración con servicios de pago (Wompi)
+- ✅ **Procesamiento de Pagos**: Integración con servicios de pago (TechHavenPay)
 - ✅ **Seguimiento de Entregas**: Sistema de delivery integrado
 - ✅ **Database Seeding**: Productos y clientes iniciales precargados
 - ✅ **Cobertura de Tests**: +80% con Jest
@@ -137,7 +137,7 @@ PASO 5: Inventario Actualizado
        │
        ├─→ 2. ProcessPayment (Card + Delivery Data)
        │   ├─→ Retrieve Transaction
-       │   ├─→ Call Payment Gateway (Mock/Wompi)
+       │   ├─→ Call Payment Gateway (Mock/TechHavenPay)
        │   └─→ Update Transaction Status
        │
        └─→ 3. Get Transaction Status + Delivery Info
@@ -236,7 +236,7 @@ JWT_SECRET=your-secret-key-change-in-production
 NODE_ENV=development
 
 # Payment Service
-PAYMENT_SERVICE_URL=https://api-sandbox.co.uat.wompi.dev/v1
+PAYMENT_SERVICE_URL=https://api-sandbox.techhavenpay.io/v1
 PAYMENT_SERVICE_API_KEY=your_api_key_here
 ```
 
@@ -518,7 +518,7 @@ class CreateTransactionInputDto {
 
 ```typescript
 // ✅ Datos de Tarjeta NO almacenados
-// La información de tarjeta se envía directamente a Wompi
+// La información de tarjeta se envía directamente a TechHavenPay
 // Backend solo maneja transactionId, no números de tarjeta
 
 // ✅ Encriptación en tránsito
@@ -527,7 +527,7 @@ class CreateTransactionInputDto {
 
 // ✅ PCI-DSS Compliance
 // No se almacenan PAN (Primary Account Numbers)
-// Tokenización con Wompi
+// Tokenización con TechHavenPay
 // Logs no contienen datos de tarjeta
 ```
 
@@ -657,8 +657,8 @@ docker-compose -f docker/docker-compose.yml up -d
 | Entorno | URL | Base de Datos | Payment Service |
 |---------|-----|----------------|-----------------|
 | **Development** | <http://localhost:3000> | PostgreSQL Local | Mock Service |
-| **Staging** | TBD | PostgreSQL Staging | Wompi Sandbox |
-| **Production** | TBD | PostgreSQL RDS | Wompi Production |
+| **Staging** | TBD | PostgreSQL Staging | TechHavenPay Sandbox |
+| **Production** | TBD | PostgreSQL RDS | TechHavenPay Production |
 
 ### Deployment en AWS (Ejemplo)
 
@@ -976,7 +976,7 @@ Sistema Externo (Zapier, IFTTT, etc.)
 
 ```
 TechHaven API
-    ├─ Wompi (Colombia, México)
+    ├─ TechHavenPay (Colombia, México)
     ├─ Stripe (Mundial)
     ├─ PayPal (Mundial)
     └─ Más en roadmap...

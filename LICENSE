@@ -33,9 +33,9 @@ TECHHAVEN PAYMENT BACKEND - ADDITIONAL TERMS
    - Local data protection laws
 
 2. PAYMENT GATEWAY INTEGRATION
-   This software integrates with Wompi payment gateway. Usage requires:
-   - Valid Wompi account and API credentials
-   - Compliance with Wompi's terms of service
+   This software integrates with TechHavenPay payment gateway. Usage requires:
+   - Valid TechHavenPay account and API credentials
+   - Compliance with TechHavenPay's terms of service
    - SSL/TLS encryption for all payment data
    - No storage of sensitive payment card information
 
