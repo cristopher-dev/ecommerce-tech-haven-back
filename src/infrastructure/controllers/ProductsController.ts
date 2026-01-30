@@ -5,13 +5,23 @@ import {
   Param,
   HttpException,
   HttpStatus,
+  UseGuards,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiParam,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { GetProductsUseCase } from '../../application/use-cases/GetProductsUseCase';
 import { GetProductByIdUseCase } from '../../application/use-cases/GetProductByIdUseCase';
 
 @ApiTags('Products')
 @Controller('products')
+@UseGuards(JwtAuthGuard)
+@ApiBearerAuth()
 export class ProductsController {
   constructor(
     private readonly getProductsUseCase: GetProductsUseCase,

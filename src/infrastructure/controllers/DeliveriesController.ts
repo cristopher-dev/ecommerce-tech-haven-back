@@ -1,11 +1,20 @@
 import 'reflect-metadata';
-import { Controller, Get, Param } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
+import { Controller, Get, Param, UseGuards } from '@nestjs/common';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiParam,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { GetDeliveriesUseCase } from '../../application/use-cases/GetDeliveriesUseCase';
 import { GetDeliveryByIdUseCase } from '../../application/use-cases/GetDeliveryByIdUseCase';
 
 @ApiTags('Deliveries')
 @Controller('deliveries')
+@UseGuards(JwtAuthGuard)
+@ApiBearerAuth()
 export class DeliveriesController {
   constructor(
     private readonly getDeliveriesUseCase: GetDeliveriesUseCase,

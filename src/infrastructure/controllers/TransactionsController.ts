@@ -1,12 +1,22 @@
 import 'reflect-metadata';
-import { Controller, Post, Body, Param, Put, Get } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  Param,
+  Put,
+  Get,
+  UseGuards,
+} from '@nestjs/common';
 import {
   ApiTags,
   ApiOperation,
   ApiResponse,
   ApiParam,
   ApiBody,
+  ApiBearerAuth,
 } from '@nestjs/swagger';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { CreateTransactionUseCase } from '../../application/use-cases/CreateTransactionUseCase';
 import { ProcessPaymentUseCase } from '../../application/use-cases/ProcessPaymentUseCase';
 import { GetTransactionsUseCase } from '../../application/use-cases/GetTransactionsUseCase';
@@ -15,6 +25,8 @@ import { CreateTransactionInputDto, CardDataDto } from './dto';
 
 @ApiTags('Transactions')
 @Controller('transactions')
+@UseGuards(JwtAuthGuard)
+@ApiBearerAuth()
 export class TransactionsController {
   constructor(
     private readonly createTransactionUseCase: CreateTransactionUseCase,

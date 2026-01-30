@@ -99,6 +99,13 @@
   - [x] @ApiBody con ejemplos de request (admin, customer)
   - [x] @ApiResponse con ejemplos de respuestas (200, 400, 401)
   - [x] DTOs con @ApiProperty decorators
+- [x] Proteger endpoints con @UseGuards(JwtAuthGuard)
+  - [x] TransactionsController - Requiere JWT token
+  - [x] DeliveriesController - Requiere JWT token
+  - [x] CustomersController - Requiere JWT token
+  - [x] ProductsController - Requiere JWT token
+  - [x] @ApiBearerAuth() en Swagger para documentar token requerido
+  - [x] Retorna 401 Unauthorized sin token válido
 
 ---
 

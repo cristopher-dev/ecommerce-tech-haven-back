@@ -1,18 +1,22 @@
 import 'reflect-metadata';
-import { Controller, Get, Post, Body, Param } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, UseGuards } from '@nestjs/common';
 import {
   ApiTags,
   ApiOperation,
   ApiResponse,
   ApiParam,
   ApiBody,
+  ApiBearerAuth,
 } from '@nestjs/swagger';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { GetCustomersUseCase } from '../../application/use-cases/GetCustomersUseCase';
 import { GetCustomerByIdUseCase } from '../../application/use-cases/GetCustomerByIdUseCase';
 import { CreateCustomerUseCase } from '../../application/use-cases/CreateCustomerUseCase';
 import { CreateCustomerInputDto } from './dto';
 
 @ApiTags('Customers')
+@UseGuards(JwtAuthGuard)
+@ApiBearerAuth()
 @Controller('customers')
 export class CustomersController {
   constructor(
