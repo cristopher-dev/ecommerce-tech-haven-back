@@ -93,6 +93,12 @@
   - [x] Test credenciales inválidas
   - [x] Test usuario no existe
   - [x] Test JWT token generado correctamente
+- [x] Documentación Swagger/OpenAPI en AuthController
+  - [x] @ApiTags('Authentication')
+  - [x] @ApiOperation con descripción completa
+  - [x] @ApiBody con ejemplos de request (admin, customer)
+  - [x] @ApiResponse con ejemplos de respuestas (200, 400, 401)
+  - [x] DTOs con @ApiProperty decorators
 
 ---
 
