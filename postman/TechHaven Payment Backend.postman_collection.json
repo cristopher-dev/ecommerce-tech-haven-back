@@ -1,46 +1,31 @@
 {
   "info": {
-    "name": "TechHaven Payment Backend API",
-    "description": "API collection for TechHaven Payment Onboarding Backend. This collection includes all endpoints for managing products, transactions, customers, and deliveries.",
+    "_postman_id": "techhaven-payment-backend",
+    "name": "TechHaven Payment Backend",
+    "description": "API collection for TechHaven Payment Backend - NestJS Hexagonal Architecture",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
     {
-      "name": "Products",
+      "name": "Authentication",
       "item": [
         {
-          "name": "Get All Products",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/products",
-              "host": ["{{base_url}}"],
-              "path": ["products"]
-            },
-            "description": "Retrieve a list of all available products with their stock information."
-          }
-        }
-      ]
-    },
-    {
-      "name": "Transactions",
-      "item": [
-        {
-          "name": "Get All Transactions",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/transactions",
-              "host": ["{{base_url}}"],
-              "path": ["transactions"]
-            },
-            "description": "Retrieve a list of all transactions."
-          }
-        },
-        {
-          "name": "Create Transaction",
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.environment.set('auth_token', jsonData.token);",
+                  "    pm.environment.set('user_role', jsonData.role);",
+                  "    pm.environment.set('user_email', jsonData.email);",
+                  "}"
+                ]
+              }
+            }
+          ],
           "request": {
             "method": "POST",
             "header": [
@@ -51,37 +36,59 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"customerName\": \"John Doe\",\n  \"customerEmail\": \"john.doe@example.com\",\n  \"customerAddress\": \"123 Main St, City, Country\",\n  \"productId\": \"prod-1\",\n  \"quantity\": 1\n}"
+              "raw": "{\n  \"email\": \"admin@techhaven.com\",\n  \"password\": \"admin123\"\n}"
             },
             "url": {
-              "raw": "{{base_url}}/transactions",
+              "raw": "{{base_url}}/auth/login",
               "host": ["{{base_url}}"],
-              "path": ["transactions"]
+              "path": ["auth", "login"]
             },
-            "description": "Create a new pending transaction. Note: Customer and Product must exist."
-          }
-        },
+            "description": "Authenticate user with email and password. Returns JWT token valid for 24h."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Products",
+      "item": [
         {
-          "name": "Process Payment",
+          "name": "Get all products",
           "request": {
-            "method": "PUT",
+            "method": "GET",
             "header": [
               {
-                "key": "Content-Type",
-                "value": "application/json"
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
               }
             ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"number\": \"4111111111111111\",\n  \"expMonth\": \"12\",\n  \"expYear\": \"25\",\n  \"cvc\": \"123\",\n  \"cardHolder\": \"John Doe\"\n}"
-            },
             "url": {
-              "raw": "{{base_url}}/transactions/{{transaction_id}}/process-payment",
+              "raw": "{{base_url}}/products",
               "host": ["{{base_url}}"],
-              "path": ["transactions", "{{transaction_id}}", "process-payment"]
+              "path": ["products"]
             },
-            "description": "Process payment for a pending transaction using TechHaven API. Requires card data (fake data for testing)."
-          }
+            "description": "Retrieve a list of all available products in the system"
+          },
+          "response": []
+        },
+        {
+          "name": "Get product by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/products/{{product_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["products", "{{product_id}}"]
+            },
+            "description": "Retrieve detailed information about a specific product"
+          },
+          "response": []
         }
       ]
     },
@@ -89,17 +96,166 @@
       "name": "Customers",
       "item": [
         {
-          "name": "Get All Customers",
+          "name": "Get all customers",
           "request": {
             "method": "GET",
-            "header": [],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
             "url": {
               "raw": "{{base_url}}/customers",
               "host": ["{{base_url}}"],
               "path": ["customers"]
             },
-            "description": "Retrieve a list of all customers."
-          }
+            "description": "Retrieve a list of all customers in the system"
+          },
+          "response": []
+        },
+        {
+          "name": "Get customer by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/customers/{{customer_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["customers", "{{customer_id}}"]
+            },
+            "description": "Retrieve detailed information about a specific customer"
+          },
+          "response": []
+        },
+        {
+          "name": "Create customer",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"John Doe\",\n  \"email\": \"john.doe@example.com\",\n  \"address\": \"123 Main St, City, Country\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/customers",
+              "host": ["{{base_url}}"],
+              "path": ["customers"]
+            },
+            "description": "Create a new customer with name, email, and address"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Transactions",
+      "item": [
+        {
+          "name": "Get all transactions",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/transactions",
+              "host": ["{{base_url}}"],
+              "path": ["transactions"]
+            },
+            "description": "Retrieve a list of all transactions in the system"
+          },
+          "response": []
+        },
+        {
+          "name": "Get transaction by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/transactions/{{transaction_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["transactions", "{{transaction_id}}"]
+            },
+            "description": "Retrieve detailed information about a specific transaction"
+          },
+          "response": []
+        },
+        {
+          "name": "Create transaction",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerName\": \"Jane Smith\",\n  \"customerEmail\": \"jane.smith@example.com\",\n  \"customerAddress\": \"456 Oak Ave, City, Country\",\n  \"productId\": \"prod-789\",\n  \"quantity\": 2\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/transactions",
+              "host": ["{{base_url}}"],
+              "path": ["transactions"]
+            },
+            "description": "Create a new transaction with customer and product details"
+          },
+          "response": []
+        },
+        {
+          "name": "Process payment",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cardNumber\": \"4532015112830366\",\n  \"cardHolder\": \"John Doe\",\n  \"expiryDate\": \"12/25\",\n  \"cvv\": \"123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/transactions/{{transaction_id}}/process-payment",
+              "host": ["{{base_url}}"],
+              "path": ["transactions", "{{transaction_id}}", "process-payment"]
+            },
+            "description": "Process the payment for an existing transaction using card data"
+          },
+          "response": []
         }
       ]
     },
@@ -107,17 +263,42 @@
       "name": "Deliveries",
       "item": [
         {
-          "name": "Get All Deliveries",
+          "name": "Get all deliveries",
           "request": {
             "method": "GET",
-            "header": [],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
             "url": {
               "raw": "{{base_url}}/deliveries",
               "host": ["{{base_url}}"],
               "path": ["deliveries"]
             },
-            "description": "Retrieve a list of all deliveries."
-          }
+            "description": "Retrieve a list of all deliveries in the system"
+          },
+          "response": []
+        },
+        {
+          "name": "Get delivery by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/deliveries/{{delivery_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["deliveries", "{{delivery_id}}"]
+            },
+            "description": "Retrieve detailed information about a specific delivery"
+          },
+          "response": []
         }
       ]
     }
@@ -129,8 +310,38 @@
       "type": "string"
     },
     {
+      "key": "auth_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "user_role",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "user_email",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "product_id",
+      "value": "prod-789",
+      "type": "string"
+    },
+    {
+      "key": "customer_id",
+      "value": "cust-456",
+      "type": "string"
+    },
+    {
       "key": "transaction_id",
-      "value": "sample-transaction-id",
+      "value": "txn-123",
+      "type": "string"
+    },
+    {
+      "key": "delivery_id",
+      "value": "del-123",
       "type": "string"
     }
   ]
