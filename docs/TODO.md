@@ -53,6 +53,47 @@
 - [x] Actualizar stock tras pago exitoso
 - [x] Manejo robusto de errores de pago
 
+### 5.1. Autenticación y JWT (Login - Usuarios Dummy)
+
+- [ ] Endpoint POST `/auth/login` - Autenticar usuario con email y password
+  - [ ] Usuarios dummy predefinidos (seeded en BD)
+  - [ ] Validación de credenciales
+  - [ ] Generación de JWT token en respuesta
+- [ ] Endpoint POST `/auth/register` - Registro de nuevo usuario (opcional)
+  - [ ] Validación de email único
+  - [ ] Hash de password (bcryptjs)
+  - [ ] Generar JWT token tras registro exitoso
+- [ ] Guardia de autenticación JWT (`@UseGuards(JwtAuthGuard)`)
+  - [ ] Proteger endpoints sensibles (transacciones, pagos, entregas)
+  - [ ] Validar token en header `Authorization: Bearer {token}`
+  - [ ] Rechazar requests sin token válido con 401
+- [ ] Entity Usuario en `src/domain/entities/User.ts`
+  - [ ] Propiedades: id, email, password (hash), rol, createdAt
+- [ ] Tabla de usuarios en BD (PostgreSQL)
+  - [ ] Índice único en email
+  - [ ] Usuarios dummy seeded en DatabaseSeeder
+  - [ ] Ejemplos: `admin@techhaven.com`, `customer@techhaven.com`
+- [ ] DTO de Login en `src/infrastructure/controllers/dto.ts`
+  - [ ] LoginDto: email, password
+  - [ ] Validadores con class-validator
+- [ ] Use Case: `LoginUseCase` en `src/application/use-cases/`
+  - [ ] Retorna `Either<Error, { token: string; user: User }>`
+  - [ ] Validar credenciales contra BD
+  - [ ] Generar JWT token si válidas
+- [ ] Configuración JWT en AppModule
+  - [ ] Secret key en variables de entorno
+  - [ ] Tiempo de expiración del token (ej: 24h)
+  - [ ] JwtStrategy y JwtAuthGuard
+- [ ] Rol de usuario (ADMIN, CUSTOMER)
+  - [ ] Validación de permisos en endpoints críticos
+  - [ ] Solo ADMIN puede ver todas las transacciones
+  - [ ] CUSTOMER solo ve sus propias transacciones
+- [ ] Unit Tests para autenticación en `tests/application/use-cases/LoginUseCase.spec.ts`
+  - [ ] Test login exitoso
+  - [ ] Test credenciales inválidas
+  - [ ] Test usuario no existe
+  - [ ] Test JWT token generado correctamente
+
 ---
 
 ## Requisitos de Arquitectura y Código
@@ -258,15 +299,15 @@
 
 ## Criterios de Evaluación Resumidos
 
-| Criterio | Puntos | Estado |
-|----------|--------|--------|
-| API funcionando correctamente | 20 | ✅ |
-| Unit testing >80% coverage | 30 | ✅ |
-| Deployment en Cloud | 20 | ✅ |
-| OWASP/HTTPS/Security headers | 5 (BONUS) | ✅ |
-| Hexagonal Architecture + ROP | 10 (BONUS) | ✅ |
-| Clean code | 10 (BONUS) | ✅ |
-| **TOTAL MÍNIMO** | **100** | **✅** |
+| Criterio                       | Puntos     | Estado |
+| ------------------------------ | ---------- | ------ |
+| API funcionando correctamente  | 20         | ✅     |
+| Unit testing >80% coverage     | 30         | ✅     |
+| Deployment en Cloud            | 20         | ✅     |
+| OWASP/HTTPS/Security headers   | 5 (BONUS)  | ✅     |
+| Hexagonal Architecture + ROP   | 10 (BONUS) | ✅     |
+| Clean code                     | 10 (BONUS) | ✅     |
+| **TOTAL MÍNIMO**               | **100**    | **✅** |
 
 ---
 
