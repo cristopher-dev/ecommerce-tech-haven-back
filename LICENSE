@@ -1,0 +1,75 @@
+MIT License
+
+Copyright (c) 2024 Cristopher Martinez
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+---
+
+TECHHAVEN PAYMENT BACKEND - ADDITIONAL TERMS
+
+1. SECURITY & COMPLIANCE
+   This software is designed to handle payment transactions and sensitive customer
+   data. When deploying this software in production, you must ensure compliance with:
+   - PCI-DSS (Payment Card Industry Data Security Standard)
+   - OWASP security guidelines
+   - GDPR regulations (if handling EU customer data)
+   - Local data protection laws
+
+2. PAYMENT GATEWAY INTEGRATION
+   This software integrates with Wompi payment gateway. Usage requires:
+   - Valid Wompi account and API credentials
+   - Compliance with Wompi's terms of service
+   - SSL/TLS encryption for all payment data
+   - No storage of sensitive payment card information
+
+3. DATA PROTECTION
+   Users of this software are responsible for:
+   - Implementing proper data backup procedures
+   - Securing database credentials
+   - Monitoring access logs
+   - Implementing regular security audits
+   - Encrypting sensitive data in transit and at rest
+
+4. LIABILITY DISCLAIMER
+   The authors and copyright holders are not liable for:
+   - Data breaches or security incidents
+   - Loss or corruption of payment data
+   - Regulatory fines or penalties
+   - Third-party payment processing failures
+   - Unauthorized access to sensitive information
+
+5. SUPPORT & MAINTENANCE
+   - No guarantee of ongoing support or maintenance
+   - Security patches will be provided on best-effort basis
+   - Users are responsible for keeping dependencies updated
+   - Regular security audits are recommended
+
+6. CONTRIBUTION GUIDELINES
+   Contributions are welcome but must:
+   - Maintain security standards
+   - Include appropriate tests (>80% coverage)
+   - Follow existing code style and architecture
+   - Include documentation updates
+   - Pass security review before merge
+
+---
+
+For questions or issues, contact: Cristopher Martinez
+GitHub: <https://github.com/cristopher-dev/ecommerce-tech-haven-back>

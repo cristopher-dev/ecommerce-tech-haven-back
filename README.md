@@ -847,9 +847,14 @@ UNLICENSED - Proyecto privado
 
 | Rol | Contacto |
 |-----|----------|
-| Backend Lead | [javier.perez@techhaven.dev](mailto:javier.perez@techhaven.dev) |
+| Backend Developer | Cristopher Martinez |
 | DevOps | [devops@techhaven.dev](mailto:devops@techhaven.dev) |
 | QA | [qa@techhaven.dev](mailto:qa@techhaven.dev) |
+
+**GitHub:**
+
+- Backend: [github.com/cristopher-dev/ecommerce-tech-haven-back](https://github.com/cristopher-dev/ecommerce-tech-haven-back)
+- Frontend: [github.com/cristopher-dev/ecommerce-tech-haven-front](https://github.com/cristopher-dev/ecommerce-tech-haven-front)
 
 ---
 
