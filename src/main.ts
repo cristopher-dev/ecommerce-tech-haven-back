@@ -31,6 +31,7 @@ export async function bootstrap() {
     .setTitle('TechHaven Payment API')
     .setDescription('API for TechHaven payment onboarding')
     .setVersion('1.0')
+    .addBearerAuth()
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api/docs', app, document, {
