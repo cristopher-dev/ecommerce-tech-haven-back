@@ -6,12 +6,14 @@ import {
   CustomerEntity,
   TransactionEntity,
   DeliveryEntity,
+  UserEntity,
 } from './entities';
 import {
   ProductRepositoryImpl,
   CustomerRepositoryImpl,
   TransactionRepositoryImpl,
   DeliveryRepositoryImpl,
+  UserRepositoryImpl,
 } from './repositories';
 import { DatabaseSeeder } from './DatabaseSeeder';
 
@@ -34,6 +36,7 @@ import { DatabaseSeeder } from './DatabaseSeeder';
             CustomerEntity,
             TransactionEntity,
             DeliveryEntity,
+            UserEntity,
           ],
           synchronize: true, // Habilitar sincronización de esquema automática
           logging: configService.get('DATABASE_LOGGING', 'false') === 'true',
@@ -48,6 +51,7 @@ import { DatabaseSeeder } from './DatabaseSeeder';
       CustomerEntity,
       TransactionEntity,
       DeliveryEntity,
+      UserEntity,
     ]),
   ],
   providers: [
@@ -68,12 +72,17 @@ import { DatabaseSeeder } from './DatabaseSeeder';
       provide: 'DeliveryRepository',
       useClass: DeliveryRepositoryImpl,
     },
+    {
+      provide: 'UserRepository',
+      useClass: UserRepositoryImpl,
+    },
   ],
   exports: [
     'ProductRepository',
     'CustomerRepository',
     'TransactionRepository',
     'DeliveryRepository',
+    'UserRepository',
   ],
 })
 export class DatabaseModule {}

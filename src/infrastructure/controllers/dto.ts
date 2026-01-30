@@ -118,3 +118,42 @@ export class CardDataDto {
   })
   cardholderName!: string;
 }
+
+export class LoginDto {
+  @IsNotEmpty()
+  @IsEmail()
+  @ApiProperty({
+    description: 'User email',
+    example: 'admin@techhaven.com',
+  })
+  email!: string;
+
+  @IsNotEmpty()
+  @IsString()
+  @Length(6, 255)
+  @ApiProperty({
+    description: 'User password',
+    example: 'password123',
+  })
+  password!: string;
+}
+
+export class LoginResponseDto {
+  @ApiProperty({
+    description: 'JWT access token',
+    example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
+  })
+  token!: string;
+
+  @ApiProperty({
+    description: 'User email',
+    example: 'admin@techhaven.com',
+  })
+  email!: string;
+
+  @ApiProperty({
+    description: 'User role',
+    example: 'ADMIN',
+  })
+  role!: string;
+}

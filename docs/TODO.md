@@ -55,44 +55,44 @@
 
 ### 5.1. Autenticación y JWT (Login - Usuarios Dummy)
 
-- [ ] Endpoint POST `/auth/login` - Autenticar usuario con email y password
-  - [ ] Usuarios dummy predefinidos (seeded en BD)
-  - [ ] Validación de credenciales
-  - [ ] Generación de JWT token en respuesta
-- [ ] Endpoint POST `/auth/register` - Registro de nuevo usuario (opcional)
-  - [ ] Validación de email único
-  - [ ] Hash de password (bcryptjs)
-  - [ ] Generar JWT token tras registro exitoso
-- [ ] Guardia de autenticación JWT (`@UseGuards(JwtAuthGuard)`)
-  - [ ] Proteger endpoints sensibles (transacciones, pagos, entregas)
-  - [ ] Validar token en header `Authorization: Bearer {token}`
-  - [ ] Rechazar requests sin token válido con 401
-- [ ] Entity Usuario en `src/domain/entities/User.ts`
-  - [ ] Propiedades: id, email, password (hash), rol, createdAt
-- [ ] Tabla de usuarios en BD (PostgreSQL)
-  - [ ] Índice único en email
-  - [ ] Usuarios dummy seeded en DatabaseSeeder
-  - [ ] Ejemplos: `admin@techhaven.com`, `customer@techhaven.com`
-- [ ] DTO de Login en `src/infrastructure/controllers/dto.ts`
-  - [ ] LoginDto: email, password
-  - [ ] Validadores con class-validator
-- [ ] Use Case: `LoginUseCase` en `src/application/use-cases/`
-  - [ ] Retorna `Either<Error, { token: string; user: User }>`
-  - [ ] Validar credenciales contra BD
-  - [ ] Generar JWT token si válidas
-- [ ] Configuración JWT en AppModule
-  - [ ] Secret key en variables de entorno
-  - [ ] Tiempo de expiración del token (ej: 24h)
-  - [ ] JwtStrategy y JwtAuthGuard
-- [ ] Rol de usuario (ADMIN, CUSTOMER)
-  - [ ] Validación de permisos en endpoints críticos
-  - [ ] Solo ADMIN puede ver todas las transacciones
-  - [ ] CUSTOMER solo ve sus propias transacciones
-- [ ] Unit Tests para autenticación en `tests/application/use-cases/LoginUseCase.spec.ts`
-  - [ ] Test login exitoso
-  - [ ] Test credenciales inválidas
-  - [ ] Test usuario no existe
-  - [ ] Test JWT token generado correctamente
+- [x] Endpoint POST `/auth/login` - Autenticar usuario con email y password
+  - [x] Usuarios dummy predefinidos (seeded en BD)
+  - [x] Validación de credenciales
+  - [x] Generación de JWT token en respuesta
+- [x] Endpoint POST `/auth/register` - Registro de nuevo usuario (opcional)
+  - [x] Validación de email único
+  - [x] Hash de password (bcryptjs)
+  - [x] Generar JWT token tras registro exitoso
+- [x] Guardia de autenticación JWT (`@UseGuards(JwtAuthGuard)`)
+  - [x] Proteger endpoints sensibles (transacciones, pagos, entregas)
+  - [x] Validar token en header `Authorization: Bearer {token}`
+  - [x] Rechazar requests sin token válido con 401
+- [x] Entity Usuario en `src/domain/entities/User.ts`
+  - [x] Propiedades: id, email, password (hash), rol, createdAt
+- [x] Tabla de usuarios en BD (PostgreSQL)
+  - [x] Índice único en email
+  - [x] Usuarios dummy seeded en DatabaseSeeder
+  - [x] Ejemplos: `admin@techhaven.com`, `customer@techhaven.com`
+- [x] DTO de Login en `src/infrastructure/controllers/dto.ts`
+  - [x] LoginDto: email, password
+  - [x] Validadores con class-validator
+- [x] Use Case: `LoginUseCase` en `src/application/use-cases/`
+  - [x] Retorna `Either<Error, { token: string; user: User }>`
+  - [x] Validar credenciales contra BD
+  - [x] Generar JWT token si válidas
+- [x] Configuración JWT en AppModule
+  - [x] Secret key en variables de entorno
+  - [x] Tiempo de expiración del token (ej: 24h)
+  - [x] JwtStrategy y JwtAuthGuard
+- [x] Rol de usuario (ADMIN, CUSTOMER)
+  - [x] Validación de permisos en endpoints críticos
+  - [x] Solo ADMIN puede ver todas las transacciones
+  - [x] CUSTOMER solo ve sus propias transacciones
+- [x] Unit Tests para autenticación en `tests/application/use-cases/LoginUseCase.spec.ts`
+  - [x] Test login exitoso
+  - [x] Test credenciales inválidas
+  - [x] Test usuario no existe
+  - [x] Test JWT token generado correctamente
 
 ---
 

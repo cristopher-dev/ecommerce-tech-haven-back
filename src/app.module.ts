@@ -1,10 +1,13 @@
 import 'reflect-metadata';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { JwtModule } from '@nestjs/jwt';
+import { PassportModule } from '@nestjs/passport';
 import { ProductsController } from './infrastructure/controllers/ProductsController';
 import { TransactionsController } from './infrastructure/controllers/TransactionsController';
 import { CustomersController } from './infrastructure/controllers/CustomersController';
 import { DeliveriesController } from './infrastructure/controllers/DeliveriesController';
+import { AuthController } from './infrastructure/controllers/AuthController';
 import { GetProductsUseCase } from './application/use-cases/GetProductsUseCase';
 import { GetProductByIdUseCase } from './application/use-cases/GetProductByIdUseCase';
 import { CreateTransactionUseCase } from './application/use-cases/CreateTransactionUseCase';
@@ -16,16 +19,27 @@ import { GetCustomerByIdUseCase } from './application/use-cases/GetCustomerByIdU
 import { CreateCustomerUseCase } from './application/use-cases/CreateCustomerUseCase';
 import { GetDeliveriesUseCase } from './application/use-cases/GetDeliveriesUseCase';
 import { GetDeliveryByIdUseCase } from './application/use-cases/GetDeliveryByIdUseCase';
+import { LoginUseCase } from './application/use-cases/LoginUseCase';
 import { DatabaseModule } from './infrastructure/database/DatabaseModule';
 import { MockTechHavenPaymentService } from './infrastructure/external/MockTechHavenPaymentService';
+import { JwtStrategy } from './infrastructure/auth/jwt.strategy';
 
 @Module({
-  imports: [ConfigModule.forRoot(), DatabaseModule],
+  imports: [
+    ConfigModule.forRoot(),
+    PassportModule,
+    JwtModule.register({
+      secret: process.env['JWT_SECRET'] || 'tech-haven-secret-key-dev',
+      signOptions: { expiresIn: '24h' },
+    }),
+    DatabaseModule,
+  ],
   controllers: [
     ProductsController,
     TransactionsController,
     CustomersController,
     DeliveriesController,
+    AuthController,
   ],
   providers: [
     GetProductsUseCase,
@@ -39,6 +53,8 @@ import { MockTechHavenPaymentService } from './infrastructure/external/MockTechH
     CreateCustomerUseCase,
     GetDeliveriesUseCase,
     GetDeliveryByIdUseCase,
+    LoginUseCase,
+    JwtStrategy,
     {
       provide: 'TechHavenPaymentService',
       useClass: MockTechHavenPaymentService,
