@@ -6,6 +6,7 @@ import { AppModule } from './../src/app.module';
 
 describe('App (e2e)', () => {
   let app: INestApplication<App>;
+  let authToken: string;
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -14,6 +15,17 @@ describe('App (e2e)', () => {
 
     app = moduleFixture.createNestApplication();
     await app.init();
+
+    // Login to get auth token
+    const loginResponse = await request(app.getHttpServer())
+      .post('/auth/login')
+      .send({
+        email: 'admin@techhaven.com',
+        password: 'admin123',
+      })
+      .expect(HttpStatus.OK);
+
+    authToken = loginResponse.body.token;
   });
 
   afterAll(async () => {
@@ -23,6 +35,7 @@ describe('App (e2e)', () => {
   it('/products (GET)', () => {
     return request(app.getHttpServer())
       .get('/products')
+      .set('Authorization', `Bearer ${authToken}`)
       .expect(HttpStatus.OK)
       .expect((res) => {
         expect(Array.isArray(res.body)).toBe(true);
@@ -37,6 +50,7 @@ describe('App (e2e)', () => {
   it('/customers (GET)', () => {
     return request(app.getHttpServer())
       .get('/customers')
+      .set('Authorization', `Bearer ${authToken}`)
       .expect(HttpStatus.OK)
       .expect((res) => {
         expect(Array.isArray(res.body)).toBe(true);
@@ -46,6 +60,7 @@ describe('App (e2e)', () => {
   it('/transactions (GET)', () => {
     return request(app.getHttpServer())
       .get('/transactions')
+      .set('Authorization', `Bearer ${authToken}`)
       .expect(HttpStatus.OK)
       .expect((res) => {
         expect(Array.isArray(res.body)).toBe(true);
@@ -55,6 +70,7 @@ describe('App (e2e)', () => {
   it('/deliveries (GET)', () => {
     return request(app.getHttpServer())
       .get('/deliveries')
+      .set('Authorization', `Bearer ${authToken}`)
       .expect(HttpStatus.OK)
       .expect((res) => {
         expect(Array.isArray(res.body)).toBe(true);
@@ -65,6 +81,7 @@ describe('App (e2e)', () => {
     // First, get a product ID
     const productsResponse = await request(app.getHttpServer())
       .get('/products')
+      .set('Authorization', `Bearer ${authToken}`)
       .expect(HttpStatus.OK);
     const productId = (productsResponse.body as { id: string }[])[0].id;
 
@@ -72,12 +89,21 @@ describe('App (e2e)', () => {
       customerName: 'Test Customer',
       customerEmail: 'test@example.com',
       customerAddress: '123 Test St',
-      productId: productId,
-      quantity: 1,
+      deliveryInfo: {
+        firstName: 'Test',
+        lastName: 'Customer',
+        phone: '+573001234567',
+        address: '123 Test St',
+        city: 'Bogotá',
+        state: 'Cundinamarca',
+        zipCode: '110111',
+      },
+      items: [{ productId, quantity: 1 }],
     };
 
     return request(app.getHttpServer())
       .post('/transactions')
+      .set('Authorization', `Bearer ${authToken}`)
       .send(createTransactionDto)
       .expect(HttpStatus.CREATED)
       .expect((res) => {
@@ -95,6 +121,7 @@ describe('App (e2e)', () => {
     // First, create a transaction
     const productsResponse = await request(app.getHttpServer())
       .get('/products')
+      .set('Authorization', `Bearer ${authToken}`)
       .expect(HttpStatus.OK);
     const productId = (productsResponse.body as { id: string }[])[0].id;
 
@@ -102,12 +129,21 @@ describe('App (e2e)', () => {
       customerName: 'Test Customer',
       customerEmail: 'test@example.com',
       customerAddress: '123 Test St',
-      productId: productId,
-      quantity: 1,
+      deliveryInfo: {
+        firstName: 'Test',
+        lastName: 'Customer',
+        phone: '+573001234567',
+        address: '123 Test St',
+        city: 'Bogotá',
+        state: 'Cundinamarca',
+        zipCode: '110111',
+      },
+      items: [{ productId, quantity: 1 }],
     };
 
     const createResponse = await request(app.getHttpServer())
       .post('/transactions')
+      .set('Authorization', `Bearer ${authToken}`)
       .send(createTransactionDto)
       .expect(HttpStatus.CREATED);
 
@@ -123,6 +159,7 @@ describe('App (e2e)', () => {
 
     return request(app.getHttpServer())
       .put(`/transactions/${transactionId}/process-payment`)
+      .set('Authorization', `Bearer ${authToken}`)
       .send(cardData)
       .expect(HttpStatus.OK)
       .expect((res) => {
@@ -136,11 +173,13 @@ describe('App (e2e)', () => {
     it('GET /products/:id - Get product by ID', async () => {
       const productsResponse = await request(app.getHttpServer())
         .get('/products')
+        .set('Authorization', `Bearer ${authToken}`)
         .expect(HttpStatus.OK);
       const productId = (productsResponse.body as { id: string }[])[0].id;
 
       return request(app.getHttpServer())
         .get(`/products/${productId}`)
+        .set('Authorization', `Bearer ${authToken}`)
         .expect(HttpStatus.OK)
         .expect((res) => {
           expect(res.body).toHaveProperty('id', productId);
@@ -153,6 +192,7 @@ describe('App (e2e)', () => {
     it('GET /products/:id - Non-existent product returns 404', async () => {
       return request(app.getHttpServer())
         .get('/products/non-existent-id')
+        .set('Authorization', `Bearer ${authToken}`)
         .expect(HttpStatus.NOT_FOUND)
         .expect((res) => {
           expect(res.body).toHaveProperty('message'); // Error message
@@ -170,6 +210,7 @@ describe('App (e2e)', () => {
 
       return request(app.getHttpServer())
         .post('/customers')
+        .set('Authorization', `Bearer ${authToken}`)
         .send(createCustomerDto)
         .expect(HttpStatus.CREATED)
         .expect((res) => {
@@ -183,6 +224,7 @@ describe('App (e2e)', () => {
     it('GET /customers/:id - Get customer by ID', async () => {
       const customersResponse = await request(app.getHttpServer())
         .get('/customers')
+        .set('Authorization', `Bearer ${authToken}`)
         .expect(HttpStatus.OK);
 
       if ((customersResponse.body as any[]).length === 0) {
@@ -195,6 +237,7 @@ describe('App (e2e)', () => {
 
         const createResponse = await request(app.getHttpServer())
           .post('/customers')
+          .set('Authorization', `Bearer ${authToken}`)
           .send(createCustomerDto)
           .expect(HttpStatus.CREATED);
 
@@ -202,6 +245,7 @@ describe('App (e2e)', () => {
 
         return request(app.getHttpServer())
           .get(`/customers/${customerId}`)
+          .set('Authorization', `Bearer ${authToken}`)
           .expect(HttpStatus.OK)
           .expect((res) => {
             expect(res.body).toHaveProperty('id', customerId);
@@ -214,6 +258,7 @@ describe('App (e2e)', () => {
 
       return request(app.getHttpServer())
         .get(`/customers/${customerId}`)
+        .set('Authorization', `Bearer ${authToken}`)
         .expect(HttpStatus.OK)
         .expect((res) => {
           expect(res.body).toHaveProperty('id', customerId);
@@ -227,6 +272,7 @@ describe('App (e2e)', () => {
     it('GET /transactions/:id - Get transaction by ID', async () => {
       const productsResponse = await request(app.getHttpServer())
         .get('/products')
+        .set('Authorization', `Bearer ${authToken}`)
         .expect(HttpStatus.OK);
       const productId = (productsResponse.body as { id: string }[])[0].id;
 
@@ -234,12 +280,21 @@ describe('App (e2e)', () => {
         customerName: 'Transaction Test',
         customerEmail: `txn-${Date.now()}@example.com`,
         customerAddress: 'Transaction Address',
-        productId: productId,
-        quantity: 1,
+        deliveryInfo: {
+          firstName: 'Trans',
+          lastName: 'Action',
+          phone: '+573001234567',
+          address: 'Transaction Address',
+          city: 'Bogotá',
+          state: 'Cundinamarca',
+          zipCode: '110111',
+        },
+        items: [{ productId, quantity: 1 }],
       };
 
       const createResponse = await request(app.getHttpServer())
         .post('/transactions')
+        .set('Authorization', `Bearer ${authToken}`)
         .send(createTransactionDto)
         .expect(HttpStatus.CREATED);
 
@@ -247,6 +302,7 @@ describe('App (e2e)', () => {
 
       return request(app.getHttpServer())
         .get(`/transactions/${transactionId}`)
+        .set('Authorization', `Bearer ${authToken}`)
         .expect(HttpStatus.OK)
         .expect((res) => {
           expect(res.body).toHaveProperty('id', transactionId);
@@ -260,6 +316,7 @@ describe('App (e2e)', () => {
     it('GET /deliveries/:id - Get delivery by ID', async () => {
       const deliveriesResponse = await request(app.getHttpServer())
         .get('/deliveries')
+        .set('Authorization', `Bearer ${authToken}`)
         .expect(HttpStatus.OK);
 
       if ((deliveriesResponse.body as any[]).length > 0) {
@@ -267,6 +324,7 @@ describe('App (e2e)', () => {
 
         return request(app.getHttpServer())
           .get(`/deliveries/${deliveryId}`)
+          .set('Authorization', `Bearer ${authToken}`)
           .expect(HttpStatus.OK)
           .expect((res) => {
             expect(res.body).toHaveProperty('id', deliveryId);
@@ -282,6 +340,7 @@ describe('App (e2e)', () => {
       // Step 1: Get a product
       const productsResponse = await request(app.getHttpServer())
         .get('/products')
+        .set('Authorization', `Bearer ${authToken}`)
         .expect(HttpStatus.OK);
       const productId = (productsResponse.body as { id: string }[])[0].id;
 
@@ -290,12 +349,21 @@ describe('App (e2e)', () => {
         customerName: 'Workflow Test',
         customerEmail: `workflow-${Date.now()}@example.com`,
         customerAddress: 'Workflow Address',
-        productId: productId,
-        quantity: 1,
+        deliveryInfo: {
+          firstName: 'Work',
+          lastName: 'Flow',
+          phone: '+573001234567',
+          address: 'Workflow Address',
+          city: 'Bogotá',
+          state: 'Cundinamarca',
+          zipCode: '110111',
+        },
+        items: [{ productId, quantity: 1 }],
       };
 
       const createResponse = await request(app.getHttpServer())
         .post('/transactions')
+        .set('Authorization', `Bearer ${authToken}`)
         .send(createTransactionDto)
         .expect(HttpStatus.CREATED);
 
@@ -305,6 +373,7 @@ describe('App (e2e)', () => {
       // Step 3: Verify transaction can be retrieved
       const getResponse = await request(app.getHttpServer())
         .get(`/transactions/${transactionId}`)
+        .set('Authorization', `Bearer ${authToken}`)
         .expect(HttpStatus.OK);
       expect(getResponse.body).toHaveProperty('id', transactionId);
 
@@ -319,6 +388,7 @@ describe('App (e2e)', () => {
 
       const paymentResponse = await request(app.getHttpServer())
         .put(`/transactions/${transactionId}/process-payment`)
+        .set('Authorization', `Bearer ${authToken}`)
         .send(cardData)
         .expect(HttpStatus.OK);
 
@@ -330,6 +400,7 @@ describe('App (e2e)', () => {
       if (paymentResponse.body.status === 'APPROVED') {
         const deliveriesResponse = await request(app.getHttpServer())
           .get('/deliveries')
+          .set('Authorization', `Bearer ${authToken}`)
           .expect(HttpStatus.OK);
 
         const delivery = (deliveriesResponse.body as any[]).find(
