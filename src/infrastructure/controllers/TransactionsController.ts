@@ -237,6 +237,7 @@ export class TransactionsController {
 
     return {
       success: true,
+      id: transaction.id,
       transactionId: transaction.transactionId || '',
       orderId: transaction.orderId || '',
       amount: transaction.amount,

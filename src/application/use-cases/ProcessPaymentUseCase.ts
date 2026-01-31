@@ -33,8 +33,13 @@ export class ProcessPaymentUseCase {
     transactionId: string,
     cardData: CardData,
   ): Promise<Either<Error, Transaction>> {
-    const transaction =
-      await this.transactionRepository.findByTransactionId(transactionId);
+    // Try to find by UUID id first (new way), then by transactionId (backward compatibility)
+    let transaction =
+      await this.transactionRepository.findById(transactionId);
+    if (!transaction) {
+      transaction =
+        await this.transactionRepository.findByTransactionId(transactionId);
+    }
     if (!transaction) return left(new Error('Transaction not found'));
 
     const customer = await this.customerRepository.findById(
