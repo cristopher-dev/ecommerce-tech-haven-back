@@ -2,5 +2,7 @@
   "sonarlint.connectedMode.project": {
     "connectionId": "sonarqube-server",
     "projectKey": "tech-haven-back"
-  }
+  },
+  "github.copilot.chat.responsesApiReasoningSummary": "off",
+  "chat.agent.thinking.generateTitles": false
 }
