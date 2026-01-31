@@ -2,34 +2,50 @@ version: '3.8'
 
 services:
   postgres:
-    image: postgres:15-alpine
+    image: postgres:16-alpine
     container_name: tech-haven-postgres
     environment:
       POSTGRES_DB: ${DATABASE_NAME:-tech-haven_db}
       POSTGRES_USER: ${DATABASE_USER:-postgres}
       POSTGRES_PASSWORD: ${DATABASE_PASSWORD:-password}
+      POSTGRES_INITDB_ARGS: --encoding=UTF8 --locale=C
     ports:
       - '${DATABASE_PORT:-5432}:5432'
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./init-db.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       tech-haven_network:
         ipv4_address: 172.20.0.10
     restart: unless-stopped
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U ${DATABASE_USER:-postgres}']
+      test: ['CMD-SHELL', 'pg_isready -U ${DATABASE_USER:-postgres} -h localhost']
       interval: 10s
       timeout: 5s
       retries: 5
+      start_period: 10s
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN
+      - DAC_OVERRIDE
+      - SETGID
+      - SETUID
 
   pgadmin:
-    image: dpage/pgadmin4:latest
+    image: dpage/pgadmin4:8.0
     container_name: tech-haven-pgadmin
     environment:
       PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL:-admin@tech-haven.com}
       PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD:-admin}
+      PGADMIN_CONFIG_MAX_QUERY_HIST_STORED: 100
+      PGADMIN_CONFIG_ENHANCED_COOKIE_PROTECTION: 'True'
+      PGADMIN_CONFIG_COOKIE_SAMESITE: 'Lax'
+      PGADMIN_CONFIG_COOKIE_DEFAULT_SECURE: 'False'
     ports:
-      - '5050:80'
+      - '${PGADMIN_PORT:-5050}:80'
     depends_on:
       postgres:
         condition: service_healthy
@@ -37,11 +53,15 @@ services:
       tech-haven_network:
         ipv4_address: 172.20.0.11
     restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
 
   app:
     build:
       context: ..
       dockerfile: Dockerfile
+      args:
+        NODE_ENV: ${NODE_ENV:-production}
     container_name: tech-haven-app
     environment:
       NODE_ENV: ${NODE_ENV:-production}
@@ -51,6 +71,10 @@ services:
       DATABASE_PASSWORD: ${DATABASE_PASSWORD:-password}
       DATABASE_NAME: ${DATABASE_NAME:-tech-haven_db}
       DATABASE_LOGGING: ${DATABASE_LOGGING:-false}
+      JWT_SECRET: ${JWT_SECRET:-tech-haven-secret-key-dev}
+      JWT_EXPIRATION: ${JWT_EXPIRATION:-24h}
+      APP_PORT: ${APP_PORT:-3000}
+      LOG_LEVEL: ${LOG_LEVEL:-debug}
     ports:
       - '${APP_PORT:-3000}:3000'
     depends_on:
@@ -60,10 +84,22 @@ services:
       tech-haven_network:
         ipv4_address: 172.20.0.12
     restart: unless-stopped
-    command: node dist/main.js
+    healthcheck:
+      test: ['CMD', 'wget', '--quiet', '--tries=1', '--spider', 'http://localhost:3000/health']
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add:
+      - NET_BIND_SERVICE
 
 volumes:
   postgres_data:
+    driver: local
 
 networks:
   tech-haven_network:
