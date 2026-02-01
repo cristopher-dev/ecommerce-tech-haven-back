@@ -55,14 +55,7 @@
     "stock": 18,
     "imageUrl": "https://images.unsplash.com/photo-1598327105666-5b89351aff97?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=300&q=80"
   },
-  {
-    "id": "prod-11",
-    "name": "Tablet Pro 12.9\"",
-    "description": "Powerful tablet for creative professionals",
-    "price": 1099,
-    "stock": 12,
-    "imageUrl": "https://images.unsplash.com/photo-1526765260-f10f8aa7e745?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=300&q=80"
-  },
+
   {
     "id": "prod-12",
     "name": "Bluetooth Speaker Premium",
@@ -79,14 +72,7 @@
     "stock": 45,
     "imageUrl": "https://images.unsplash.com/photo-1609091839311-d5365f9ff1c5?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=300&q=80"
   },
-  {
-    "id": "prod-14",
-    "name": "WiFi 6 Router",
-    "description": "Ultra-fast WiFi 6 mesh router system",
-    "price": 299.99,
-    "stock": 14,
-    "imageUrl": "https://images.unsplash.com/photo-1631862550519-c7bc9d1ee5f9?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=300&q=80"
-  },
+
   {
     "id": "prod-15",
     "name": "Gaming Headset RGB",
@@ -103,14 +89,7 @@
     "stock": 9,
     "imageUrl": "https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=300&q=80"
   },
-  {
-    "id": "prod-18",
-    "name": "Graphics Tablet",
-    "description": "Pressure-sensitive graphics tablet for artists",
-    "price": 299.99,
-    "stock": 16,
-    "imageUrl": "https://images.unsplash.com/photo-1554866585-acbb2b90556e?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=300&q=80"
-  },
+ 
   {
     "id": "prod-19",
     "name": "Microphone Condenser",
