@@ -34,8 +34,7 @@ export class ProcessPaymentUseCase {
     cardData: CardData,
   ): Promise<Either<Error, Transaction>> {
     // Try to find by UUID id first (new way), then by transactionId (backward compatibility)
-    let transaction =
-      await this.transactionRepository.findById(transactionId);
+    let transaction = await this.transactionRepository.findById(transactionId);
     if (!transaction) {
       transaction =
         await this.transactionRepository.findByTransactionId(transactionId);
@@ -47,11 +46,17 @@ export class ProcessPaymentUseCase {
     );
     if (!customer) return left(new Error('Customer not found'));
 
+    // Get acceptance tokens first
+    const tokensResult = await this.techHavenService.getAcceptanceTokens();
+    if (tokensResult._tag === 'Left') return left(tokensResult.left);
+    const acceptanceTokens = tokensResult.right;
+
     const result = await this.techHavenService.processPayment(
       transactionId,
       transaction.amount,
       cardData,
       customer.email,
+      acceptanceTokens,
     );
     if (result._tag === 'Left') return left(result.left);
 

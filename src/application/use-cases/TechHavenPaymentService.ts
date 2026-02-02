@@ -9,11 +9,18 @@ export interface CardData {
   cardholderName: string;
 }
 
+export interface AcceptanceTokens {
+  acceptanceToken: string;
+  personalDataAuthToken: string;
+}
+
 export interface TechHavenPaymentService {
+  getAcceptanceTokens(): Promise<Either<Error, AcceptanceTokens>>;
   processPayment(
     transactionId: string,
     amount: number,
     cardData: CardData,
     customerEmail: string,
+    acceptanceTokens: AcceptanceTokens,
   ): Promise<Either<Error, TransactionStatus>>;
 }

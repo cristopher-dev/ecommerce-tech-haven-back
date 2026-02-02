@@ -28,6 +28,7 @@ describe('ProcessPaymentUseCase', () => {
       findById: jest.fn(),
       updateStatus: jest.fn(),
       findAll: jest.fn(),
+      findByTransactionId: jest.fn(),
     };
     const mockDel = {
       create: jest.fn(),
@@ -46,6 +47,7 @@ describe('ProcessPaymentUseCase', () => {
       findAll: jest.fn(),
     };
     const mockTechHaven = {
+      getAcceptanceTokens: jest.fn(),
       processPayment: jest.fn(),
     };
 
@@ -72,18 +74,42 @@ describe('ProcessPaymentUseCase', () => {
     const transaction = new Transaction(
       '1',
       'cust1',
-      'prod1',
       100,
       TransactionStatus.PENDING,
+      [{ productId: 'prod1', quantity: 1 }],
+      {
+        firstName: 'John',
+        lastName: 'Doe',
+        address: 'Address',
+        city: 'City',
+        state: 'State',
+        postalCode: '12345',
+        phone: '1234567890',
+      },
+      50,
+      100,
+      100,
       new Date(),
       new Date(),
     );
     const updatedTransaction = new Transaction(
       '1',
       'cust1',
-      'prod1',
       100,
       TransactionStatus.APPROVED,
+      [{ productId: 'prod1', quantity: 1 }],
+      {
+        firstName: 'John',
+        lastName: 'Doe',
+        address: 'Address',
+        city: 'City',
+        state: 'State',
+        postalCode: '12345',
+        phone: '1234567890',
+      },
+      50,
+      100,
+      100,
       new Date(),
       new Date(),
     );
@@ -106,6 +132,13 @@ describe('ProcessPaymentUseCase', () => {
       .mockResolvedValueOnce(transaction)
       .mockResolvedValueOnce(updatedTransaction);
     mockCustomerRepo.findById.mockResolvedValue(customer);
+    mockTechHavenService.getAcceptanceTokens.mockResolvedValue({
+      _tag: 'Right',
+      right: {
+        acceptanceToken: 'mock_token',
+        personalDataAuthToken: 'mock_auth_token',
+      },
+    });
     mockTechHavenService.processPayment.mockResolvedValue({
       _tag: 'Right',
       right: TransactionStatus.APPROVED,
@@ -150,9 +183,21 @@ describe('ProcessPaymentUseCase', () => {
     const transaction = new Transaction(
       '1',
       'cust1',
-      'prod1',
       100,
       TransactionStatus.PENDING,
+      [{ productId: 'prod1', quantity: 1 }],
+      {
+        firstName: 'John',
+        lastName: 'Doe',
+        address: 'Address',
+        city: 'City',
+        state: 'State',
+        postalCode: '12345',
+        phone: '1234567890',
+      },
+      50,
+      100,
+      100,
       new Date(),
       new Date(),
     );
@@ -178,9 +223,21 @@ describe('ProcessPaymentUseCase', () => {
     const transaction = new Transaction(
       '1',
       'cust1',
-      'prod1',
       100,
       TransactionStatus.PENDING,
+      [{ productId: 'prod1', quantity: 1 }],
+      {
+        firstName: 'John',
+        lastName: 'Doe',
+        address: 'Address',
+        city: 'City',
+        state: 'State',
+        postalCode: '12345',
+        phone: '1234567890',
+      },
+      50,
+      100,
+      100,
       new Date(),
       new Date(),
     );
@@ -193,6 +250,13 @@ describe('ProcessPaymentUseCase', () => {
 
     mockTransactionRepo.findById.mockResolvedValue(transaction);
     mockCustomerRepo.findById.mockResolvedValue(customer);
+    mockTechHavenService.getAcceptanceTokens.mockResolvedValue({
+      _tag: 'Right',
+      right: {
+        acceptanceToken: 'mock_token',
+        personalDataAuthToken: 'mock_auth_token',
+      },
+    });
     mockTechHavenService.processPayment.mockResolvedValue({
       _tag: 'Left',
       left: new Error('Payment declined'),
@@ -216,18 +280,42 @@ describe('ProcessPaymentUseCase', () => {
     const transaction = new Transaction(
       '1',
       'cust1',
-      'prod1',
       100,
       TransactionStatus.PENDING,
+      [{ productId: 'prod1', quantity: 1 }],
+      {
+        firstName: 'John',
+        lastName: 'Doe',
+        address: 'Address',
+        city: 'City',
+        state: 'State',
+        postalCode: '12345',
+        phone: '1234567890',
+      },
+      50,
+      100,
+      100,
       new Date(),
       new Date(),
     );
     const updatedTransaction = new Transaction(
       '1',
       'cust1',
-      'prod1',
       100,
       TransactionStatus.DECLINED,
+      [{ productId: 'prod1', quantity: 1 }],
+      {
+        firstName: 'John',
+        lastName: 'Doe',
+        address: 'Address',
+        city: 'City',
+        state: 'State',
+        postalCode: '12345',
+        phone: '1234567890',
+      },
+      50,
+      100,
+      100,
       new Date(),
       new Date(),
     );
@@ -242,6 +330,13 @@ describe('ProcessPaymentUseCase', () => {
       .mockResolvedValueOnce(transaction)
       .mockResolvedValueOnce(updatedTransaction);
     mockCustomerRepo.findById.mockResolvedValue(customer);
+    mockTechHavenService.getAcceptanceTokens.mockResolvedValue({
+      _tag: 'Right',
+      right: {
+        acceptanceToken: 'mock_token',
+        personalDataAuthToken: 'mock_auth_token',
+      },
+    });
     mockTechHavenService.processPayment.mockResolvedValue({
       _tag: 'Right',
       right: TransactionStatus.DECLINED,

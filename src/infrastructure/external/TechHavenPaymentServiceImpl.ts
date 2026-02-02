@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { createHash } from 'crypto';
 import { ConfigService } from '@nestjs/config';
 import axios, { AxiosError } from 'axios';
 import { Either, left, right } from 'fp-ts/Either';
@@ -7,8 +6,24 @@ import { TransactionStatus } from '../../domain/entities/Transaction';
 import {
   TechHavenPaymentService,
   CardData,
+  AcceptanceTokens,
 } from '../../application/use-cases/TechHavenPaymentService';
 import { CENTS_PER_UNIT, DEFAULT_INSTALLMENTS } from '../../domain/constants';
+
+interface AcceptanceTokensResponse {
+  data: {
+    presigned_acceptance: {
+      acceptance_token: string;
+      permalink: string;
+      type: string;
+    };
+    presigned_personal_data_auth: {
+      acceptance_token: string;
+      permalink: string;
+      type: string;
+    };
+  };
+}
 
 interface TokenResponse {
   data: {
@@ -18,6 +33,7 @@ interface TokenResponse {
 
 interface TransactionResponse {
   data: {
+    id: string;
     status: string;
   };
 }
@@ -26,22 +42,45 @@ interface TransactionResponse {
 export class TechHavenPaymentServiceImpl implements TechHavenPaymentService {
   constructor(private configService: ConfigService) {}
 
+  async getAcceptanceTokens(): Promise<Either<Error, AcceptanceTokens>> {
+    try {
+      const apiUrl = this.configService.get<string>('PAYMENT_API_URL')!;
+      const publicKey = this.configService.get<string>('PAYMENT_PUBLIC_KEY')!;
+
+      const response = await axios.get<AcceptanceTokensResponse>(
+        `${apiUrl}/merchants/${publicKey}`,
+      );
+
+      const acceptanceToken =
+        response.data.data.presigned_acceptance.acceptance_token;
+      const personalDataAuthToken =
+        response.data.data.presigned_personal_data_auth.acceptance_token;
+
+      return right({
+        acceptanceToken,
+        personalDataAuthToken,
+      });
+    } catch (error) {
+      const axiosError = error as AxiosError;
+      console.error(
+        'Wompi API error getting acceptance tokens:',
+        axiosError.response?.data || axiosError.message,
+      );
+      return left(new Error('Error getting acceptance tokens from Wompi'));
+    }
+  }
+
   async processPayment(
     transactionId: string,
     amount: number,
     cardData: CardData,
     customerEmail: string,
+    acceptanceTokens: AcceptanceTokens,
   ): Promise<Either<Error, TransactionStatus>> {
     try {
-      const techHavenUrl = this.configService.get<string>(
-        'TECH_HAVEN_SANDBOX_URL',
-      )!;
-      const publicKey = this.configService.get<string>(
-        'TECH_HAVEN_PUBLIC_KEY',
-      )!;
-      const privateKey = this.configService.get<string>(
-        'TECH_HAVEN_PRIVATE_KEY',
-      )!;
+      const techHavenUrl = this.configService.get<string>('PAYMENT_API_URL')!;
+      const publicKey = this.configService.get<string>('PAYMENT_PUBLIC_KEY')!;
+      const privateKey = this.configService.get<string>('PAYMENT_PRIVATE_KEY')!;
 
       const tokenResponse = await axios.post<TokenResponse>(
         `${techHavenUrl}/tokens/cards`,
@@ -64,21 +103,17 @@ export class TechHavenPaymentServiceImpl implements TechHavenPaymentService {
       const transactionResponse = await axios.post<TransactionResponse>(
         `${techHavenUrl}/transactions`,
         {
-          amount_in_cents: amount * CENTS_PER_UNIT, // TechHaven expects cents
+          acceptance_token: acceptanceTokens.acceptanceToken,
+          accept_personal_auth: acceptanceTokens.personalDataAuthToken,
+          amount_in_cents: amount * CENTS_PER_UNIT, // Wompi expects cents
           currency: 'COP',
-          signature: this.generateSignature(
-            amount * CENTS_PER_UNIT,
-            'COP',
-            transactionId,
-            privateKey,
-          ),
           customer_email: customerEmail,
+          reference: transactionId,
           payment_method: {
             type: 'CARD',
             token: token,
             installments: DEFAULT_INSTALLMENTS, // Assuming single payment
           },
-          reference: transactionId,
         },
         {
           headers: {
@@ -102,17 +137,7 @@ export class TechHavenPaymentServiceImpl implements TechHavenPaymentService {
         'TechHaven API error:',
         axiosError.response?.data || axiosError.message,
       );
-      return left(new Error('Error processing payment with TechHaven'));
+      return left(new Error('Error processing payment with Wompi'));
     }
-  }
-
-  private generateSignature(
-    amount: number,
-    currency: string,
-    reference: string,
-    privateKey: string,
-  ): string {
-    const data = `${amount}${currency}${reference}${privateKey}`;
-    return createHash('sha256').update(data).digest('hex');
   }
 }

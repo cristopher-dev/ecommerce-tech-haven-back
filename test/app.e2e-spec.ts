@@ -139,11 +139,11 @@ describe('App (e2e)', () => {
     // Extract transaction ID - prefer UUID id, fallback to transactionId
     let transactionId: string;
     console.log('Create Response body:', JSON.stringify(createResponse.body));
-    if ((createResponse.body as any).id && (createResponse.body as any).id !== null) {
-      transactionId = (createResponse.body as any).id;
+    if (createResponse.body.id && createResponse.body.id !== null) {
+      transactionId = createResponse.body.id;
       console.log('Using UUID id:', transactionId);
-    } else if ((createResponse.body as any).transactionId) {
-      transactionId = (createResponse.body as any).transactionId;
+    } else if (createResponse.body.transactionId) {
+      transactionId = createResponse.body.transactionId;
       console.log('Using transactionId:', transactionId);
     } else {
       console.log('No ID found, body keys:', Object.keys(createResponse.body));
@@ -290,7 +290,10 @@ describe('App (e2e)', () => {
         .send(createTransactionDto)
         .expect(HttpStatus.CREATED);
 
-      const transactionId = (createResponse.body as any).id || (createResponse.body as any).transactionId || 'unknown';
+      const transactionId =
+        createResponse.body.id ||
+        createResponse.body.transactionId ||
+        'unknown';
 
       return request(app.getHttpServer())
         .get(`/transactions/${transactionId}`)
@@ -357,10 +360,10 @@ describe('App (e2e)', () => {
 
       // Extract transaction ID - prefer UUID id, fallback to transactionId
       let transactionId: string;
-      if ((createResponse.body as any).id && (createResponse.body as any).id !== null) {
-        transactionId = (createResponse.body as any).id;
-      } else if ((createResponse.body as any).transactionId) {
-        transactionId = (createResponse.body as any).transactionId;
+      if (createResponse.body.id && createResponse.body.id !== null) {
+        transactionId = createResponse.body.id;
+      } else if (createResponse.body.transactionId) {
+        transactionId = createResponse.body.transactionId;
       } else {
         throw new Error('No transaction ID returned from POST');
       }
