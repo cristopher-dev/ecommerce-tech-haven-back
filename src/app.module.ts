@@ -3,6 +3,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
+import { HttpModule } from '@nestjs/axios';
 import { ProductsController } from './infrastructure/controllers/ProductsController';
 import { TransactionsController } from './infrastructure/controllers/TransactionsController';
 import { CustomersController } from './infrastructure/controllers/CustomersController';
@@ -21,8 +22,8 @@ import { GetDeliveriesUseCase } from './application/use-cases/GetDeliveriesUseCa
 import { GetDeliveryByIdUseCase } from './application/use-cases/GetDeliveryByIdUseCase';
 import { LoginUseCase } from './application/use-cases/LoginUseCase';
 import { DatabaseModule } from './infrastructure/database/DatabaseModule';
-import { MockTechHavenPaymentService } from './infrastructure/external/MockTechHavenPaymentService';
 import { JwtStrategy } from './infrastructure/auth/jwt.strategy';
+import { TechHavenPaymentServiceImpl } from './infrastructure/external/TechHavenPaymentServiceImpl';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { JwtStrategy } from './infrastructure/auth/jwt.strategy';
       secret: process.env['JWT_SECRET'] || 'tech-haven-secret-key-dev',
       signOptions: { expiresIn: '24h' },
     }),
+    HttpModule,
     DatabaseModule,
   ],
   controllers: [
@@ -55,9 +57,10 @@ import { JwtStrategy } from './infrastructure/auth/jwt.strategy';
     GetDeliveryByIdUseCase,
     LoginUseCase,
     JwtStrategy,
+    TechHavenPaymentServiceImpl,
     {
       provide: 'TechHavenPaymentService',
-      useClass: MockTechHavenPaymentService,
+      useClass: TechHavenPaymentServiceImpl,
     },
   ],
 })
