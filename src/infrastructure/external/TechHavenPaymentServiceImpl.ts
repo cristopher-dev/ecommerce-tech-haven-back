@@ -65,11 +65,20 @@ interface WompiPaymentLink {
 }
 
 interface WompiMerchant {
+  id: number;
   name: string;
   email: string;
   public_key: string;
-  acceptance_token: string;
-  personal_data_token: string;
+  presigned_acceptance: {
+    acceptance_token: string;
+    permalink: string;
+    type: string;
+  };
+  presigned_personal_data_auth: {
+    acceptance_token: string;
+    permalink: string;
+    type: string;
+  };
 }
 
 interface WompiFinancialInstitution {
@@ -95,7 +104,7 @@ export class TechHavenPaymentServiceImpl implements TechHavenPaymentService {
   async getAcceptanceTokens(): Promise<Either<Error, AcceptanceTokens>> {
     try {
       const response = await lastValueFrom(
-        this.httpService.get<WompiMerchant>(
+        this.httpService.get<{ data: WompiMerchant }>(
           `${this.baseUrl}/merchants/${this.merchantPublicKey}`,
           {
             headers: this.getHeaders(),
@@ -104,8 +113,10 @@ export class TechHavenPaymentServiceImpl implements TechHavenPaymentService {
       );
 
       return right({
-        acceptanceToken: response.data.acceptance_token,
-        personalDataAuthToken: response.data.personal_data_token,
+        acceptanceToken:
+          response.data.data.presigned_acceptance.acceptance_token,
+        personalDataAuthToken:
+          response.data.data.presigned_personal_data_auth.acceptance_token,
       });
     } catch (error) {
       const errorMessage =
