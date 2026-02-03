@@ -167,49 +167,16 @@ export class TransactionsController {
   })
   async tokenizeCard(@Body() cardData: CardDataDto): Promise<any> {
     try {
-      // Get acceptance tokens first
-      const acceptanceResult = await this.paymentService.getAcceptanceTokens();
-      if (acceptanceResult._tag === 'Left') {
-        throw new BadRequestException({
-          success: false,
-          error: 'Failed to get acceptance tokens',
-          code: 'ACCEPTANCE_TOKEN_ERROR',
-        });
-      }
-
-      const acceptanceTokens = acceptanceResult.right;
-
       // Tokenize the card
-      const tokenResult = await this.paymentService.tokenizeCard(
-        {
-          cardNumber: cardData.cardNumber,
-          expirationMonth: cardData.expirationMonth,
-          expirationYear: cardData.expirationYear,
-          cvv: cardData.cvv,
-          cardholderName: cardData.cardholderName,
-        },
-        acceptanceTokens,
-      );
-
-      if (tokenResult._tag === 'Left') {
-        throw new BadRequestException({
-          success: false,
-          error: tokenResult.left.message,
-          code: 'TOKENIZATION_FAILED',
-        });
-      }
-
-      const tokenId = tokenResult.right;
-
-      return {
-        success: true,
-        tokenId,
-        brand: this.extractCardBrand(cardData.cardNumber),
-        lastFour: cardData.cardNumber.slice(-4),
+      const result = await this.paymentService.tokenizeCard({
+        cardNumber: cardData.cardNumber,
         expirationMonth: cardData.expirationMonth,
         expirationYear: cardData.expirationYear,
-        createdAt: new Date().toISOString(),
-      };
+        cvv: cardData.cvv,
+        cardholderName: cardData.cardholderName,
+      });
+
+      return result;
     } catch (error) {
       if (error instanceof BadRequestException) {
         throw error;
@@ -670,25 +637,5 @@ export class TransactionsController {
       cardLastFour: cardData.cardNumber.slice(-4),
       approvedAt: transaction.updatedAt.toISOString(),
     };
-  }
-
-  /**
-   * Helper method to determine card brand from card number
-   */
-  private extractCardBrand(cardNumber: string): string {
-    const cleanNumber = cardNumber.replaceAll(/\s/g, '');
-    if (/^\d4\d{12}(?:\d{3})?$/.test(cleanNumber)) {
-      return 'VISA';
-    }
-    if (/^5[1-5]\d{14}$/.test(cleanNumber)) {
-      return 'MASTERCARD';
-    }
-    if (/^3[47]\d{13}$/.test(cleanNumber)) {
-      return 'AMEX';
-    }
-    if (/^6(?:011|5\d{2})\d{12}$/.test(cleanNumber)) {
-      return 'DISCOVER';
-    }
-    return 'UNKNOWN';
   }
 }

@@ -18,8 +18,16 @@ export interface TechHavenPaymentService {
   getAcceptanceTokens(): Promise<Either<Error, AcceptanceTokens>>;
   tokenizeCard(
     cardData: CardData,
-    acceptanceTokens: AcceptanceTokens,
-  ): Promise<Either<Error, string>>;
+  ): Promise<{
+    id: string;
+    created_at: string;
+    brand: string;
+    name: string;
+    last_four: string;
+    bin: string;
+    exp_year: number;
+    exp_month: number;
+  }>;
   processPayment(
     transactionId: string,
     amount: number,

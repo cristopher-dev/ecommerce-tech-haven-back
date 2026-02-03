@@ -88,14 +88,15 @@ interface WompiFinancialInstitution {
 
 @Injectable()
 export class TechHavenPaymentServiceImpl implements TechHavenPaymentService {
-  private readonly baseUrl = 'https://sandbox.wompi.co/v1';
+  private readonly baseUrl: string;
   private merchantPublicKey: string;
   private merchantPrivateKey: string;
 
   constructor(private readonly httpService: HttpService) {
     // Load from environment variables
-    this.merchantPublicKey = process.env['WOMPI_PUBLIC_KEY'] || '';
-    this.merchantPrivateKey = process.env['WOMPI_PRIVATE_KEY'] || '';
+    this.baseUrl = process.env['PAYMENT_GATEWAY_BASE_URL'] || '';
+    this.merchantPublicKey = process.env['PAYMENT_GATEWAY_PUBLIC_KEY'] || '';
+    this.merchantPrivateKey = process.env['PAYMENT_GATEWAY_PRIVATE_KEY'] || '';
   }
 
   /**
@@ -139,12 +140,8 @@ export class TechHavenPaymentServiceImpl implements TechHavenPaymentService {
   ): Promise<Either<Error, TransactionStatus>> {
     try {
       // First tokenize the card
-      const tokenResult = await this.tokenizeCard(cardData, acceptanceTokens);
-      if (tokenResult._tag === 'Left') {
-        return left(tokenResult.left);
-      }
-
-      const cardToken = tokenResult.right;
+      const cardTokenData = await this.tokenizeCard(cardData);
+      const cardToken = cardTokenData.id;
 
       // Create transaction with tokenized card
       const transactionResult = await this.createTransaction(
@@ -177,13 +174,12 @@ export class TechHavenPaymentServiceImpl implements TechHavenPaymentService {
    */
   async tokenizeCard(
     cardData: CardData,
-    acceptanceTokens: AcceptanceTokens,
-  ): Promise<Either<Error, string>> {
+  ): Promise<WompiTokenCardResponse['data']> {
     try {
       const payload = {
         number: cardData.cardNumber.replace(/\s/g, ''),
-        exp_month: cardData.expirationMonth,
-        exp_year: cardData.expirationYear,
+        exp_month: String(cardData.expirationMonth),
+        exp_year: String(cardData.expirationYear),
         cvc: cardData.cvv,
         card_holder: cardData.cardholderName,
       };
@@ -194,21 +190,18 @@ export class TechHavenPaymentServiceImpl implements TechHavenPaymentService {
           payload,
           {
             headers: {
-              ...this.getHeaders(),
+              Authorization: `Bearer ${this.merchantPublicKey}`,
               'Content-Type': 'application/json',
-              'Wompi-Acceptance-Token': acceptanceTokens.acceptanceToken,
-              'Wompi-Personal-Data-Token':
-                acceptanceTokens.personalDataAuthToken,
             },
           },
         ),
       );
 
-      return right(response.data.data.id);
+      return response.data.data;
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : String(error);
-      return left(new Error(`Card tokenization failed: ${errorMessage}`));
+      throw new Error(`Card tokenization failed: ${errorMessage}`);
     }
   }
 
