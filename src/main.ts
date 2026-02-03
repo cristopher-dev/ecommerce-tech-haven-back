@@ -29,6 +29,7 @@ export async function bootstrap() {
     ) => {
       if (
         !origin ||
+        origin === 'null' ||
         allowedOrigins.includes('*') ||
         allowedOrigins.includes(origin)
       ) {

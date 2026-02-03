@@ -16,9 +16,7 @@ export interface AcceptanceTokens {
 
 export interface TechHavenPaymentService {
   getAcceptanceTokens(): Promise<Either<Error, AcceptanceTokens>>;
-  tokenizeCard(
-    cardData: CardData,
-  ): Promise<{
+  tokenizeCard(cardData: CardData): Promise<{
     id: string;
     created_at: string;
     brand: string;
