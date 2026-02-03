@@ -7,6 +7,20 @@
 [![Test Coverage](https://img.shields.io/badge/Coverage-80%25-brightgreen?style=flat-square)](coverage/)
 [![Code Quality](https://img.shields.io/badge/Code%20Quality-SonarQube-blue?style=flat-square)](sonar-project.properties)
 
+### 📋 Tabla de Contenidos
+
+- [📋 Descripción](#-descripción-del-proyecto)
+- [🏗️ Arquitectura](#-arquitectura-del-sistema)
+- [🗄️ Modelo de Datos](#-modelo-de-datos)
+- [🚀 Guía Completa](#-guía-de-inicio-rápido)
+- [📚 API Endpoints](#-documentación-de-api)
+- [🧪 Testing](#-testing-y-cobertura)
+- [🔒 Seguridad](#-seguridad---cumplimiento-owasp--pci-dss)
+- [📦 Estructura](#-estructura-del-proyecto)
+- [💡 Ventajas](#-ventajas-competitivas)
+
+---
+
 ## 🚀 Inicio Rápido
 
 ### ⚡ 30 segundos para estar listo
@@ -22,23 +36,9 @@ npm install
 npm run start:dev
 
 # 4. Acceder
-http://localhost:3000/api-docs   # 📚 API Docs
-http://localhost:3000/health     # ✅ Health Check
+api.cristopher-dev.com/api-docs   # 📚 API Docs
+api.cristopher-dev.com/health     # ✅ Health Check
 ```
-
-### 📋 Tabla de Contenidos
-
-- [📋 Descripción](#-descripción-del-proyecto)
-- [🏗️ Arquitectura](#-arquitectura-del-sistema)
-- [🗄️ Modelo de Datos](#-modelo-de-datos)
-- [🚀 Guía Completa](#-guía-de-inicio-rápido)
-- [📚 API Endpoints](#-documentación-de-api)
-- [🧪 Testing](#-testing-y-cobertura)
-- [🔒 Seguridad](#-seguridad---cumplimiento-owasp--pci-dss)
-- [📦 Estructura](#-estructura-del-proyecto)
-- [💡 Ventajas](#-ventajas-competitivas)
-
----
 
 ## 📋 Descripción del Proyecto
 
@@ -253,12 +253,12 @@ docker-compose up -d
 npm run start:dev
 ```
 
-El servidor estará disponible en: **<http://localhost:3000>**
+El servidor estará disponible en: **<api.cristopher-dev.com>**
 
 ### Verificación de Salud
 
 ```bash
-curl http://localhost:3000/health
+curl api.cristopher-dev.com/health
 ```
 
 Respuesta exitosa:
@@ -280,7 +280,7 @@ Respuesta exitosa:
 Accede a la documentación interactiva en:
 
 ```
-http://localhost:3000/api-docs
+api.cristopher-dev.com/api-docs
 ```
 
 ### Colección de Postman
@@ -291,10 +291,10 @@ Importa la colección oficial: [TechHaven Payment Backend.postman_collection.jso
 
 #### 🛍️ Productos
 
-| Método | Endpoint | Descripción | Auth |
-|--------|----------|-------------|------|
-| `GET` | `/api/products` | Listar todos los productos | ✗ |
-| `GET` | `/api/products/:id` | Obtener producto por ID | ✗ |
+| Método | Endpoint            | Descripción                | Auth |
+| ------ | ------------------- | -------------------------- | ---- |
+| `GET`  | `/api/products`     | Listar todos los productos | ✗    |
+| `GET`  | `/api/products/:id` | Obtener producto por ID    | ✗    |
 
 **Ejemplo de Respuesta:**
 
@@ -312,17 +312,17 @@ Importa la colección oficial: [TechHaven Payment Backend.postman_collection.jso
 
 #### 💳 Transacciones
 
-| Método | Endpoint | Descripción | Auth |
-|--------|----------|-------------|------|
-| `POST` | `/api/transactions` | Crear nueva transacción | ✓ JWT |
-| `GET` | `/api/transactions` | Listar transacciones | ✓ JWT |
-| `GET` | `/api/transactions/:id` | Obtener transacción por ID | ✓ JWT |
-| `PUT` | `/api/transactions/:id/process-payment` | Procesar pago | ✓ JWT |
+| Método | Endpoint                                | Descripción                | Auth  |
+| ------ | --------------------------------------- | -------------------------- | ----- |
+| `POST` | `/api/transactions`                     | Crear nueva transacción    | ✓ JWT |
+| `GET`  | `/api/transactions`                     | Listar transacciones       | ✓ JWT |
+| `GET`  | `/api/transactions/:id`                 | Obtener transacción por ID | ✓ JWT |
+| `PUT`  | `/api/transactions/:id/process-payment` | Procesar pago              | ✓ JWT |
 
 **Crear Transacción:**
 
 ```bash
-curl -X POST http://localhost:3000/api/transactions \
+curl -X POST api.cristopher-dev.com/api/transactions \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer YOUR_JWT_TOKEN" \
   -d '{
@@ -352,10 +352,10 @@ curl -X POST http://localhost:3000/api/transactions \
 
 #### 🚚 Entregas
 
-| Método | Endpoint | Descripción | Auth |
-|--------|----------|-------------|------|
-| `GET` | `/api/deliveries` | Listar entregas | ✓ JWT |
-| `GET` | `/api/deliveries/:id` | Obtener entrega por ID | ✓ JWT |
+| Método | Endpoint              | Descripción            | Auth  |
+| ------ | --------------------- | ---------------------- | ----- |
+| `GET`  | `/api/deliveries`     | Listar entregas        | ✓ JWT |
+| `GET`  | `/api/deliveries/:id` | Obtener entrega por ID | ✓ JWT |
 
 **Ejemplo de Respuesta:**
 
@@ -372,14 +372,14 @@ curl -X POST http://localhost:3000/api/transactions \
 
 #### 🔐 Autenticación
 
-| Método | Endpoint | Descripción | Auth |
-|--------|----------|-------------|------|
-| `POST` | `/api/auth/login` | Obtener token JWT | ✗ |
+| Método | Endpoint          | Descripción       | Auth |
+| ------ | ----------------- | ----------------- | ---- |
+| `POST` | `/api/auth/login` | Obtener token JWT | ✗    |
 
 **Login:**
 
 ```bash
-curl -X POST http://localhost:3000/api/auth/login \
+curl -X POST api.cristopher-dev.com/api/auth/login \
   -H "Content-Type: application/json" \
   -d '{
     "email": "admin@techhaven.com",
@@ -440,18 +440,18 @@ npm run sonar:analyze
 
 ### 🛡️ OWASP Top 10 - Implementación
 
-| OWASP Risk | Implementación | Status |
-|-----------|----------------|--------|
-| A01:2021 - Broken Access Control | JWT Auth + Role-Based Access | ✅ |
-| A02:2021 - Cryptographic Failures | HTTPS/TLS, bcrypt para passwords | ✅ |
-| A03:2021 - Injection | Parameterized queries, TypeORM ORM | ✅ |
-| A04:2021 - Insecure Design | Security by design arquitectura | ✅ |
-| A05:2021 - Security Misconfiguration | Environment variables, Helmet | ✅ |
-| A06:2021 - Vulnerable Components | npm audit, dependencias actualizadas | ✅ |
-| A07:2021 - Authentication Failures | JWT strong signing, expiration | ✅ |
-| A08:2021 - Data Integrity Failures | TypeORM validation, DTOs | ✅ |
-| A09:2021 - Logging & Monitoring | Structured logging, audit trails | ✅ |
-| A10:2021 - SSRF | No external redirects, URL whitelist | ✅ |
+| OWASP Risk                           | Implementación                       | Status |
+| ------------------------------------ | ------------------------------------ | ------ |
+| A01:2021 - Broken Access Control     | JWT Auth + Role-Based Access         | ✅     |
+| A02:2021 - Cryptographic Failures    | HTTPS/TLS, bcrypt para passwords     | ✅     |
+| A03:2021 - Injection                 | Parameterized queries, TypeORM ORM   | ✅     |
+| A04:2021 - Insecure Design           | Security by design arquitectura      | ✅     |
+| A05:2021 - Security Misconfiguration | Environment variables, Helmet        | ✅     |
+| A06:2021 - Vulnerable Components     | npm audit, dependencias actualizadas | ✅     |
+| A07:2021 - Authentication Failures   | JWT strong signing, expiration       | ✅     |
+| A08:2021 - Data Integrity Failures   | TypeORM validation, DTOs             | ✅     |
+| A09:2021 - Logging & Monitoring      | Structured logging, audit trails     | ✅     |
+| A10:2021 - SSRF                      | No external redirects, URL whitelist | ✅     |
 
 ### 🔐 Headers de Seguridad (Helmet)
 
@@ -505,7 +505,7 @@ class CreateTransactionInputDto {
   @NotEmpty()
   customerEmail: string;
 
-  @IsPhoneNumber('CO')  // Colombia format validation
+  @IsPhoneNumber('CO') // Colombia format validation
   customerPhone: string;
 
   @MinLength(5)
@@ -654,11 +654,11 @@ docker-compose -f docker/docker-compose.yml up -d
 
 ### Entornos Soportados
 
-| Entorno | URL | Base de Datos | Payment Service |
-|---------|-----|----------------|-----------------|
-| **Development** | <http://localhost:3000> | PostgreSQL Local | Mock Service |
-| **Staging** | TBD | PostgreSQL Staging | TechHavenPay Sandbox |
-| **Production** | TBD | PostgreSQL RDS | TechHavenPay Production |
+| Entorno         | URL                      | Base de Datos      | Payment Service         |
+| --------------- | ------------------------ | ------------------ | ----------------------- |
+| **Development** | <api.cristopher-dev.com> | PostgreSQL Local   | Mock Service            |
+| **Staging**     | TBD                      | PostgreSQL Staging | TechHavenPay Sandbox    |
+| **Production**  | TBD                      | PostgreSQL RDS     | TechHavenPay Production |
 
 ### Deployment en AWS (Ejemplo)
 
@@ -729,7 +729,7 @@ PAYMENT_SERVICE_API_KEY=${SECRETS_PAYMENT_API_KEY}
 ### Health Check
 
 ```bash
-curl http://localhost:3000/health
+curl api.cristopher-dev.com/health
 ```
 
 ---
@@ -793,7 +793,7 @@ docker-compose -f docker/docker-compose.yml up -d
 
 ```bash
 # Generar nuevo token
-curl -X POST http://localhost:3000/api/auth/login \
+curl -X POST api.cristopher-dev.com/api/auth/login \
   -H "Content-Type: application/json" \
   -d '{"email": "admin@techhaven.com", "password": "..."}'
 ```
@@ -845,11 +845,11 @@ UNLICENSED - Proyecto privado
 
 ## 👥 Contacto y Soporte
 
-| Rol | Contacto |
-|-----|----------|
-| Backend Developer | Cristopher Martinez |
-| DevOps | [devops@techhaven.dev](mailto:devops@techhaven.dev) |
-| QA | [qa@techhaven.dev](mailto:qa@techhaven.dev) |
+| Rol               | Contacto                                            |
+| ----------------- | --------------------------------------------------- |
+| Backend Developer | Cristopher Martinez                                 |
+| DevOps            | [devops@techhaven.dev](mailto:devops@techhaven.dev) |
+| QA                | [qa@techhaven.dev](mailto:qa@techhaven.dev)         |
 
 **GitHub:**
 
@@ -883,13 +883,13 @@ UNLICENSED - Proyecto privado
 
 ### 🎯 Funcionalidades Únicas
 
-| Feature | Descripción | Beneficio |
-| --- | --- | --- |
-| **Hexagonal Architecture** | Separación de capas pura | Máxima flexibilidad |
-| **ROP Pattern** | Railway Oriented Programming | Errores predecibles |
-| **In-Memory Testing** | Repositorios fake incluidos | Tests rápidos (0ms DB) |
-| **Auto Seeding** | Datos iniciales automáticos | Setup en 30 segundos |
-| **Type-Safe** | TypeScript strict mode | Cero errores en runtime |
+| Feature                    | Descripción                  | Beneficio               |
+| -------------------------- | ---------------------------- | ----------------------- |
+| **Hexagonal Architecture** | Separación de capas pura     | Máxima flexibilidad     |
+| **ROP Pattern**            | Railway Oriented Programming | Errores predecibles     |
+| **In-Memory Testing**      | Repositorios fake incluidos  | Tests rápidos (0ms DB)  |
+| **Auto Seeding**           | Datos iniciales automáticos  | Setup en 30 segundos    |
+| **Type-Safe**              | TypeScript strict mode       | Cero errores en runtime |
 
 ---
 
@@ -1021,27 +1021,27 @@ TechHaven API
 
 ### 🎁 Bonus Points Incluidos
 
-| Feature | Puntos |
-|---------|--------|
-| OWASP + HTTPS Security Headers | 5 puntos |
-| Responsive API Design | 5 puntos |
-| Clean Code & Arquitectura | 10 puntos |
-| Hexagonal + Ports & Adapters | 10 puntos |
-| ROP Pattern Implementation | 10 puntos |
-| **Total Bonus** | **40 puntos** |
+| Feature                        | Puntos        |
+| ------------------------------ | ------------- |
+| OWASP + HTTPS Security Headers | 5 puntos      |
+| Responsive API Design          | 5 puntos      |
+| Clean Code & Arquitectura      | 10 puntos     |
+| Hexagonal + Ports & Adapters   | 10 puntos     |
+| ROP Pattern Implementation     | 10 puntos     |
+| **Total Bonus**                | **40 puntos** |
 
 ### 📊 Comparativa con Alternativas
 
-| Aspecto | TechHaven | Express Generic | Strapi |
-|--------|-----------|-----------------|--------|
-| Arquitectura | Hexagonal ✅ | No | Monolítica |
-| ROP Pattern | Sí ✅ | No | No |
-| Type Safety | TypeScript ✅ | Parcial | Básico |
-| Tests Coverage | > 80% ✅ | Bajo | Bajo |
-| Security OWASP | Completo ✅ | Parcial | Parcial |
-| Curva Aprendizaje | Media | Baja | Media |
-| Documentación | Excellent ✅ | Buena | Buena |
-| Escalabilidad | Excelente ✅ | Buena | Media |
+| Aspecto           | TechHaven     | Express Generic | Strapi     |
+| ----------------- | ------------- | --------------- | ---------- |
+| Arquitectura      | Hexagonal ✅  | No              | Monolítica |
+| ROP Pattern       | Sí ✅         | No              | No         |
+| Type Safety       | TypeScript ✅ | Parcial         | Básico     |
+| Tests Coverage    | > 80% ✅      | Bajo            | Bajo       |
+| Security OWASP    | Completo ✅   | Parcial         | Parcial    |
+| Curva Aprendizaje | Media         | Baja            | Media      |
+| Documentación     | Excellent ✅  | Buena           | Buena      |
+| Escalabilidad     | Excelente ✅  | Buena           | Media      |
 
 ### 🚀 Stack Tecnológico Premium
 
@@ -1098,7 +1098,7 @@ Frontend Ready ← API REST ← Business Logic ← Domain Models ← Database
 3. **Acceder Swagger**
 
    ```
-   http://localhost:3000/api-docs
+   api.cristopher-dev.com/api-docs
    ```
 
 4. **Importar Postman**
