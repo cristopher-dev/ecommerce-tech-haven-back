@@ -16,6 +16,10 @@ export interface AcceptanceTokens {
 
 export interface TechHavenPaymentService {
   getAcceptanceTokens(): Promise<Either<Error, AcceptanceTokens>>;
+  tokenizeCard(
+    cardData: CardData,
+    acceptanceTokens: AcceptanceTokens,
+  ): Promise<Either<Error, string>>;
   processPayment(
     transactionId: string,
     amount: number,

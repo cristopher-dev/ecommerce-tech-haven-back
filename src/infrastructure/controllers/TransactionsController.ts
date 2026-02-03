@@ -29,12 +29,14 @@ import { GetTransactionByIdUseCase } from '../../application/use-cases/GetTransa
 import type { CustomerRepository } from '../../domain/repositories/CustomerRepository';
 import type { ProductRepository } from '../../domain/repositories/ProductRepository';
 import type { DeliveryRepository } from '../../domain/repositories/DeliveryRepository';
+import type { TechHavenPaymentService } from '../../application/use-cases/TechHavenPaymentService';
 import {
   CreateTransactionInputDto,
   CardDataDto,
   TransactionResponseDto,
   ProcessPaymentResponseDto,
   GetTransactionResponseDto,
+  TokenizeCardResponseDto,
 } from './dto';
 
 @ApiTags('Transactions')
@@ -53,17 +55,41 @@ export class TransactionsController {
     private readonly productRepository: ProductRepository,
     @Inject('DeliveryRepository')
     private readonly deliveryRepository: DeliveryRepository,
+    @Inject('TechHavenPaymentService')
+    private readonly paymentService: TechHavenPaymentService,
   ) {}
 
   @Get()
   @ApiOperation({
-    summary: 'Get all transactions',
+    summary: 'List all transactions',
     description:
-      'Retrieve a list of all transactions in the system, including their status, amount, and associated customer and product information.',
+      'Retrieve a complete list of all transactions in the system with their current status, amount, customer information, and product details.',
+    operationId: 'getTransactions',
   })
   @ApiResponse({
     status: 200,
-    description: 'List of transactions',
+    description: 'List of all transactions retrieved successfully',
+    schema: {
+      example: [
+        {
+          id: 'txn_123',
+          status: 'APPROVED',
+          amount: 150000,
+          customerId: 'cust_456',
+          items: [
+            {
+              productId: 'prod_1',
+              quantity: 2,
+            },
+          ],
+          createdAt: '2026-02-03T10:00:00.000Z',
+        },
+      ],
+    },
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized - Missing or invalid JWT token',
   })
   async getTransactions() {
     const result = await this.getTransactionsUseCase.execute();
@@ -73,19 +99,197 @@ export class TransactionsController {
     return result.right;
   }
 
-  @Get(':id')
+  @Post('tokenize-card')
+  @HttpCode(HttpStatus.OK)
   @ApiOperation({
-    summary: 'Get a transaction by ID',
+    summary: 'Tokenize a credit card',
     description:
-      'Retrieve detailed information about a specific transaction with full details including items, customer, and delivery info.',
+      'Securely tokenize a credit card using Wompi payment gateway. This endpoint converts sensitive card data into a reusable token for payment processing without storing card details. Returns a token ID that can be used in subsequent payment operations.',
+    operationId: 'tokenizeCard',
   })
-  @ApiParam({ name: 'id', description: 'Transaction ID' })
+  @ApiBody({
+    type: CardDataDto,
+    description: 'Credit card data to be tokenized',
+    examples: {
+      visa: {
+        summary: 'VISA Card Example',
+        value: {
+          cardNumber: '4242424242424242',
+          expirationMonth: 12,
+          expirationYear: 2029,
+          cvv: '789',
+          cardholderName: 'Pedro Pérez',
+        },
+      },
+      mastercard: {
+        summary: 'Mastercard Example',
+        value: {
+          cardNumber: '5555555555554444',
+          expirationMonth: 6,
+          expirationYear: 2027,
+          cvv: '123',
+          cardholderName: 'Juan García',
+        },
+      },
+    },
+  })
   @ApiResponse({
     status: 200,
-    description: 'Transaction found',
-    type: GetTransactionResponseDto,
+    description: 'Card tokenized successfully',
+    type: TokenizeCardResponseDto,
+    schema: {
+      example: {
+        success: true,
+        tokenId: 'tok_visa_4242',
+        brand: 'VISA',
+        lastFour: '4242',
+        expirationMonth: 12,
+        expirationYear: 2029,
+        createdAt: '2026-02-03T10:30:00.000Z',
+      },
+    },
   })
-  @ApiResponse({ status: 404, description: 'Transaction not found' })
+  @ApiResponse({
+    status: 400,
+    description:
+      'Bad Request - Invalid card data, validation failed, or tokenization error',
+    schema: {
+      example: {
+        success: false,
+        error: 'Invalid card number',
+        code: 'TOKENIZATION_FAILED',
+      },
+    },
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized - Missing or invalid JWT token',
+  })
+  async tokenizeCard(@Body() cardData: CardDataDto): Promise<any> {
+    try {
+      // Get acceptance tokens first
+      const acceptanceResult = await this.paymentService.getAcceptanceTokens();
+      if (acceptanceResult._tag === 'Left') {
+        throw new BadRequestException({
+          success: false,
+          error: 'Failed to get acceptance tokens',
+          code: 'ACCEPTANCE_TOKEN_ERROR',
+        });
+      }
+
+      const acceptanceTokens = acceptanceResult.right;
+
+      // Tokenize the card
+      const tokenResult = await this.paymentService.tokenizeCard(
+        {
+          cardNumber: cardData.cardNumber,
+          expirationMonth: cardData.expirationMonth,
+          expirationYear: cardData.expirationYear,
+          cvv: cardData.cvv,
+          cardholderName: cardData.cardholderName,
+        },
+        acceptanceTokens,
+      );
+
+      if (tokenResult._tag === 'Left') {
+        throw new BadRequestException({
+          success: false,
+          error: tokenResult.left.message,
+          code: 'TOKENIZATION_FAILED',
+        });
+      }
+
+      const tokenId = tokenResult.right;
+
+      return {
+        success: true,
+        tokenId,
+        brand: this.extractCardBrand(cardData.cardNumber),
+        lastFour: cardData.cardNumber.slice(-4),
+        expirationMonth: cardData.expirationMonth,
+        expirationYear: cardData.expirationYear,
+        createdAt: new Date().toISOString(),
+      };
+    } catch (error) {
+      if (error instanceof BadRequestException) {
+        throw error;
+      }
+      throw new BadRequestException({
+        success: false,
+        error:
+          error instanceof Error ? error.message : 'Card tokenization failed',
+        code: 'TOKENIZATION_ERROR',
+      });
+    }
+  }
+
+  @Get(':id')
+  @ApiOperation({
+    summary: 'Get transaction details',
+    description:
+      'Retrieve detailed information about a specific transaction including items, customer details, delivery status, and timeline events.',
+    operationId: 'getTransactionById',
+  })
+  @ApiParam({
+    name: 'id',
+    description: 'Unique transaction identifier',
+    example: 'txn_123abc',
+    type: 'string',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Transaction details retrieved successfully',
+    type: GetTransactionResponseDto,
+    schema: {
+      example: {
+        success: true,
+        id: 'txn_123',
+        transactionId: 'TXN-2026-001',
+        orderId: 'ORD-2026-001',
+        status: 'APPROVED',
+        amount: 150000,
+        items: [
+          {
+            productId: 'prod_1',
+            name: 'Laptop Gaming',
+            price: 75000,
+            quantity: 2,
+          },
+        ],
+        customer: {
+          id: 'cust_456',
+          name: 'Pedro Pérez',
+          email: 'pedro@example.com',
+        },
+        delivery: {
+          id: 'del_789',
+          status: 'PENDING',
+          estimatedDays: 3,
+          carrier: 'DHL',
+        },
+        timeline: {
+          createdAt: '2026-02-03T10:00:00.000Z',
+          approvedAt: '2026-02-03T10:15:00.000Z',
+          deliveryAssignedAt: '2026-02-03T10:20:00.000Z',
+        },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Transaction not found',
+    schema: {
+      example: {
+        success: false,
+        error: 'Transaction not found',
+        code: 'TRANSACTION_NOT_FOUND',
+      },
+    },
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized - Missing or invalid JWT token',
+  })
   async getTransactionById(@Param('id') id: string): Promise<any> {
     const result = await this.getTransactionByIdUseCase.execute(id);
     if (result._tag === 'Left') {
@@ -160,19 +364,71 @@ export class TransactionsController {
   @Post()
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({
-    summary: 'Create a new transaction (multi-product cart)',
+    summary: 'Create a new transaction',
     description:
-      'Create a new transaction with multiple items. Supports cart checkout with delivery information. The transaction will be created with PENDING status.',
+      'Create a new transaction with multiple items (shopping cart). The transaction is created with PENDING status and requires payment processing before delivery. Validates product availability and customer information.',
+    operationId: 'createTransaction',
   })
-  @ApiBody({ type: CreateTransactionInputDto })
+  @ApiBody({
+    type: CreateTransactionInputDto,
+    description:
+      'Transaction creation request with cart items and delivery details',
+  })
   @ApiResponse({
     status: 201,
-    description: 'Transaction created successfully',
+    description: 'Transaction created successfully with PENDING status',
     type: TransactionResponseDto,
+    schema: {
+      example: {
+        success: true,
+        id: 'txn_123',
+        transactionId: 'TXN-2026-001',
+        orderId: 'ORD-2026-001',
+        amount: 150000,
+        status: 'PENDING',
+        baseFee: 5000,
+        deliveryFee: 10000,
+        subtotal: 135000,
+        customer: {
+          id: 'cust_456',
+          name: 'Pedro Pérez',
+          email: 'pedro@example.com',
+          address: 'Calle 123 #45, Bogotá',
+        },
+        items: [
+          {
+            productId: 'prod_1',
+            name: 'Laptop Gaming',
+            price: 75000,
+            quantity: 2,
+            total: 150000,
+          },
+        ],
+        createdAt: '2026-02-03T10:00:00.000Z',
+      },
+    },
   })
   @ApiResponse({
     status: 400,
-    description: 'Validation error',
+    description:
+      'Bad Request - Validation error, insufficient stock, or invalid product',
+    schema: {
+      example: {
+        success: false,
+        error: 'Validation failed',
+        code: 'VALIDATION_ERROR',
+        details: [
+          {
+            field: 'transaction',
+            message: 'Product not found',
+          },
+        ],
+      },
+    },
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized - Missing or invalid JWT token',
   })
   async createTransaction(
     @Body() input: CreateTransactionInputDto,
@@ -259,22 +515,83 @@ export class TransactionsController {
 
   @Put(':id/process-payment')
   @ApiOperation({
-    summary: 'Process payment for a transaction',
+    summary: 'Process payment for transaction',
     description:
-      'Process the payment for an existing transaction using card data. If the payment is approved, the transaction status changes to APPROVED, stock is reduced, and a delivery is assigned.',
+      'Process payment for an existing transaction using credit card data. Upon successful payment, the transaction status changes to APPROVED, product stock is reduced, and a delivery is automatically assigned.',
+    operationId: 'processPayment',
   })
-  @ApiParam({ name: 'id', description: 'Transaction ID' })
-  @ApiBody({ type: CardDataDto })
+  @ApiParam({
+    name: 'id',
+    description: 'Transaction ID to process payment for',
+    example: 'txn_123abc',
+    type: 'string',
+  })
+  @ApiBody({
+    type: CardDataDto,
+    description: 'Credit card information for payment',
+  })
   @ApiResponse({
     status: 200,
-    description: 'Payment processed successfully',
+    description: 'Payment processed successfully, transaction APPROVED',
     type: ProcessPaymentResponseDto,
+    schema: {
+      example: {
+        success: true,
+        id: 'txn_123',
+        customerId: 'cust_456',
+        amount: 150000,
+        status: 'APPROVED',
+        transactionId: 'TXN-2026-001',
+        orderId: 'ORD-2026-001',
+        items: [
+          {
+            productId: 'prod_1',
+            quantity: 2,
+            name: 'Laptop Gaming',
+            price: 75000,
+          },
+        ],
+        customer: {
+          name: 'Pedro Pérez',
+          email: 'pedro@example.com',
+        },
+        deliveryAssigned: {
+          id: 'del_789',
+          estimatedDays: 3,
+          carrier: 'DHL',
+        },
+        cardLastFour: '4242',
+        approvedAt: '2026-02-03T10:15:00.000Z',
+      },
+    },
   })
   @ApiResponse({
     status: 400,
-    description: 'Payment failed or invalid transaction',
+    description:
+      'Bad Request - Payment failed, invalid card data, or insufficient funds',
+    schema: {
+      example: {
+        success: false,
+        error: 'Card declined',
+        code: 'PAYMENT_FAILED',
+      },
+    },
   })
-  @ApiResponse({ status: 404, description: 'Transaction not found' })
+  @ApiResponse({
+    status: 404,
+    description: 'Transaction not found',
+    schema: {
+      example: {
+        success: false,
+        error: 'Transaction not found',
+        code: 'TRANSACTION_NOT_FOUND',
+      },
+    },
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized - Missing or invalid JWT token',
+  })
   async processPayment(
     @Param('id') id: string,
     @Body() cardData: CardDataDto,
@@ -353,5 +670,25 @@ export class TransactionsController {
       cardLastFour: cardData.cardNumber.slice(-4),
       approvedAt: transaction.updatedAt.toISOString(),
     };
+  }
+
+  /**
+   * Helper method to determine card brand from card number
+   */
+  private extractCardBrand(cardNumber: string): string {
+    const cleanNumber = cardNumber.replaceAll(/\s/g, '');
+    if (/^\d4\d{12}(?:\d{3})?$/.test(cleanNumber)) {
+      return 'VISA';
+    }
+    if (/^5[1-5]\d{14}$/.test(cleanNumber)) {
+      return 'MASTERCARD';
+    }
+    if (/^3[47]\d{13}$/.test(cleanNumber)) {
+      return 'AMEX';
+    }
+    if (/^6(?:011|5\d{2})\d{12}$/.test(cleanNumber)) {
+      return 'DISCOVER';
+    }
+    return 'UNKNOWN';
   }
 }

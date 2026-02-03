@@ -12,7 +12,7 @@ import {
   ValidateNested,
   ArrayMinSize,
 } from 'class-validator';
-import { Type } from 'class-transformer';
+import { Type, Transform } from 'class-transformer';
 import {
   IsValidCard,
   IsValidExpiration,
@@ -508,7 +508,7 @@ export class CardDataDto {
   @IsValidCard()
   @ApiProperty({
     description: 'Credit card number',
-    example: '4532015112830366',
+    example: '4242424242424242',
   })
   cardNumber!: string;
 
@@ -516,9 +516,10 @@ export class CardDataDto {
   @IsInt()
   @Min(1)
   @Max(12)
+  @Type(() => Number)
   @ApiProperty({
     description: 'Expiration month (1-12)',
-    example: 1,
+    example: 12,
     minimum: 1,
     maximum: 12,
   })
@@ -528,9 +529,25 @@ export class CardDataDto {
   @IsInt()
   @Min(2025)
   @IsValidExpiration()
+  @Type(() => Number)
+  @Transform(({ value }) => {
+    if (typeof value === 'string') {
+      const num = parseInt(value, 10);
+      // If it's a 2-digit year (29), convert to 4-digit (2029)
+      if (num < 100) {
+        return num + 2000;
+      }
+      return num;
+    }
+    // If already a number and it's 2-digit, convert it
+    if (typeof value === 'number' && value < 100) {
+      return value + 2000;
+    }
+    return value;
+  })
   @ApiProperty({
-    description: 'Expiration year (YYYY format)',
-    example: 2026,
+    description: 'Expiration year (YY or YYYY format, e.g., 29 or 2029)',
+    example: 2029,
     minimum: 2025,
   })
   expirationYear!: number;
@@ -540,7 +557,7 @@ export class CardDataDto {
   @IsValidCVVFormat()
   @ApiProperty({
     description: 'CVV (3-4 digits)',
-    example: '123',
+    example: '789',
     minLength: 3,
     maxLength: 4,
   })
@@ -551,7 +568,7 @@ export class CardDataDto {
   @MinLength(2)
   @ApiProperty({
     description: 'Card holder name',
-    example: 'Juan Perez',
+    example: 'Pedro Pérez',
     minLength: 2,
   })
   cardholderName!: string;
@@ -594,4 +611,48 @@ export class LoginResponseDto {
     example: 'ADMIN',
   })
   role!: string;
+}
+
+export class TokenizeCardResponseDto {
+  @ApiProperty({
+    description: 'Whether tokenization was successful',
+    example: true,
+  })
+  success!: boolean;
+
+  @ApiProperty({
+    description: 'Tokenized card ID from Wompi',
+    example: 'tok_visa_4242',
+  })
+  tokenId!: string;
+
+  @ApiProperty({
+    description: 'Card brand',
+    example: 'VISA',
+  })
+  brand!: string;
+
+  @ApiProperty({
+    description: 'Last four digits of the card',
+    example: '4242',
+  })
+  lastFour!: string;
+
+  @ApiProperty({
+    description: 'Expiration month',
+    example: 12,
+  })
+  expirationMonth!: number;
+
+  @ApiProperty({
+    description: 'Expiration year',
+    example: 2029,
+  })
+  expirationYear!: number;
+
+  @ApiProperty({
+    description: 'Token creation timestamp',
+    example: '2026-02-03T10:30:00Z',
+  })
+  createdAt!: string;
 }
