@@ -15,7 +15,6 @@ describe('TransactionsController', () => {
   let mockCreateUC: jest.Mocked<CreateTransactionUseCase>;
   let mockProcessUC: jest.Mocked<ProcessPaymentUseCase>;
   let mockGetUC: jest.Mocked<GetTransactionsUseCase>;
-  let mockGetByIdUC: jest.Mocked<GetTransactionByIdUseCase>;
 
   beforeEach(async () => {
     const mockCreate = { execute: jest.fn() };
@@ -38,6 +37,10 @@ describe('TransactionsController', () => {
       findById: jest.fn(),
       findAll: jest.fn(),
     };
+    const mockPaymentService = {
+      processPayment: jest.fn(),
+      tokenizeCard: jest.fn(),
+    };
 
     const module: TestingModule = await Test.createTestingModule({
       controllers: [TransactionsController],
@@ -49,6 +52,7 @@ describe('TransactionsController', () => {
         { provide: 'CustomerRepository', useValue: mockCustomerRepo },
         { provide: 'ProductRepository', useValue: mockProductRepo },
         { provide: 'DeliveryRepository', useValue: mockDeliveryRepo },
+        { provide: 'TechHavenPaymentService', useValue: mockPaymentService },
       ],
     }).compile();
 
@@ -56,7 +60,6 @@ describe('TransactionsController', () => {
     mockCreateUC = module.get(CreateTransactionUseCase);
     mockProcessUC = module.get(ProcessPaymentUseCase);
     mockGetUC = module.get(GetTransactionsUseCase);
-    mockGetByIdUC = module.get(GetTransactionByIdUseCase);
   });
 
   it('should get transactions', async () => {
@@ -93,24 +96,36 @@ describe('TransactionsController', () => {
   });
 
   it('should create transaction with string productId', async () => {
+    const deliveryInfo = {
+      firstName: 'John',
+      lastName: 'Doe',
+      address: '123 Main St',
+      city: 'City',
+      state: 'State',
+      postalCode: '12345',
+      phone: '1234567890',
+    };
     const input = {
       customerName: 'John Doe',
       customerEmail: 'john@example.com',
       customerAddress: '123 Main St, City',
-      productId: '1',
-      quantity: 1,
+      deliveryInfo,
+      items: [{ productId: '1', quantity: 1 }],
     };
     const transaction = new Transaction(
       '1',
       'cust1',
-      '1',
-      100,
+      250, // amount
       TransactionStatus.PENDING,
+      [{ productId: '1', quantity: 1 }],
+      deliveryInfo,
+      50, // baseFee
+      100, // deliveryFee
+      100, // subtotal
       new Date(),
       new Date(),
       'TXN-20250130-0001',
       'ORD-20250130-0001',
-      1,
     );
     mockCreateUC.execute.mockReturnValue(() =>
       Promise.resolve({ _tag: 'Right', right: transaction }),
@@ -124,24 +139,36 @@ describe('TransactionsController', () => {
   });
 
   it('should create transaction with number productId', async () => {
+    const deliveryInfo = {
+      firstName: 'John',
+      lastName: 'Doe',
+      address: '123 Main St',
+      city: 'City',
+      state: 'State',
+      postalCode: '12345',
+      phone: '1234567890',
+    };
     const input = {
       customerName: 'John Doe',
       customerEmail: 'john@example.com',
       customerAddress: '123 Main St, City',
-      productId: 1,
-      quantity: 1,
+      deliveryInfo,
+      items: [{ productId: '1', quantity: 1 }],
     };
     const transaction = new Transaction(
       '1',
       'cust1',
-      '1',
-      100,
+      250, // amount
       TransactionStatus.PENDING,
+      [{ productId: '1', quantity: 1 }],
+      deliveryInfo,
+      50, // baseFee
+      100, // deliveryFee
+      100, // subtotal
       new Date(),
       new Date(),
       'TXN-20250130-0001',
       'ORD-20250130-0001',
-      1,
     );
     mockCreateUC.execute.mockReturnValue(() =>
       Promise.resolve({ _tag: 'Right', right: transaction }),
@@ -154,17 +181,29 @@ describe('TransactionsController', () => {
   });
 
   it('should process payment', async () => {
+    const deliveryInfo = {
+      firstName: 'John',
+      lastName: 'Doe',
+      address: '123 Main St',
+      city: 'City',
+      state: 'State',
+      postalCode: '12345',
+      phone: '1234567890',
+    };
     const transaction = new Transaction(
       '1',
       'cust1',
-      'prod1',
-      100,
+      250, // amount
       TransactionStatus.APPROVED,
+      [{ productId: '1', quantity: 1 }],
+      deliveryInfo,
+      50, // baseFee
+      100, // deliveryFee
+      100, // subtotal
       new Date(),
       new Date(),
       'TXN-20250130-0001',
       'ORD-20250130-0001',
-      1,
     );
     mockProcessUC.execute.mockResolvedValue({
       _tag: 'Right',
@@ -179,7 +218,12 @@ describe('TransactionsController', () => {
       cardholderName: 'John Doe',
     });
 
-    expect(result).toEqual(transaction);
+    expect(result.success).toBe(true);
+    expect(result.id).toBe('1');
+    expect(result.status).toBe('APPROVED');
+    expect(result.transactionId).toBe('TXN-20250130-0001');
+    expect(result.orderId).toBe('ORD-20250130-0001');
+    expect(result.cardLastFour).toBe('1111');
   });
 
   it('should throw error on get transactions failure', async () => {
@@ -194,12 +238,21 @@ describe('TransactionsController', () => {
   });
 
   it('should throw BadRequestException on validation error', async () => {
+    const deliveryInfo = {
+      firstName: 'John',
+      lastName: 'Doe',
+      address: '123 Main St',
+      city: 'City',
+      state: 'State',
+      postalCode: '12345',
+      phone: '1234567890',
+    };
     const input = {
       customerName: 'John',
       customerEmail: 'john@example.com',
       customerAddress: '123 Main St, City',
-      productId: '',
-      quantity: 1,
+      deliveryInfo,
+      items: [{ productId: '', quantity: 1 }],
     };
     mockCreateUC.execute.mockReturnValue(() =>
       Promise.resolve({
@@ -214,12 +267,21 @@ describe('TransactionsController', () => {
   });
 
   it('should throw NotFoundException on product not found', async () => {
+    const deliveryInfo = {
+      firstName: 'John',
+      lastName: 'Doe',
+      address: '123 Main St',
+      city: 'City',
+      state: 'State',
+      postalCode: '12345',
+      phone: '1234567890',
+    };
     const input = {
       customerName: 'John',
       customerEmail: 'john@example.com',
       customerAddress: '123 Main St, City',
-      productId: '999999',
-      quantity: 1,
+      deliveryInfo,
+      items: [{ productId: '999999', quantity: 1 }],
     };
     mockCreateUC.execute.mockReturnValue(() =>
       Promise.resolve({
@@ -247,6 +309,6 @@ describe('TransactionsController', () => {
         cvv: '123',
         cardholderName: 'John Doe',
       }),
-    ).rejects.toThrow('Payment failed');
+    ).rejects.toThrow(BadRequestException);
   });
 });

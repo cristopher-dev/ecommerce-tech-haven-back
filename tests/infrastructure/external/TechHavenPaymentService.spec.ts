@@ -1,18 +1,13 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ConfigModule } from '@nestjs/config';
-import { HttpModule, HttpService } from '@nestjs/axios';
+import { HttpService } from '@nestjs/axios';
 import { of } from 'rxjs';
 import { TechHavenPaymentServiceImpl } from '../../../src/infrastructure/external/TechHavenPaymentServiceImpl';
-
-jest.mock('axios');
-import axios from 'axios';
-
-const mockedAxios = axios as jest.Mocked<typeof axios>;
 
 describe('TechHavenPaymentServiceImpl', () => {
   let service: TechHavenPaymentServiceImpl;
   let consoleErrorSpy: jest.SpyInstance;
-  let mockHttpService: jest.Mocked<HttpService>;
+  let mockHttpService: any;
 
   beforeEach(async () => {
     consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
@@ -20,7 +15,7 @@ describe('TechHavenPaymentServiceImpl', () => {
       post: jest.fn(),
     };
     const module: TestingModule = await Test.createTestingModule({
-      imports: [ConfigModule.forRoot(), HttpModule],
+      imports: [ConfigModule.forRoot()],
       providers: [
         TechHavenPaymentServiceImpl,
         {
@@ -42,28 +37,32 @@ describe('TechHavenPaymentServiceImpl', () => {
 
   it('should process payment successfully', async () => {
     mockHttpService.post
-      .mockReturnValueOnce(of({
-        data: {
+      .mockImplementationOnce(() =>
+        of({
           data: {
-            id: 'token123',
+            data: {
+              id: 'token123',
+            },
           },
-        },
-        status: 200,
-        statusText: 'OK',
-        headers: {},
-        config: {} as any,
-      }))
-      .mockReturnValueOnce(of({
-        data: {
+          status: 200,
+          statusText: 'OK',
+          headers: {},
+          config: {} as any,
+        }),
+      )
+      .mockImplementationOnce(() =>
+        of({
           data: {
-            status: 'APPROVED',
+            data: {
+              status: 'APPROVED',
+            },
           },
-        },
-        status: 200,
-        statusText: 'OK',
-        headers: {},
-        config: {} as any,
-      }));
+          status: 200,
+          statusText: 'OK',
+          headers: {},
+          config: {} as any,
+        }),
+      );
 
     const cardData = {
       cardNumber: '4111111111111111',
@@ -89,28 +88,32 @@ describe('TechHavenPaymentServiceImpl', () => {
 
   it('should handle declined payment', async () => {
     mockHttpService.post
-      .mockReturnValueOnce(of({
-        data: {
+      .mockImplementationOnce(() =>
+        of({
           data: {
-            id: 'token123',
+            data: {
+              id: 'token123',
+            },
           },
-        },
-        status: 200,
-        statusText: 'OK',
-        headers: {},
-        config: {} as any,
-      }))
-      .mockReturnValueOnce(of({
-        data: {
+          status: 200,
+          statusText: 'OK',
+          headers: {},
+          config: {} as any,
+        }),
+      )
+      .mockImplementationOnce(() =>
+        of({
           data: {
-            status: 'DECLINED',
+            data: {
+              status: 'DECLINED',
+            },
           },
-        },
-        status: 200,
-        statusText: 'OK',
-        headers: {},
-        config: {} as any,
-      }));
+          status: 200,
+          statusText: 'OK',
+          headers: {},
+          config: {} as any,
+        }),
+      );
 
     const cardData = {
       cardNumber: '4111111111111111',
@@ -136,28 +139,32 @@ describe('TechHavenPaymentServiceImpl', () => {
 
   it('should handle pending payment', async () => {
     mockHttpService.post
-      .mockReturnValueOnce(of({
-        data: {
+      .mockImplementationOnce(() =>
+        of({
           data: {
-            id: 'token123',
+            data: {
+              id: 'token123',
+            },
           },
-        },
-        status: 200,
-        statusText: 'OK',
-        headers: {},
-        config: {} as any,
-      }))
-      .mockReturnValueOnce(of({
-        data: {
+          status: 200,
+          statusText: 'OK',
+          headers: {},
+          config: {} as any,
+        }),
+      )
+      .mockImplementationOnce(() =>
+        of({
           data: {
-            status: 'PENDING',
+            data: {
+              status: 'PENDING',
+            },
           },
-        },
-        status: 200,
-        statusText: 'OK',
-        headers: {},
-        config: {} as any,
-      }));
+          status: 200,
+          statusText: 'OK',
+          headers: {},
+          config: {} as any,
+        }),
+      );
 
     const cardData = {
       cardNumber: '4111111111111111',
@@ -182,17 +189,23 @@ describe('TechHavenPaymentServiceImpl', () => {
   });
 
   it('should handle API error', async () => {
-    mockHttpService.post.mockReturnValueOnce(of({
-      data: {
-        data: {
-          id: 'token123',
-        },
-      },
-      status: 200,
-      statusText: 'OK',
-      headers: {},
-      config: {} as any,
-    }));
+    mockHttpService.post
+      .mockImplementationOnce(() =>
+        of({
+          data: {
+            data: {
+              id: 'token123',
+            },
+          },
+          status: 200,
+          statusText: 'OK',
+          headers: {},
+          config: {} as any,
+        }),
+      )
+      .mockImplementationOnce(() => {
+        throw new Error('API error');
+      });
 
     const cardData = {
       cardNumber: '4111111111111111',
