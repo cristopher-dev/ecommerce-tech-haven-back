@@ -47,11 +47,25 @@ describe('TransactionRepositoryImpl', () => {
     it('should create a transaction', async () => {
       const transactionData = {
         customerId: 'cust-1',
-        productId: 'prod-1',
+        items: [{ productId: 'prod-1', quantity: 1 }],
+        deliveryInfo: {
+          firstName: 'John',
+          lastName: 'Doe',
+          address: '123 Main St',
+          city: 'Anytown',
+          state: 'CA',
+          postalCode: '12345',
+          phone: '555-1234',
+        },
         amount: 100,
+        baseFee: 10,
+        deliveryFee: 5,
+        subtotal: 85,
         status: TransactionStatus.PENDING,
         transactionId: 'TXN-20250130-0001',
         orderId: 'ORD-20250130-0001',
+        // Backwards compatibility
+        productId: 'prod-1',
         quantity: 1,
       };
       const entity = {
@@ -60,23 +74,59 @@ describe('TransactionRepositoryImpl', () => {
         createdAt: new Date(),
         updatedAt: new Date(),
       };
-      mockTransactionEntityRepository.create.mockReturnValue(entity);
-      mockTransactionEntityRepository.save.mockResolvedValue(entity);
+      mockTransactionEntityRepository.create.mockReturnValue(
+        entity as TransactionEntity,
+      );
+
+      mockTransactionEntityRepository.save.mockResolvedValue(
+        entity as TransactionEntity,
+      );
 
       const result = await repository.create(transactionData);
 
       expect(result).toBeInstanceOf(Transaction);
       expect(result.id).toBe('1');
       expect(result.customerId).toBe('cust-1');
-      expect(result.productId).toBe('prod-1');
+      expect(result.items).toEqual([{ productId: 'prod-1', quantity: 1 }]);
+      expect(result.deliveryInfo).toEqual({
+        firstName: 'John',
+        lastName: 'Doe',
+        address: '123 Main St',
+        city: 'Anytown',
+        state: 'CA',
+        postalCode: '12345',
+        phone: '555-1234',
+      });
       expect(result.amount).toBe(100);
+      expect(result.baseFee).toBe(10);
+      expect(result.deliveryFee).toBe(5);
+      expect(result.subtotal).toBe(85);
       expect(result.status).toBe(TransactionStatus.PENDING);
       expect(result.transactionId).toBe('TXN-20250130-0001');
       expect(result.orderId).toBe('ORD-20250130-0001');
+      expect(result.productId).toBe('prod-1');
       expect(result.quantity).toBe(1);
+      // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(mockTransactionEntityRepository.create).toHaveBeenCalledWith({
         id: expect.any(String),
-        ...transactionData,
+        customerId: 'cust-1',
+        items: [{ productId: 'prod-1', quantity: 1 }],
+        deliveryInfo: {
+          firstName: 'John',
+          lastName: 'Doe',
+          address: '123 Main St',
+          city: 'Anytown',
+          state: 'CA',
+          postalCode: '12345',
+          phone: '555-1234',
+        },
+        amount: 100,
+        baseFee: 10,
+        deliveryFee: 5,
+        subtotal: 85,
+        status: TransactionStatus.PENDING,
+        transactionId: 'TXN-20250130-0001',
+        orderId: 'ORD-20250130-0001',
       });
       expect(mockTransactionEntityRepository.save).toHaveBeenCalledWith(entity);
     });
@@ -87,16 +137,31 @@ describe('TransactionRepositoryImpl', () => {
       const entity = {
         id: '1',
         customerId: 'cust-1',
-        productId: 'prod-1',
+        items: [{ productId: 'prod-1', quantity: 1 }],
+        deliveryInfo: {
+          firstName: 'John',
+          lastName: 'Doe',
+          address: '123 Main St',
+          city: 'Anytown',
+          state: 'CA',
+          postalCode: '12345',
+          phone: '555-1234',
+        },
         amount: 100,
+        baseFee: 10,
+        deliveryFee: 5,
+        subtotal: 85,
         status: TransactionStatus.PENDING,
         transactionId: 'TXN-20250130-0001',
         orderId: 'ORD-20250130-0001',
+        productId: 'prod-1',
         quantity: 1,
         createdAt: new Date(),
         updatedAt: new Date(),
       };
-      mockTransactionEntityRepository.findOne.mockResolvedValue(entity);
+      mockTransactionEntityRepository.findOne.mockResolvedValue(
+        entity as TransactionEntity,
+      );
 
       const result = await repository.findById('1');
 
@@ -105,6 +170,7 @@ describe('TransactionRepositoryImpl', () => {
       expect(result!.transactionId).toBe('TXN-20250130-0001');
       expect(result!.orderId).toBe('ORD-20250130-0001');
       expect(result!.quantity).toBe(1);
+      // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(mockTransactionEntityRepository.findOne).toHaveBeenCalledWith({
         where: { id: '1' },
       });
@@ -121,12 +187,15 @@ describe('TransactionRepositoryImpl', () => {
 
   describe('updateStatus', () => {
     it('should update transaction status', async () => {
-      mockTransactionEntityRepository.update.mockResolvedValue({
-        affected: 1,
-      } as any);
+      const mockUpdateResult = { affected: 1 } as any;
+
+      mockTransactionEntityRepository.update.mockResolvedValue(
+        mockUpdateResult,
+      );
 
       await repository.updateStatus('1', TransactionStatus.APPROVED);
 
+      // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(mockTransactionEntityRepository.update).toHaveBeenCalledWith('1', {
         status: TransactionStatus.APPROVED,
       });
@@ -139,24 +208,40 @@ describe('TransactionRepositoryImpl', () => {
         {
           id: '1',
           customerId: 'cust-1',
-          productId: 'prod-1',
+          items: [{ productId: 'prod-1', quantity: 1 }],
+          deliveryInfo: {
+            firstName: 'John',
+            lastName: 'Doe',
+            address: '123 Main St',
+            city: 'Anytown',
+            state: 'CA',
+            postalCode: '12345',
+            phone: '555-1234',
+          },
           amount: 100,
+          baseFee: 10,
+          deliveryFee: 5,
+          subtotal: 85,
           status: TransactionStatus.PENDING,
           transactionId: 'TXN-20250130-0001',
           orderId: 'ORD-20250130-0001',
+          productId: 'prod-1',
           quantity: 1,
           createdAt: new Date(),
           updatedAt: new Date(),
         },
       ];
-      mockTransactionEntityRepository.find.mockResolvedValue(entities);
+      mockTransactionEntityRepository.find.mockResolvedValue(
+        entities as TransactionEntity[],
+      );
 
       const result = await repository.findAll();
 
       expect(result).toHaveLength(1);
       expect(result[0]).toBeInstanceOf(Transaction);
-      expect(result[0].id).toBe('1');
-      expect(result[0].transactionId).toBe('TXN-20250130-0001');
+      expect(result[0]!.id).toBe('1');
+      expect(result[0]!.transactionId).toBe('TXN-20250130-0001');
+      // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(mockTransactionEntityRepository.find).toHaveBeenCalledWith({
         order: { createdAt: 'DESC' },
       });

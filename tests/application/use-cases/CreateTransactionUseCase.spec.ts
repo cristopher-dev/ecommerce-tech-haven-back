@@ -52,12 +52,21 @@ describe('CreateTransactionUseCase', () => {
   });
 
   it('should create transaction successfully with string productId', async () => {
+    const deliveryInfo = {
+      firstName: 'John',
+      lastName: 'Doe',
+      address: '123 Main St',
+      city: 'City',
+      state: 'State',
+      postalCode: '12345',
+      phone: '1234567890',
+    };
     const input = {
       customerName: 'John Doe',
       customerEmail: 'john@example.com',
       customerAddress: '123 Main St, City',
-      productId: '1',
-      quantity: 1,
+      deliveryInfo,
+      items: [{ productId: '1', quantity: 1 }],
     };
     const product = new Product('1', 'Prod', 'Desc', 100, 10);
     const customer = new Customer(
@@ -69,14 +78,17 @@ describe('CreateTransactionUseCase', () => {
     const transaction = new Transaction(
       'trans1',
       'cust1',
-      '1',
-      100,
+      250, // amount
       TransactionStatus.PENDING,
+      [{ productId: '1', quantity: 1 }],
+      deliveryInfo,
+      50, // baseFee
+      100, // deliveryFee
+      100, // subtotal
       new Date(),
       new Date(),
       'TXN-20250130-0001',
       'ORD-20250130-0001',
-      1,
     );
 
     mockProductRepo.findById.mockResolvedValue(product);
@@ -91,12 +103,21 @@ describe('CreateTransactionUseCase', () => {
   });
 
   it('should create transaction successfully with number productId', async () => {
+    const deliveryInfo = {
+      firstName: 'John',
+      lastName: 'Doe',
+      address: '123 Main St',
+      city: 'City',
+      state: 'State',
+      postalCode: '12345',
+      phone: '1234567890',
+    };
     const input = {
       customerName: 'John Doe',
       customerEmail: 'john@example.com',
       customerAddress: '123 Main St, City',
-      productId: 1,
-      quantity: 1,
+      deliveryInfo,
+      items: [{ productId: '1', quantity: 1 }],
     };
     const product = new Product('1', 'Prod', 'Desc', 100, 10);
     const customer = new Customer(
@@ -108,14 +129,17 @@ describe('CreateTransactionUseCase', () => {
     const transaction = new Transaction(
       'trans1',
       'cust1',
-      '1',
-      100,
+      250, // amount
       TransactionStatus.PENDING,
+      [{ productId: '1', quantity: 1 }],
+      deliveryInfo,
+      50, // baseFee
+      100, // deliveryFee
+      100, // subtotal
       new Date(),
       new Date(),
       'TXN-20250130-0001',
       'ORD-20250130-0001',
-      1,
     );
 
     mockProductRepo.findById.mockResolvedValue(product);
@@ -130,12 +154,21 @@ describe('CreateTransactionUseCase', () => {
   });
 
   it('should fail if product not found', async () => {
+    const deliveryInfo = {
+      firstName: 'John',
+      lastName: 'Doe',
+      address: '123 Main St',
+      city: 'City',
+      state: 'State',
+      postalCode: '12345',
+      phone: '1234567890',
+    };
     const input = {
       customerName: 'John Doe',
       customerEmail: 'john@example.com',
       customerAddress: '123 Main St, City',
-      productId: '999',
-      quantity: 1,
+      deliveryInfo,
+      items: [{ productId: '999', quantity: 1 }],
     };
 
     mockProductRepo.findById.mockResolvedValue(null);
@@ -143,16 +176,25 @@ describe('CreateTransactionUseCase', () => {
     const result = await useCase.execute(input)();
 
     expect(result._tag).toBe('Left');
-    expect((result as any).left.message).toBe('Product not found');
+    expect((result as any).left.message).toBe("Product '999' not found");
   });
 
   it('should fail if insufficient stock', async () => {
+    const deliveryInfo = {
+      firstName: 'John',
+      lastName: 'Doe',
+      address: '123 Main St',
+      city: 'City',
+      state: 'State',
+      postalCode: '12345',
+      phone: '1234567890',
+    };
     const input = {
       customerName: 'John Doe',
       customerEmail: 'john@example.com',
       customerAddress: '123 Main St, City',
-      productId: '1',
-      quantity: 5,
+      deliveryInfo,
+      items: [{ productId: '1', quantity: 5 }],
     };
     const product = new Product('1', 'Prod', 'Desc', 100, 2);
 
@@ -161,16 +203,27 @@ describe('CreateTransactionUseCase', () => {
     const result = await useCase.execute(input)();
 
     expect(result._tag).toBe('Left');
-    expect((result as any).left.message).toBe('Insufficient stock');
+    expect((result as any).left.message).toBe(
+      "Insufficient stock for product '1'",
+    );
   });
 
   it('should fail if customerName is empty', async () => {
+    const deliveryInfo = {
+      firstName: 'John',
+      lastName: 'Doe',
+      address: '123 Main St',
+      city: 'City',
+      state: 'State',
+      postalCode: '12345',
+      phone: '1234567890',
+    };
     const input = {
       customerName: '',
       customerEmail: 'john@example.com',
       customerAddress: '123 Main St, City',
-      productId: '1',
-      quantity: 1,
+      deliveryInfo,
+      items: [{ productId: '1', quantity: 1 }],
     };
 
     const result = await useCase.execute(input)();
@@ -182,12 +235,21 @@ describe('CreateTransactionUseCase', () => {
   });
 
   it('should fail if productId is empty', async () => {
+    const deliveryInfo = {
+      firstName: 'John',
+      lastName: 'Doe',
+      address: '123 Main St',
+      city: 'City',
+      state: 'State',
+      postalCode: '12345',
+      phone: '1234567890',
+    };
     const input = {
       customerName: 'John Doe',
       customerEmail: 'john@example.com',
       customerAddress: '123 Main St, City',
-      productId: '',
-      quantity: 1,
+      deliveryInfo,
+      items: [{ productId: '', quantity: 1 }],
     };
 
     const result = await useCase.execute(input)();
@@ -197,12 +259,21 @@ describe('CreateTransactionUseCase', () => {
   });
 
   it('should fail if quantity is invalid', async () => {
+    const deliveryInfo = {
+      firstName: 'John',
+      lastName: 'Doe',
+      address: '123 Main St',
+      city: 'City',
+      state: 'State',
+      postalCode: '12345',
+      phone: '1234567890',
+    };
     const input = {
       customerName: 'John Doe',
       customerEmail: 'john@example.com',
       customerAddress: '123 Main St, City',
-      productId: '1',
-      quantity: 0,
+      deliveryInfo,
+      items: [{ productId: '1', quantity: 0 }],
     };
 
     const result = await useCase.execute(input)();
@@ -214,12 +285,21 @@ describe('CreateTransactionUseCase', () => {
   });
 
   it('should fail if customerEmail is invalid', async () => {
+    const deliveryInfo = {
+      firstName: 'John',
+      lastName: 'Doe',
+      address: '123 Main St',
+      city: 'City',
+      state: 'State',
+      postalCode: '12345',
+      phone: '1234567890',
+    };
     const input = {
       customerName: 'John Doe',
       customerEmail: 'invalid-email',
       customerAddress: '123 Main St, City',
-      productId: '1',
-      quantity: 1,
+      deliveryInfo,
+      items: [{ productId: '1', quantity: 1 }],
     };
 
     const result = await useCase.execute(input)();
@@ -231,12 +311,21 @@ describe('CreateTransactionUseCase', () => {
   });
 
   it('should fail if customerAddress is too short', async () => {
+    const deliveryInfo = {
+      firstName: 'John',
+      lastName: 'Doe',
+      address: '123 Main St',
+      city: 'City',
+      state: 'State',
+      postalCode: '12345',
+      phone: '1234567890',
+    };
     const input = {
       customerName: 'John Doe',
       customerEmail: 'john@example.com',
       customerAddress: 'St',
-      productId: '1',
-      quantity: 1,
+      deliveryInfo,
+      items: [{ productId: '1', quantity: 1 }],
     };
 
     const result = await useCase.execute(input)();
