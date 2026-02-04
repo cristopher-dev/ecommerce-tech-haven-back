@@ -16,8 +16,8 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
-      tech-haven_network:
-        ipv4_address: 172.21.0.10
+      nginx_network:
+        ipv4_address: 172.22.0.11
     restart: unless-stopped
     healthcheck:
       test:
@@ -43,8 +43,8 @@ services:
       postgres:
         condition: service_healthy
     networks:
-      tech-haven_network:
-        ipv4_address: 172.21.0.11
+      nginx_network:
+        ipv4_address: 172.22.0.12
     restart: unless-stopped
 
   app:
@@ -79,8 +79,8 @@ services:
       postgres:
         condition: service_healthy
     networks:
-      tech-haven_network:
-        ipv4_address: 172.21.0.12
+      nginx_network:
+        ipv4_address: 172.22.0.13
     restart: unless-stopped
     healthcheck:
       test:
@@ -102,8 +102,5 @@ volumes:
     driver: local
 
 networks:
-  tech-haven_network:
-    driver: bridge
-    ipam:
-      config:
-        - subnet: 172.21.0.0/16
+  nginx_network:
+    external: true
