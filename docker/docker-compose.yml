@@ -25,26 +25,6 @@ services:
       retries: 5
       start_period: 10s
 
-  pgadmin:
-    image: dpage/pgadmin4:8.0
-    container_name: tech-haven-pgadmin
-    environment:
-      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL:-admin@tech-haven.com}
-      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD:-admin}
-      PGADMIN_CONFIG_MAX_QUERY_HIST_STORED: 100
-      PGADMIN_CONFIG_ENHANCED_COOKIE_PROTECTION: 'True'
-      PGADMIN_CONFIG_COOKIE_SAMESITE: '"Lax"'
-      PGADMIN_CONFIG_COOKIE_DEFAULT_SECURE: 'False'
-    ports:
-      - '${PGADMIN_PORT:-5050}:80'
-    depends_on:
-      postgres:
-        condition: service_healthy
-    networks:
-      docker_nginx_network:
-        ipv4_address: 172.22.0.12
-    restart: unless-stopped
-
   app:
     build:
       context: ..
