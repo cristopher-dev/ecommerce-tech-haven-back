@@ -112,4 +112,56 @@ describe('CustomerRepositoryImpl', () => {
       expect(mockCustomerEntityRepository.find).toHaveBeenCalled();
     });
   });
+
+  describe('findByEmail', () => {
+    it('should return a customer by email', async () => {
+      const entity = {
+        id: '1',
+        name: 'John Doe',
+        email: 'john@example.com',
+        address: '123 Main St',
+      };
+      mockCustomerEntityRepository.findOne.mockResolvedValue(entity);
+
+      const result = await repository.findByEmail('john@example.com');
+
+      expect(result).toBeInstanceOf(Customer);
+      expect(result!.email).toBe('john@example.com');
+      expect(mockCustomerEntityRepository.findOne).toHaveBeenCalledWith({
+        where: { email: 'john@example.com' },
+      });
+    });
+
+    it('should return null if customer not found by email', async () => {
+      mockCustomerEntityRepository.findOne.mockResolvedValue(null);
+
+      const result = await repository.findByEmail('nonexistent@example.com');
+
+      expect(result).toBeNull();
+    });
+  });
+
+  describe('save', () => {
+    it('should save a customer', async () => {
+      const customer = new Customer(
+        '1',
+        'John Doe',
+        'john@example.com',
+        '123 Main St',
+      );
+      const entity = {
+        id: '1',
+        name: 'John Doe',
+        email: 'john@example.com',
+        address: '123 Main St',
+      };
+      mockCustomerEntityRepository.save.mockResolvedValue(entity);
+
+      const result = await repository.save(customer);
+
+      expect(result).toBeInstanceOf(Customer);
+      expect(result.id).toBe('1');
+      expect(mockCustomerEntityRepository.save).toHaveBeenCalled();
+    });
+  });
 });

@@ -1,7 +1,7 @@
+import 'reflect-metadata';
 import { NestFactory } from '@nestjs/core';
 import { SwaggerModule } from '@nestjs/swagger';
 import { bootstrap } from '../src/main';
-import 'reflect-metadata';
 
 jest.mock('@nestjs/core');
 jest.mock('../src/app.module', () => ({
@@ -24,7 +24,9 @@ jest.mock('@nestjs/swagger', () => ({
   },
 }));
 
-describe('main', () => {
+jest.mock('helmet');
+
+describe('main - bootstrap', () => {
   let mockApp: any;
 
   beforeEach(() => {

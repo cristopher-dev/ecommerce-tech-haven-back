@@ -247,4 +247,54 @@ describe('TransactionRepositoryImpl', () => {
       });
     });
   });
+
+  describe('findByTransactionId', () => {
+    it('should return a transaction by transaction id', async () => {
+      const entity = {
+        id: '1',
+        customerId: 'cust-1',
+        items: [],
+        deliveryInfo: {
+          firstName: 'John',
+          lastName: 'Doe',
+          address: '123 Main St',
+          city: 'Anytown',
+          state: 'CA',
+          postalCode: '12345',
+          phone: '555-1234',
+        },
+        amount: 100,
+        baseFee: 10,
+        deliveryFee: 5,
+        subtotal: 85,
+        status: TransactionStatus.PENDING,
+        transactionId: 'TXN-20250130-0001',
+        orderId: 'ORD-20250130-0001',
+        productId: 'prod-1',
+        quantity: 1,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+      mockTransactionEntityRepository.findOne.mockResolvedValue(
+        entity as TransactionEntity,
+      );
+
+      const result = await repository.findByTransactionId('TXN-20250130-0001');
+
+      expect(result).toBeInstanceOf(Transaction);
+      expect(result!.transactionId).toBe('TXN-20250130-0001');
+      // eslint-disable-next-line @typescript-eslint/unbound-method
+      expect(mockTransactionEntityRepository.findOne).toHaveBeenCalledWith({
+        where: { transactionId: 'TXN-20250130-0001' },
+      });
+    });
+
+    it('should return null if transaction not found', async () => {
+      mockTransactionEntityRepository.findOne.mockResolvedValue(null);
+
+      const result = await repository.findByTransactionId('nonexistent');
+
+      expect(result).toBeNull();
+    });
+  });
 });

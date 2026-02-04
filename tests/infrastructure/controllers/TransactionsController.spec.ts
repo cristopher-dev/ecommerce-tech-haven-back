@@ -311,4 +311,105 @@ describe('TransactionsController', () => {
       }),
     ).rejects.toThrow(BadRequestException);
   });
+
+  it('should get transaction by id', async () => {
+    const mockCustomerRepo = {
+      findById: jest.fn().mockResolvedValue({
+        id: 'cust1',
+        name: 'John Doe',
+        email: 'john@example.com',
+      }),
+    };
+
+    const mockDeliveryRepo = {
+      findById: jest.fn().mockResolvedValue(null),
+    };
+
+    const mockGetByIdUC = {
+      execute: jest.fn().mockResolvedValue({
+        _tag: 'Right',
+        right: new Transaction(
+          '1',
+          'cust1',
+          100,
+          TransactionStatus.APPROVED,
+          [],
+          {
+            firstName: 'John',
+            lastName: 'Doe',
+            address: '123 Main',
+            city: 'NYC',
+            state: 'NY',
+            postalCode: '10001',
+            phone: '+1234567890',
+          },
+          50,
+          100,
+          50,
+          new Date(),
+          new Date(),
+          'TXN-20250130-0001',
+          'ORD-20250130-0001',
+        ),
+      }),
+    };
+
+    const module: TestingModule = await Test.createTestingModule({
+      controllers: [TransactionsController],
+      providers: [
+        { provide: CreateTransactionUseCase, useValue: { execute: jest.fn() } },
+        { provide: ProcessPaymentUseCase, useValue: { execute: jest.fn() } },
+        { provide: GetTransactionsUseCase, useValue: { execute: jest.fn() } },
+        { provide: GetTransactionByIdUseCase, useValue: mockGetByIdUC },
+        { provide: 'CustomerRepository', useValue: mockCustomerRepo },
+        { provide: 'ProductRepository', useValue: {} },
+        { provide: 'DeliveryRepository', useValue: mockDeliveryRepo },
+        { provide: 'TechHavenPaymentService', useValue: {} },
+      ],
+    }).compile();
+
+    const controllerLocal = module.get<TransactionsController>(
+      TransactionsController,
+    );
+
+    const result = await controllerLocal.getTransactionById('1');
+
+    expect(result).toBeDefined();
+    expect(result.id).toBe('1');
+  });
+
+  it('should handle get transaction by id error', async () => {
+    const mockGetByIdUC = {
+      execute: jest.fn().mockResolvedValue({
+        _tag: 'Left',
+        left: new Error('Transaction not found'),
+      }),
+    };
+
+    const mockCustomerRepo = {
+      findById: jest.fn(),
+    };
+
+    const module: TestingModule = await Test.createTestingModule({
+      controllers: [TransactionsController],
+      providers: [
+        { provide: CreateTransactionUseCase, useValue: { execute: jest.fn() } },
+        { provide: ProcessPaymentUseCase, useValue: { execute: jest.fn() } },
+        { provide: GetTransactionsUseCase, useValue: { execute: jest.fn() } },
+        { provide: GetTransactionByIdUseCase, useValue: mockGetByIdUC },
+        { provide: 'CustomerRepository', useValue: mockCustomerRepo },
+        { provide: 'ProductRepository', useValue: {} },
+        { provide: 'DeliveryRepository', useValue: {} },
+        { provide: 'TechHavenPaymentService', useValue: {} },
+      ],
+    }).compile();
+
+    const controllerLocal = module.get<TransactionsController>(
+      TransactionsController,
+    );
+
+    await expect(
+      controllerLocal.getTransactionById('invalid'),
+    ).rejects.toThrow();
+  });
 });

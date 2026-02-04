@@ -38,6 +38,11 @@ describe('InMemoryTransactionRepository', () => {
     expect(found).toEqual(created);
   });
 
+  it('should return null when transaction not found', async () => {
+    const found = await repo.findById('non-existent');
+    expect(found).toBeNull();
+  });
+
   it('should update status', async () => {
     const created = await repo.create({
       customerId: 'cust1',
@@ -73,5 +78,35 @@ describe('InMemoryTransactionRepository', () => {
 
     const all = await repo.findAll();
     expect(all).toHaveLength(2);
+  });
+
+  it('should find transaction by transaction id', async () => {
+    const created = await repo.create({
+      customerId: 'cust1',
+      productId: 'prod1',
+      amount: 100,
+      status: TransactionStatus.PENDING,
+      transactionId: 'txn-123',
+    });
+
+    const found = await repo.findByTransactionId('txn-123');
+    expect(found).toEqual(created);
+  });
+
+  it('should handle multiple status updates', async () => {
+    const created = await repo.create({
+      customerId: 'cust1',
+      productId: 'prod1',
+      amount: 100,
+      status: TransactionStatus.PENDING,
+    });
+
+    await repo.updateStatus(created.id, TransactionStatus.APPROVED);
+    let updated = await repo.findById(created.id);
+    expect(updated?.status).toBe(TransactionStatus.APPROVED);
+
+    await repo.updateStatus(created.id, TransactionStatus.DECLINED);
+    updated = await repo.findById(created.id);
+    expect(updated?.status).toBe(TransactionStatus.DECLINED);
   });
 });
