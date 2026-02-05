@@ -71,7 +71,7 @@ export async function bootstrap() {
 
   logger.log('✅ Base de datos conectada y productos sembrados');
   logger.log(`🚀 Servidor corriendo en: ${cleanUrl}`);
-  logger.log(`📚 Swagger disponible en: ${cleanUrl}/api`);
+  logger.log(`📚 Swagger disponible en: ${cleanUrl}/api/docs`);
 }
 
 if (process.env['NODE_ENV'] !== 'test' && typeof jest === 'undefined') {
