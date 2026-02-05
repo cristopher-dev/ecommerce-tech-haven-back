@@ -31,7 +31,9 @@ import { TechHavenPaymentServiceImpl } from './infrastructure/external/TechHaven
     PassportModule,
     JwtModule.register({
       secret: process.env['JWT_SECRET'] || 'tech-haven-secret-key-dev',
-      signOptions: { expiresIn: '24h' },
+      signOptions: {
+        expiresIn: process.env['JWT_EXPIRATION'] || ('24h' as any),
+      },
     }),
     HttpModule,
     DatabaseModule,

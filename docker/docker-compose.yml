@@ -2,8 +2,10 @@ name: docker
 
 services:
   postgres:
-    image: postgres:16-alpine
+    image: postgres:${POSTGRES_VERSION:-16-alpine}
     container_name: tech-haven-postgres
+    env_file:
+      - ../.env
     environment:
       POSTGRES_DB: ${DATABASE_NAME:-tech-haven_db}
       POSTGRES_USER: ${DATABASE_USER:-postgres}
@@ -32,9 +34,11 @@ services:
       args:
         NODE_ENV: ${NODE_ENV:-production}
     container_name: tech-haven-app
+    env_file:
+      - ../.env
     environment:
       NODE_ENV: ${NODE_ENV:-production}
-      DATABASE_HOST: ${DATABASE_HOST:-postgres}
+      DATABASE_HOST: postgres
       DATABASE_PORT: ${DATABASE_PORT:-5432}
       DATABASE_USER: ${DATABASE_USER:-postgres}
       DATABASE_PASSWORD: ${DATABASE_PASSWORD:-password}
@@ -50,7 +54,8 @@ services:
       TECH_HAVEN_PRIVATE_KEY: ${TECH_HAVEN_PRIVATE_KEY:-prv_stagtest_5i0ZGIGiFcDQifYsXxvsny7Y37tKqFWg}
       TECH_HAVEN_EVENTS_KEY: ${TECH_HAVEN_EVENTS_KEY:-stagtest_events_2PDUmhMywUkvb1LvxYnayFbmofT7w39N}
       TECH_HAVEN_INTEGRITY_KEY: ${TECH_HAVEN_INTEGRITY_KEY:-stagtest_integrity_nAIBuqayW70XpUqJS4qf4STYiISd89Fp}
-    command: sh -c "echo 'Waiting 1 minute for the database to start...' && sleep 60 && echo 'Starting the application...' && node dist/main.js"
+      DB_STARTUP_DELAY: ${DB_STARTUP_DELAY:-60}
+    command: sh -c "echo 'Waiting ${DB_STARTUP_DELAY} seconds for the database to start...' && sleep ${DB_STARTUP_DELAY} && echo 'Starting the application...' && node dist/main.js"
     ports:
       - '${APP_PORT:-3000}:3000'
     depends_on:

@@ -91,12 +91,14 @@ export class TechHavenPaymentServiceImpl implements TechHavenPaymentService {
   private readonly baseUrl: string;
   private merchantPublicKey: string;
   private merchantPrivateKey: string;
+  private paymentServiceType: string;
 
   constructor(private readonly httpService: HttpService) {
     // Load from environment variables
-    this.baseUrl = process.env['PAYMENT_GATEWAY_BASE_URL'] || '';
-    this.merchantPublicKey = process.env['PAYMENT_GATEWAY_PUBLIC_KEY'] || '';
-    this.merchantPrivateKey = process.env['PAYMENT_GATEWAY_PRIVATE_KEY'] || '';
+    this.baseUrl = process.env['TECH_HAVEN_SANDBOX_URL'] || '';
+    this.merchantPublicKey = process.env['TECH_HAVEN_PUBLIC_KEY'] || '';
+    this.merchantPrivateKey = process.env['TECH_HAVEN_PRIVATE_KEY'] || '';
+    this.paymentServiceType = process.env['PAYMENT_SERVICE_TYPE'] || 'mock';
   }
 
   /**
@@ -138,6 +140,12 @@ export class TechHavenPaymentServiceImpl implements TechHavenPaymentService {
     customerEmail: string,
     acceptanceTokens: AcceptanceTokens,
   ): Promise<Either<Error, TransactionStatus>> {
+    // Check if using mock service
+    if (this.paymentServiceType === 'mock') {
+      // Simulate successful payment for testing
+      return right(TransactionStatus.APPROVED);
+    }
+
     try {
       // First tokenize the card
       const cardTokenData = await this.tokenizeCard(cardData);
